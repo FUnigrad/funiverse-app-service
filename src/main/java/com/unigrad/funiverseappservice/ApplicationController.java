@@ -9,7 +9,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @RestController
-@RequestMapping("/application")
+@RequestMapping("/{tenant-id}/application")
 public class ApplicationController {
     @GetMapping
     public ResponseEntity<String> getStringHello() throws UnknownHostException {
