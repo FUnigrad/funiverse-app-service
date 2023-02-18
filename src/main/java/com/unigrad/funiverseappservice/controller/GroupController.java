@@ -7,13 +7,19 @@ import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/group")
@@ -87,5 +93,49 @@ public class GroupController {
                 .buildAndExpand(returnGroup.getId()).toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Group> getById(@PathVariable Long id) {
+
+        return groupService.get(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Group>> getAll(@RequestParam(required = false) String groupName) {
+
+        List<Group> subjects = groupName == null
+                ? groupService.getAll()
+                : groupService.getByName(groupName);
+
+        return ResponseEntity.ok(subjects);
+    }
+
+    @PutMapping
+    public ResponseEntity<Group> update(@RequestBody Group group) {
+
+        return groupService.isExist(group.getId())
+                ? ResponseEntity.ok(groupService.save(group))
+                : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Group> deactivate(@PathVariable Long id) {
+        groupService.deactivate(id);
+
+        return groupService.get(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Group> activate(@PathVariable Long id) {
+        groupService.activate(id);
+
+        return groupService.get(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

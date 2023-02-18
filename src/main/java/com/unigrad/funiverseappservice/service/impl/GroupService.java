@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.repository.IGroupRepository;
 import com.unigrad.funiverseappservice.service.IGroupService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,11 +44,13 @@ public class GroupService implements IGroupService {
     }
 
     @Override
+    @Transactional
     public void activate(Long key) {
         groupRepository.updateIsActive(key,true);
     }
 
     @Override
+    @Transactional
     public void deactivate(Long key) {
         groupRepository.updateIsActive(key,false);
     }
@@ -55,6 +58,10 @@ public class GroupService implements IGroupService {
     @Override
     public boolean isExist(Long key) {
         return groupRepository.existsById(key);
+    }
+
+    public List<Group> getByName(String name) {
+        return groupRepository.findAllByNameLike(name);
     }
 
 }
