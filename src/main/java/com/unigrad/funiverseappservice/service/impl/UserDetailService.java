@@ -24,6 +24,11 @@ public class UserDetailService implements IUserDetailService {
     }
 
     @Override
+    public List<UserDetail> getAllActive() {
+        return userDetailRepository.findAllByActiveIsTrue();
+    }
+
+    @Override
     public Optional<UserDetail> get(Long key) {
         return userDetailRepository.findById(key);
     }
@@ -35,11 +40,16 @@ public class UserDetailService implements IUserDetailService {
 
     @Override
     public void activate(Long key) {
-
+        userDetailRepository.updateIsActive(key,true);
     }
 
     @Override
     public void deactivate(Long key) {
+        userDetailRepository.updateIsActive(key,false);
+    }
 
+    @Override
+    public boolean isExist(Long key) {
+        return userDetailRepository.existsById(key);
     }
 }

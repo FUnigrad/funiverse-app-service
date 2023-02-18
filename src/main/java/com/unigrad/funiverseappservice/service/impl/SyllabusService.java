@@ -3,7 +3,6 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.repository.ISyllabusRepository;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +23,11 @@ public class SyllabusService implements ISyllabusService {
     }
 
     @Override
+    public List<Syllabus> getAllActive() {
+        return syllabusRepository.findAllByActiveIsTrue();
+    }
+
+    @Override
     public Optional<Syllabus> get(Long key) {
         return syllabusRepository.findById(key);
     }
@@ -35,11 +39,16 @@ public class SyllabusService implements ISyllabusService {
 
     @Override
     public void activate(Long key) {
-
+        syllabusRepository.updateIsActive(key,true);
     }
 
     @Override
     public void deactivate(Long key) {
+        syllabusRepository.updateIsActive(key,false);
+    }
 
+    @Override
+    public boolean isExist(Long key) {
+        return syllabusRepository.existsById(key);
     }
 }

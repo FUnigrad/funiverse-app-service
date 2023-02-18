@@ -36,6 +36,8 @@ public class Curriculum {
 
     private String description;
 
+    private boolean isActive;
+
     @ManyToOne
     @JoinColumn
     private Major major;

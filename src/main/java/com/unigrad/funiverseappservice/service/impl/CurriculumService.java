@@ -23,6 +23,11 @@ public class CurriculumService implements ICurriculumService {
     }
 
     @Override
+    public List<Curriculum> getAllActive() {
+        return curriculumRepository.findAllByActiveIsTrue();
+    }
+
+    @Override
     public Optional<Curriculum> get(Long key) {
         return curriculumRepository.findById(key);
     }
@@ -34,11 +39,16 @@ public class CurriculumService implements ICurriculumService {
 
     @Override
     public void activate(Long key) {
-
+        curriculumRepository.updateIsActive(key, true);
     }
 
     @Override
     public void deactivate(Long key) {
+        curriculumRepository.updateIsActive(key, false);
+    }
 
+    @Override
+    public boolean isExist(Long key) {
+        return curriculumRepository.existsById(key);
     }
 }

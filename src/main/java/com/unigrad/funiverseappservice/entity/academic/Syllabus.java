@@ -47,6 +47,8 @@ public class Syllabus {
 
     private byte minAvgMarkToPass;
 
+    private boolean isActive;
+
     @OneToMany(mappedBy = "syllabus")
     @JsonIgnore
     private List<Group> groups;

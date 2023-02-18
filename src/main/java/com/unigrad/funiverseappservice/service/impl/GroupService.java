@@ -24,6 +24,11 @@ public class GroupService implements IGroupService {
     }
 
     @Override
+    public List<Group> getAllActive() {
+        return groupRepository.findAllByActiveIsTrue();
+    }
+
+    @Override
     public Optional<Group> get(Long key) {
         return groupRepository.findById(key);
     }
@@ -39,12 +44,17 @@ public class GroupService implements IGroupService {
 
     @Override
     public void activate(Long key) {
-
+        groupRepository.updateIsActive(key,true);
     }
 
     @Override
     public void deactivate(Long key) {
+        groupRepository.updateIsActive(key,false);
+    }
 
+    @Override
+    public boolean isExist(Long key) {
+        return groupRepository.existsById(key);
     }
 
 }

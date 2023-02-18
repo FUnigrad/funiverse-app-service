@@ -44,6 +44,8 @@ public class Group {
 
     private LocalDateTime createdDateTime;
 
+    private boolean isActive;
+
     @ManyToOne
     @JoinColumn
     private Curriculum curriculum;
