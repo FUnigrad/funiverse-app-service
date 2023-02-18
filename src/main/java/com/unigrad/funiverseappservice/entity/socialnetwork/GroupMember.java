@@ -23,7 +23,7 @@ public class GroupMember {
     @EmbeddedId
     private GroupMemberKey groupMemberKey;
 
-    private boolean isAdmin;
+    private boolean isGroupAdmin;
 
     @ManyToOne
     @MapsId("userId")

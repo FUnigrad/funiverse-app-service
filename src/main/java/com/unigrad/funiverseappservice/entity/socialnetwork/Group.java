@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class Group {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String name;
 
@@ -38,6 +39,10 @@ public class Group {
     private Type type;
 
     private String conversationId;
+
+    private boolean isPrivate;
+
+    private LocalDateTime createdDateTime;
 
     @ManyToOne
     @JoinColumn
@@ -57,7 +62,7 @@ public class Group {
 
     public enum Type {
         CLASS,
-        SUBJECT,
+        COURSE,
         DEPARTMENT,
         NORMAL
     }
