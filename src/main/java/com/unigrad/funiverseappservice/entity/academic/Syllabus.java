@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.entity.academic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.unigrad.funiverseappservice.entity.converter.DurationConverter;
+import com.unigrad.funiverseappservice.entity.converter.SyllabusConverter;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -12,11 +12,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Duration;
 import java.util.List;
 
 @Entity
@@ -24,11 +24,14 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Syllabus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
+    private String name;
 
     @ManyToOne
     @JoinColumn
@@ -38,10 +41,12 @@ public class Syllabus {
 
     private byte noSlot;
 
-    @Convert(converter = DurationConverter.class)
-    private Duration durationPerSlot;
+    private boolean isActive;
 
-    private String preRequisite;
+    private Integer duration;
+
+    @Convert(converter = SyllabusConverter.class)
+    private List<Syllabus> preRequisite;
 
     private String description;
 
