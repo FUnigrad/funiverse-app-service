@@ -7,6 +7,8 @@ public interface IService<T, K> {
 
     List<T> getAll();
 
+    List<T> getAllActive();
+
     Optional<T> get(K key);
 
     T save(T entity);
@@ -14,4 +16,6 @@ public interface IService<T, K> {
     void activate(K key);
 
     void deactivate(K key);
+
+    boolean isExist(K key);
 }
