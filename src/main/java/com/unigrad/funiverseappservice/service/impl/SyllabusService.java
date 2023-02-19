@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.repository.ISyllabusRepository;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,13 +39,15 @@ public class SyllabusService implements ISyllabusService {
     }
 
     @Override
+    @Transactional
     public void activate(Long key) {
-        syllabusRepository.updateIsActive(key,true);
+        syllabusRepository.updateIsActive(key, true);
     }
 
     @Override
+    @Transactional
     public void deactivate(Long key) {
-        syllabusRepository.updateIsActive(key,false);
+        syllabusRepository.updateIsActive(key, false);
     }
 
     @Override
