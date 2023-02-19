@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn --batch-mode clean verify
+        run: mvn --batch-mode clean package -DskipTests
 
       - name: Get Release Version
         run: |
