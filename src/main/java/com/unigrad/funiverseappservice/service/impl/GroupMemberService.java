@@ -4,7 +4,6 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.repository.IGroupMemberRepository;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +12,11 @@ import java.util.Optional;
 @Service
 public class GroupMemberService implements IGroupMemberService {
 
-    @Autowired
-    private IGroupMemberRepository groupMemberRepository;
+    private final IGroupMemberRepository groupMemberRepository;
+
+    public GroupMemberService(IGroupMemberRepository groupMemberRepository) {
+        this.groupMemberRepository = groupMemberRepository;
+    }
 
     @Override
     public List<GroupMember> getAll() {
@@ -54,5 +56,11 @@ public class GroupMemberService implements IGroupMemberService {
     @Override
     public List<GroupMember> getAllByUserId(Long key) {
         return groupMemberRepository.findAllByGroupMemberKey_UserId(key);
+    }
+
+    @Transactional
+    @Override
+    public void deleteByGroupMemberKey(GroupMember.GroupMemberKey key) {
+        groupMemberRepository.deleteGroupMemberByGroupMemberKey(key);
     }
 }

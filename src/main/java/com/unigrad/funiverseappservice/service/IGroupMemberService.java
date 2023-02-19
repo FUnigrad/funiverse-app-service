@@ -7,4 +7,6 @@ import java.util.List;
 public interface IGroupMemberService extends IService<GroupMember, GroupMember.GroupMemberKey> {
 
     List<GroupMember> getAllByUserId(Long key);
+
+    void deleteByGroupMemberKey(GroupMember.GroupMemberKey key);
 }
