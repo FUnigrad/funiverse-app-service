@@ -5,7 +5,7 @@ on:
   #     - devops
   pull_request:
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     # if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'master'
     steps:
