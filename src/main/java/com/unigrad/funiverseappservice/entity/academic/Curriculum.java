@@ -26,7 +26,7 @@ public class Curriculum {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String name;
 
@@ -35,6 +35,8 @@ public class Curriculum {
     private String schoolYear;
 
     private String description;
+
+    private boolean isActive;
 
     @ManyToOne
     @JoinColumn

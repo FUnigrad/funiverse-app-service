@@ -23,7 +23,7 @@ public class GroupMember {
     @EmbeddedId
     private GroupMemberKey groupMemberKey;
 
-    private boolean isAdmin;
+    private boolean isGroupAdmin;
 
     @ManyToOne
     @MapsId("userId")
@@ -41,8 +41,8 @@ public class GroupMember {
     @AllArgsConstructor
     public static class GroupMemberKey implements Serializable {
 
-        private long userId;
+        private Long userId;
 
-        private long groupId;
+        private Long groupId;
     }
 }

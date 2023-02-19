@@ -3,6 +3,8 @@ package com.unigrad.funiverseappservice.entity.socialnetwork;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,12 +27,13 @@ public class UserDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String name;
 
     private String code;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     private String schoolYear;
