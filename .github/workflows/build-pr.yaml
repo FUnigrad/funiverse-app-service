@@ -1,8 +1,5 @@
 name: Dockerize Application
 on:
-  # push:
-  #   branches:
-  #     - devops
   pull_request:
 jobs:
   build:
@@ -34,9 +31,7 @@ jobs:
         if: success()
         with:
           severity: info
-          details: |
-            Build Succeeded!
-            Push to hub with following tag: ${{vars.APP_SERVICE_REPO}}:v${{github.run_id}} and ${{vars.APP_SERVICE_REPO}}:latest
+          details: Build Succeeded!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Build Failed
         uses: rjstone/discord-webhook-notify@v1
