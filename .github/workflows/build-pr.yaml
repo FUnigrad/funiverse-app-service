@@ -1,9 +1,9 @@
-name: Build and test on Pull request
+name: CI
 
 on: pull_request
 
 jobs:
-  build-and-test:
+  test-pullrequest:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
