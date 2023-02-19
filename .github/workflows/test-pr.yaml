@@ -1,8 +1,9 @@
 name: Dockerize Application
 on:
+  push:
+    branches:
+      - devops
   pull_request:
-    branches-ignore:
-      - dev
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
