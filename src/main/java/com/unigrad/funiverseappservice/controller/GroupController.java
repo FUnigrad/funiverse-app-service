@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping("group")
 public class GroupController {
 
     private final IGroupService groupService;
@@ -45,43 +45,35 @@ public class GroupController {
 
         Group.Type newGroupType= newGroup.getType();
 
-        if(newGroup.getName() == null || newGroup.getName().isEmpty()){
-            throw new MissingRequiredPropertyException();
-        }
+
 
         switch (newGroupType){
 
             case CLASS ->{
-
-                if (curriculumService.get(newGroup.getCurriculum().getId()).isEmpty())
+                if(newGroup.getName() == null || newGroup.getName().isEmpty()){
+                    throw new MissingRequiredPropertyException();
+                }
+                if (newGroup.getCurriculum() == null){
                     throw new MissingRequiredPropertyException("Curriculum");
-
-                Group returnGroup = groupService.save(newGroup);
-
-                URI location = ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(returnGroup.getId()).toUri();
-
-                return ResponseEntity.created(location).build();
+                }
             }
 
             case COURSE -> {
 
-                if (curriculumService.get(newGroup.getCurriculum().getId()).isEmpty()){
-                    throw new MissingRequiredPropertyException("Curriculum");
-                }
-                if (userDetailService.get(newGroup.getTeacher().getId()).isEmpty()){
+                if (newGroup.getTeacher() == null){
                     throw new MissingRequiredPropertyException("Teacher");
                 }
-                if (syllabusService.get(newGroup.getSyllabus().getId()).isEmpty()){
+                if (newGroup.getSyllabus() == null){
                     throw new MissingRequiredPropertyException("Syllabus");
                 }
 
-                newGroup.setName("COURSE "+newGroup.getName());
+                newGroup.setName("COURSE ");
             }
 
             case DEPARTMENT, NORMAL -> {
+                if(newGroup.getName() == null || newGroup.getName().isEmpty()){
+                    throw new MissingRequiredPropertyException();
+                }
             }
         }
 

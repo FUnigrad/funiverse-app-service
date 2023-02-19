@@ -6,8 +6,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface IGroupRepository extends IBaseRepository<Group,Long> {
+public interface IGroupRepository extends IBaseRepository<Group, Long> {
 
-    @Query(value = "SELECT g FROM Group g WHERE g.name like %:name% ",nativeQuery = true)
+    @Query(value = "SELECT g FROM Group g WHERE g.name like %:name% ", nativeQuery = true)
     List<Group> findAllByNameLike(@Param("name") String name);
 }

@@ -15,7 +15,7 @@ public class TokenControllerAdvice {
 
     @ExceptionHandler(value = MissingRequiredPropertyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleTokenRefreshException(MissingRequiredPropertyException ex, WebRequest request) {
+    public ErrorMessage handleMissingRequiredPropertyException(MissingRequiredPropertyException ex, WebRequest request) {
         return new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 new Date(),

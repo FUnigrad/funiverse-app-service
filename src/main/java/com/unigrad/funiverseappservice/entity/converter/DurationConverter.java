@@ -11,7 +11,7 @@ public  class DurationConverter implements AttributeConverter<Duration, Long> {
     @Override
     public Long convertToDatabaseColumn(Duration attribute) {
         if (attribute == null){
-            return 0l;
+            return null;
         }
         return attribute.toMinutes();
     }

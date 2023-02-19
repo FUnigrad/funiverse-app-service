@@ -40,12 +40,12 @@ public class UserDetailService implements IUserDetailService {
 
     @Override
     public void activate(Long key) {
-        userDetailRepository.updateIsActive(key,true);
+        userDetailRepository.updateIsActive(key, true);
     }
 
     @Override
     public void deactivate(Long key) {
-        userDetailRepository.updateIsActive(key,false);
+        userDetailRepository.updateIsActive(key, false);
     }
 
     @Override
