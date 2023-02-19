@@ -1,12 +1,11 @@
 name: Dockerize Application
 on:
-  pull_request:
-    types: 
-    - closed
+  push:
+    branches:
+      - "dev"
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'dev'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,8 +25,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{vars.APP_SERVICE_REPO}}:v${{github.run_id}}
-            ${{vars.APP_SERVICE_REPO}}:latest
+            ${{vars.REPOSITORY}}:v${{github.run_id}}
+            ${{vars.REPOSITORY}}:latest
       - name: Build Success
         uses : rjstone/discord-webhook-notify@v1
         if: success()
@@ -36,8 +35,8 @@ jobs:
           details: |
             Build Succeeded!
             Push to hub with following tag: 
-              + ${{vars.APP_SERVICE_REPO}}:v${{github.run_id}} 
-              + ${{vars.APP_SERVICE_REPO}}:latest
+              + ${{vars.REPOSITORY}}:v${{github.run_id}} 
+              + ${{vars.REPOSITORY}}:latest
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Build Failed
         uses: rjstone/discord-webhook-notify@v1

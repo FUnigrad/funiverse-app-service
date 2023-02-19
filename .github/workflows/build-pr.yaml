@@ -1,10 +1,8 @@
-name: Dockerize Application
-on:
-  pull_request:
+name: Test Pull Request
+on: pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
-    # if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'master'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,15 +21,13 @@ jobs:
         with:
           context: .
           push: false
-          # tags: |
-          #   ${{vars.APP_SERVICE_REPO}}:v${{github.run_id}}
-          #   ${{vars.APP_SERVICE_REPO}}:latest
       - name: Build Success
         uses : rjstone/discord-webhook-notify@v1
         if: success()
         with:
           severity: info
-          details: Build Succeeded!
+          details: |
+            Build Succeeded!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Build Failed
         uses: rjstone/discord-webhook-notify@v1
