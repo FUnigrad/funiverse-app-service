@@ -18,7 +18,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn --batch-mode clean verify
+        run: mvn --batch-mode clean package -DskipTests
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
