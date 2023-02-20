@@ -1,8 +1,13 @@
 package com.unigrad.funiverseappservice.service.impl;
 
+import com.unigrad.funiverseappservice.dto.GroupMemberDTO;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.IGroupMemberRepository;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
+import com.unigrad.funiverseappservice.service.IGroupService;
+import com.unigrad.funiverseappservice.service.IUserDetailService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +19,14 @@ public class GroupMemberService implements IGroupMemberService {
 
     private final IGroupMemberRepository groupMemberRepository;
 
-    public GroupMemberService(IGroupMemberRepository groupMemberRepository) {
+    private final IGroupService groupService;
+
+    private final IUserDetailService userDetailService;
+
+    public GroupMemberService(IGroupMemberRepository groupMemberRepository, IGroupService groupService, IUserDetailService userDetailService) {
         this.groupMemberRepository = groupMemberRepository;
+        this.groupService = groupService;
+        this.userDetailService = userDetailService;
     }
 
     @Override
@@ -62,5 +73,21 @@ public class GroupMemberService implements IGroupMemberService {
     @Override
     public void deleteByGroupMemberKey(GroupMember.GroupMemberKey key) {
         groupMemberRepository.deleteGroupMemberByGroupMemberKey(key);
+    }
+
+    @Override
+    public GroupMember addMemberToGroup(GroupMemberDTO groupMemberDTO) {
+
+        Optional<Group> group = groupService.get(groupMemberDTO.getGroupId());
+        Optional<UserDetail> userDetail = userDetailService.get(groupMemberDTO.getUserId());
+
+        GroupMember groupMember = new GroupMember(new GroupMember.GroupMemberKey(groupMemberDTO.getUserId(), groupMemberDTO.getGroupId())
+                , groupMemberDTO.isGroupAdmin()
+                , userDetail.get()
+                , group.get()
+        );
+
+        groupMemberRepository.save(groupMember);
+        return groupMember;
     }
 }

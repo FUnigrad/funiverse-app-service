@@ -1,14 +1,12 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.dto.GroupMemberDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
-import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IGroupService;
-import com.unigrad.funiverseappservice.service.ISyllabusService;
-import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,25 +38,25 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<Group> createGroup(@RequestBody Group newGroup) {
 
-        Group.Type newGroupType= newGroup.getType();
+        Group.Type newGroupType = newGroup.getType();
 
-        switch (newGroupType){
+        switch (newGroupType) {
 
-            case CLASS ->{
-                if(newGroup.getName() == null || newGroup.getName().isEmpty()){
-                    throw new MissingRequiredPropertyException();
+            case CLASS -> {
+                if (StringUtils.isBlank(newGroup.getName())) {
+                    throw new MissingRequiredPropertyException("Name");
                 }
-                if (newGroup.getCurriculum() == null){
+                if (newGroup.getCurriculum() == null) {
                     throw new MissingRequiredPropertyException("Curriculum");
                 }
             }
 
             case COURSE -> {
 
-                if (newGroup.getTeacher() == null){
+                if (newGroup.getTeacher() == null) {
                     throw new MissingRequiredPropertyException("Teacher");
                 }
-                if (newGroup.getSyllabus() == null){
+                if (newGroup.getSyllabus() == null) {
                     throw new MissingRequiredPropertyException("Syllabus");
                 }
 
@@ -66,8 +64,8 @@ public class GroupController {
             }
 
             case DEPARTMENT, NORMAL -> {
-                if(newGroup.getName() == null || newGroup.getName().isEmpty()){
-                    throw new MissingRequiredPropertyException();
+                if (StringUtils.isBlank(newGroup.getName())) {
+                    throw new MissingRequiredPropertyException("Name");
                 }
             }
         }
@@ -109,26 +107,23 @@ public class GroupController {
     }
 
     @PostMapping("/add-member")
-    public ResponseEntity<Void> addNewMemberToGroup(@RequestBody GroupMember groupMember) {
+    public ResponseEntity<Void> addNewMemberToGroup(@RequestBody GroupMemberDTO groupMemberDTO) {
 
-        GroupMember newGroupMember = groupMemberService.save(groupMember);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(newGroupMember.getGroupMemberKey()).toUri();
+        groupMemberService.addMemberToGroup(groupMemberDTO);
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.ok().build();
     }
+
     @DeleteMapping("/{gid}/user/{uid}")
     public ResponseEntity<Void> removeGroupUser(@PathVariable Long gid, @PathVariable Long uid) {
 
-        GroupMember.GroupMemberKey key = new GroupMember.GroupMemberKey(uid,gid);
+        GroupMember.GroupMemberKey key = new GroupMember.GroupMemberKey(uid, gid);
 
         if (groupMemberService.isExist(key)) {
             groupMemberService.deleteByGroupMemberKey(key);
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
