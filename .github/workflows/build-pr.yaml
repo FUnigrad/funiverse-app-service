@@ -45,7 +45,7 @@ jobs:
         if: success()
         with:
           files: |
-            **/target/surefire-reports/**
+            **/target/surefire-reports/*.xml
 
       - name: Build Success
         uses : rjstone/discord-webhook-notify@v1
