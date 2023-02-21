@@ -40,13 +40,12 @@ jobs:
           tags: |
             ${{env.IMAGE_NAME}}:FUN-192
       # end test of FUN-192
-      # - name: Publish Test Results
-      #   uses: EnricoMi/publish-unit-test-result-action@v2
-      #   if: success()
-      #   with:
-      #     files: |
-      #       test-results/**/*.xml
-      #       test-results/**/*.trx
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: success()
+        with:
+          files: |
+            **/target/surefire-reports/**
 
       - name: Build Success
         uses : rjstone/discord-webhook-notify@v1
