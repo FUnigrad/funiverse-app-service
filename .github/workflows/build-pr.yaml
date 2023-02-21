@@ -1,7 +1,8 @@
 name: Build and test on Pull request
 
 on: pull_request
-
+env:
+  IMAGE_NAME: ${{vars.APP_SERVICE_REPO}}
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -37,7 +38,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{env.IMAGE_NAME}}:test
+            ${{env.IMAGE_NAME}}:FUN-192
       # end test of FUN-192
       # - name: Publish Test Results
       #   uses: EnricoMi/publish-unit-test-result-action@v2
