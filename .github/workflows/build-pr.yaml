@@ -69,7 +69,7 @@ jobs:
   #     version: ${{env.VERSION}}
   update-config:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    # needs: build-and-test
     steps:
       - name: Checkout Infra Config Repo
         uses: actions/checkout@v3
