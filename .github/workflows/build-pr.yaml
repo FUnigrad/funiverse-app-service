@@ -75,7 +75,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: FUnigrad/funiverse-infra-config
-          branch: dev
+          token: ${{secrets.PUSH_GITHUB_TOKEN}}
+          ref: dev
       # - name: Get Version
       #   run: echo "VERSION=${{needs.build-and-test.outputs.version}}" >> $GITHUB_ENV
       - name: Update Manifest
@@ -89,12 +90,9 @@ jobs:
       #     github_token: ${{secrets.PUSH_GITHUB_TOKEN}}
       #     branch: dev
       #     message: Update to ${{env.IMAGE_NAME}}:${{env.VERSION}} by CI pipeline
-      # - name: Commit and push
-      #   run: |
-      #     git config --global user.name 'nqbao11'
-      #     git config --global user.email 'nqbao11.01@gmail.com'
-      #     git commit -am "Update to ${{env.IMAGE_NAME}}:${{env.VERSION}} by CI pipeline"
-      #     git push
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Update to ${{env.IMAGE_NAME}}:${{env.VERSION}} by CI pipeline
+      - name: Commit and push
+        run: |
+          git config --global user.name 'nqbao11'
+          git config --global user.email 'nqbao11.01@gmail.com'
+          git commit -am "Update to ${{env.IMAGE_NAME}}:${{env.VERSION}} by CI pipeline"
+          git push
