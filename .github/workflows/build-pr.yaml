@@ -37,7 +37,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{env.IMAGE_NAME}}:FUN-192
+            ${{env.IMAGE_NAME}}:test
       # end test of FUN-192
       # - name: Publish Test Results
       #   uses: EnricoMi/publish-unit-test-result-action@v2
