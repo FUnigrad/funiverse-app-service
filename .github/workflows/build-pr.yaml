@@ -19,14 +19,33 @@ jobs:
 
       - name: Build with Maven
         run: mvn --batch-mode clean package -DskipTests
+      
+      # Test for FUN-192
+      - name: Get Release Version
+        run: |
+          echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: success()
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          files: |
-            test-results/**/*.xml
-            test-results/**/*.trx
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_PASSWORD}}
+    
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{env.IMAGE_NAME}}:FUN-192
+      # end test of FUN-192
+      # - name: Publish Test Results
+      #   uses: EnricoMi/publish-unit-test-result-action@v2
+      #   if: success()
+      #   with:
+      #     files: |
+      #       test-results/**/*.xml
+      #       test-results/**/*.trx
 
       - name: Build Success
         uses : rjstone/discord-webhook-notify@v1
