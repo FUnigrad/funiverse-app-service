@@ -80,11 +80,10 @@ jobs:
       - name: Update Manifest
         run: |
           cd config/4-backend
-          sed -i "s/${{env.IMAGE_NAME}}.*/${{env.IMAGE_NAME}}:${{env.VERSION}}/g' 5-app-service-deployment.yaml
+          sed -i "s/${{env.IMAGE_NAME}}.*/${{env.IMAGE_NAME}}:${{env.VERSION}}/g" 5-app-service-deployment.yaml
       - name: Commit and Push
         uses: actions-js/push@master
         with:
           github_token: ${{secrets.PUSH_GITHUB_TOKEN}}
           branch: dev
           message: Update to ${{env.IMAGE_NAME}}:${{env.VERSION}} by CI pipeline
-          
