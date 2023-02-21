@@ -19,7 +19,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn --batch-mode clean package -DskipTests
+        run: mvn --batch-mode clean package
       
       # Test for FUN-192
       - name: Get Release Version
