@@ -47,7 +47,7 @@ jobs:
         if: success()
         with:
           files: |
-            **/target/surefire-reports/**
+            **/target/surefire-reports/**.xml
 
       - name: Build Success
         uses : rjstone/discord-webhook-notify@v1
@@ -74,6 +74,4 @@ jobs:
         with:
           repository: FUnigrad/funiverse-infra-config
       - name: test
-        run: |
-          ls
-          echo ${{env.VERSION}}
+        run: echo "${{env.VERSION}}"
