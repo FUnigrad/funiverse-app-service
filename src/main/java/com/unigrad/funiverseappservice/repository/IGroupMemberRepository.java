@@ -10,4 +10,6 @@ import java.util.List;
 public interface IGroupMemberRepository extends JpaRepository<GroupMember, GroupMember.GroupMemberKey> {
 
     List<GroupMember> findAllByGroupMemberKey_UserId(Long key);
+
+    void deleteGroupMemberByGroupMemberKey(GroupMember.GroupMemberKey key);
 }

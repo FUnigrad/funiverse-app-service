@@ -11,10 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class UserDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull
     private String name;
 
     private String code;
@@ -38,8 +41,10 @@ public class UserDetail {
 
     private String schoolYear;
 
+    @Email
     private String personalMail;
 
+    @Email
     private String eduMail;
 
     private String avatar;
