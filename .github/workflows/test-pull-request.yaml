@@ -34,7 +34,7 @@ jobs:
         with:
           severity: info
           details: |
-            - **Commit** : https://github.com/${{ github.repository }}/commit/${{  github.event.pull_request.head.sha }}
+            - **Commit** : https://github.com/${{ github.repository }}/ commit/${{  github.event.pull_request.head.sha }}
             Build Succeeded!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       
