@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.unigrad</groupId>
     <artifactId>funiverse-app-service</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <name>funiverse-app-service</name>
     <description>funiverse-app-service</description>
     <properties>
