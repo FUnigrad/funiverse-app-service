@@ -55,7 +55,7 @@ jobs:
         with:
           severity: info
           details: |
-            - **Commit** : https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+            - **Commit** : https://github.com/${{ github.repository }}/commit/${{  github.event.pull_request.head.sha }}
             Build Succeeded!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       
@@ -65,7 +65,7 @@ jobs:
         with:
           severity: error
           details: |
-            - **Commit** : https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+            - **Commit** : https://github.com/${{ github.repository }}/commit/${{  github.event.pull_request.head.sha }}
             Build Failed!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
     outputs:
@@ -90,5 +90,5 @@ jobs:
         run: |
           git config --global user.name 'nqbao11'
           git config --global user.email 'nqbao11.01@gmail.com'
-          git commit -am "Update to ${{env.IMAGE_NAME}}:${{env.VERSION}} by [commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+          git commit -am "Deploy ${{env.IMAGE_NAME}}:${{env.VERSION}} by https://github.com/${{ github.repository }}/commit/${{  github.event.pull_request.head.sha }}"
           git push
