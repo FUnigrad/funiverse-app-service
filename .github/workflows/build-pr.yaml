@@ -86,10 +86,9 @@ jobs:
         run: |
           cd config/4-backend
           sed -i "s+${{env.IMAGE_NAME}}.*+${{env.IMAGE_NAME}}@${{env.VERSION}}+g" 5-app-service-deployment.yaml
-          cat 5-app-service-deployment.yaml | grep ${{env.IMAGE_NAME}}
-      # - name: Commit and push
-      #   run: |
-      #     git config --global user.name 'nqbao11'
-      #     git config --global user.email 'nqbao11.01@gmail.com'
-      #     git commit -am "Deploy ${{env.IMAGE_NAME}}:${{env.VERSION}} by https://github.com/${{ github.repository }}/commit/${{  github.event.pull_request.head.sha }}"
-      #     git push
+      - name: Commit and push
+        run: |
+          git config --global user.name 'nqbao11'
+          git config --global user.email 'nqbao11.01@gmail.com'
+          git commit -am "deployed latest ${{env.IMAGE_NAME}} by https://github.com/${{github.repository}}/commit/${{github.event.pull_request.head.sha}}"
+          git push
