@@ -3,7 +3,7 @@ package com.unigrad.funiverseappservice.service;
 import java.util.List;
 import java.util.Optional;
 
-public interface IService<T, K> {
+public interface IBaseService<T, K> {
 
     List<T> getAll();
 

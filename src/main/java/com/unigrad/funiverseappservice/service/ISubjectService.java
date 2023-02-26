@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public interface ISubjectService extends IService<Subject, Long> {
+public interface ISubjectService extends IBaseService<Subject, Long> {
 
     List<Subject> getByCode(String code);
 }

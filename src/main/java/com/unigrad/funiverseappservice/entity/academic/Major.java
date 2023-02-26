@@ -29,5 +29,7 @@ public class Major {
     @JsonIgnore
     List<Curriculum> curriculums;
 
-
+    @OneToMany(mappedBy = "major")
+    @JsonIgnore
+    List<Specialization> specializations;
 }
