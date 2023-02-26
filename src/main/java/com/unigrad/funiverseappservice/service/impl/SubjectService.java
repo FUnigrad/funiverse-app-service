@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.academic.Subject;
 import com.unigrad.funiverseappservice.repository.ISubjectRepository;
 import com.unigrad.funiverseappservice.service.ISubjectService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +58,10 @@ public class SubjectService implements ISubjectService{
     @Override
     public boolean isExist(Long key) {
         return subjectRepository.existsById(key);
+    }
+
+    @Override
+    public List<Subject> search(EntitySpecification<Subject> specification) {
+        return subjectRepository.findAll(specification);
     }
 }

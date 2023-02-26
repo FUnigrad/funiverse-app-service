@@ -23,8 +23,13 @@ public class Major {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String code;
+
     private String name;
+
+    private boolean isActive = true;
+
     @OneToMany(mappedBy = "major")
     @JsonIgnore
     List<Curriculum> curriculums;

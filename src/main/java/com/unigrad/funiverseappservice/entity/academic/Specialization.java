@@ -44,6 +44,8 @@ public class Specialization {
     @JoinColumn
     private Major major;
 
+    private boolean isActive = true;
+
     @OneToMany(mappedBy = "specialization")
     @JsonIgnore
     private List<Curriculum> curricula;
