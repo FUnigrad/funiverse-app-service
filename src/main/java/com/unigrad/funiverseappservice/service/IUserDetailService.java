@@ -4,5 +4,5 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface IUserDetailService extends IService<UserDetail, Long> {
+public interface IUserDetailService extends IBaseService<UserDetail, Long> {
 }
