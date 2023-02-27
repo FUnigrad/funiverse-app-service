@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,9 +21,8 @@ import java.time.LocalDate;
 public class Comment {
 
     @Id
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn
@@ -35,6 +34,6 @@ public class Comment {
 
     private String content;
 
-    private LocalDate createdTime;
+    private LocalDateTime createdDateTime;
 
 }
