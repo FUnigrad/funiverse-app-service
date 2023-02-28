@@ -89,11 +89,9 @@ public class GroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Group>> getAll(@RequestParam(required = false) String groupName) {
+    public ResponseEntity<List<Group>> getAll() {
 
-        List<Group> subjects = groupName == null
-                ? groupService.getAll()
-                : groupService.getByName(groupName);
+        List<Group> subjects = groupService.getAll();
 
         return ResponseEntity.ok(subjects);
     }

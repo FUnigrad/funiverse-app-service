@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ErrorMessage {
     private int statusCode;
-    private Date timestamp;
+    private LocalDateTime timestamp;
     private String message;
     private String description;
 }

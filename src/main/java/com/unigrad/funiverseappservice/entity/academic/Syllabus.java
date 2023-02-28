@@ -37,6 +37,8 @@ public class Syllabus {
     @JoinColumn
     private Subject subject;
 
+    private String code;
+
     private byte noCredit;
 
     private byte noSlot;
