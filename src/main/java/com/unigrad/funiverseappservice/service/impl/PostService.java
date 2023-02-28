@@ -8,6 +8,7 @@ import com.unigrad.funiverseappservice.repository.IPostRepository;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,7 +29,6 @@ public class PostService implements IPostService {
         this.userDetailService = userDetailService;
         this.groupService = groupService;
     }
-
 
     @Override
     public List<Post> getAll() {
@@ -56,7 +56,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
 
     }
 
@@ -66,12 +66,17 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public void deletePostById(Long id) {
+    public List<Post> search(EntitySpecification<Post> specification) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(Long id) {
         postRepository.deleteById(id);
     }
 
     @Override
-    public Post addNewPost(PostDTO postDTO) {
+    public Post addNewFromDTO(PostDTO postDTO) {
 
         Optional<UserDetail> userDetail = userDetailService.get(postDTO.getOwnerId());
         Optional<Group> group = groupService.get(postDTO.getGroupId());

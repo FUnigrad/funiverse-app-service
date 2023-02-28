@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface IPostService extends IBaseService<Post, Long> {
 
-    void deletePostById(Long id);
+    void deleteById(Long id);
 
-    Post addNewPost(PostDTO postDTO);
+    Post addNewFromDTO(PostDTO postDTO);
 
     List<Post> getAllPostInGroup(Long groupId);
 }

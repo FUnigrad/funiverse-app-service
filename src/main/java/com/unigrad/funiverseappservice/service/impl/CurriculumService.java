@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.repository.ICurriculumRepository;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,12 +44,17 @@ public class CurriculumService implements ICurriculumService {
     }
 
     @Override
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         curriculumRepository.updateIsActive(key, false);
     }
 
     @Override
     public boolean isExist(Long key) {
         return curriculumRepository.existsById(key);
+    }
+
+    @Override
+    public List<Curriculum> search(EntitySpecification<Curriculum> specification) {
+        return curriculumRepository.findAll(specification);
     }
 }

@@ -8,6 +8,7 @@ import com.unigrad.funiverseappservice.repository.ICommentRepository;
 import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,12 +32,12 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public void deleteComment(Long id) {
+    public void deleteById(Long id) {
         commentRepository.deleteById(id);
     }
 
     @Override
-    public Comment addNewComment(CommentDTO commentDTO) {
+    public Comment addFromDTO(CommentDTO commentDTO) {
 
         Optional<UserDetail> userDetail = userDetailService.get(commentDTO.getOwnerId());
         Optional<Post> post = postService.get(commentDTO.getPostId());
@@ -53,7 +54,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<Comment> getAllCommentInPost(Long pid) {
+    public List<Comment> getAllCommentsInPost(Long pid) {
         return commentRepository.getAllByPost_Id(pid);
     }
 
@@ -87,13 +88,18 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
 
     }
 
     @Override
     public boolean isExist(Long key) {
         return commentRepository.existsById(key);
+    }
+
+    @Override
+    public List<Comment> search(EntitySpecification<Comment> specification) {
+        return null;
     }
 
 

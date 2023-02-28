@@ -1,5 +1,7 @@
 package com.unigrad.funiverseappservice.service;
 
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +17,9 @@ public interface IBaseService<T, K> {
 
     void activate(K key);
 
-    void deactivate(K key);
+    void inactivate(K key);
 
     boolean isExist(K key);
+
+    List<T> search(EntitySpecification<T> specification);
 }

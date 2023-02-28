@@ -52,7 +52,7 @@ jobs:
         uses : rjstone/discord-webhook-notify@v1
         if: failure()
         with:
-          severity: info
+          severity: error
           details: |
             Build Failed!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
@@ -70,7 +70,7 @@ jobs:
           token: ${{secrets.PUSH_GITHUB_TOKEN}}
           ref: dev
       - name: Get Version
-        run: echo "VERSION=${{needs.build-and-test.outputs.version}}" >> $GITHUB_ENV
+        run: echo "VERSION=${{needs.build-and-push.outputs.version}}" >> $GITHUB_ENV
       - name: Update Manifest
         run: |
           cd config/4-backend
@@ -89,13 +89,14 @@ jobs:
           severity: error
           details: |
             Deploy Failed!
+            Check log in github action
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
-      - name: Deploy Failed
+      - name: Deploy Success
         uses: rjstone/discord-webhook-notify@v1
         if: success()
         with:
-          severity: error
+          severity: info
           details: |
             Deploy Success!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

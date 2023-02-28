@@ -8,6 +8,7 @@ import com.unigrad.funiverseappservice.repository.IGroupMemberRepository;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
-    public void deactivate(GroupMember.GroupMemberKey key) {
+    public void inactivate(GroupMember.GroupMemberKey key) {
 
     }
 
@@ -89,5 +90,10 @@ public class GroupMemberService implements IGroupMemberService {
 
         groupMemberRepository.save(groupMember);
         return groupMember;
+    }
+
+    @Override
+    public List<GroupMember> search(EntitySpecification<GroupMember> specification) {
+        return null;
     }
 }

@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.repository.IGroupRepository;
 import com.unigrad.funiverseappservice.service.IGroupService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class GroupService implements IGroupService {
 
     @Override
     @Transactional
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         groupRepository.updateIsActive(key,false);
     }
 
@@ -60,8 +61,8 @@ public class GroupService implements IGroupService {
         return groupRepository.existsById(key);
     }
 
-    public List<Group> getByName(String name) {
-        return groupRepository.findAllByNameLike(name);
+    @Override
+    public List<Group> search(EntitySpecification<Group> specification) {
+        return groupRepository.findAll(specification);
     }
-
 }

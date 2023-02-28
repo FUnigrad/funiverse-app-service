@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ICommentService extends IBaseService<Comment, Long> {
 
-    void deleteComment(Long id);
+    void deleteById(Long id);
 
-    Comment addNewComment(CommentDTO newComment);
+    Comment addFromDTO(CommentDTO newComment);
 
-    List<Comment> getAllCommentInPost(Long pid);
+    List<Comment> getAllCommentsInPost(Long pid);
 }

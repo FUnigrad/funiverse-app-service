@@ -4,6 +4,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.IUserDetailRepository;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -47,12 +48,17 @@ public class UserDetailService implements IUserDetailService {
 
     @Override
     @Transactional
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         userDetailRepository.updateIsActive(key, false);
     }
 
     @Override
     public boolean isExist(Long key) {
         return userDetailRepository.existsById(key);
+    }
+
+    @Override
+    public List<UserDetail> search(EntitySpecification<UserDetail> specification) {
+        return userDetailRepository.findAll(specification);
     }
 }
