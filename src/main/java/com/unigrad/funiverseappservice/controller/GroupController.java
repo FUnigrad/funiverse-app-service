@@ -1,12 +1,15 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.dto.GroupMemberDTO;
+import com.unigrad.funiverseappservice.dto.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
+import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
-import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
+import com.unigrad.funiverseappservice.service.IPostService;
 import io.micrometer.common.util.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -28,15 +31,21 @@ public class GroupController {
 
     private final IGroupService groupService;
 
-    private final GroupMemberService groupMemberService;
+    private final IGroupMemberService groupMemberService;
 
-    public GroupController(IGroupService groupService, GroupMemberService groupMemberService) {
+    private final IPostService postService;
+
+    private final ModelMapper modelMapper;
+
+    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IPostService postService, ModelMapper modelMapper) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
+        this.postService = postService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping
-    public ResponseEntity<Group> createGroup(@RequestBody Group newGroup) {
+    public ResponseEntity<Group> create(@RequestBody Group newGroup) {
 
         Group.Type newGroupType = newGroup.getType();
 
@@ -113,7 +122,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{gid}/user/{uid}")
-    public ResponseEntity<Void> removeGroupUser(@PathVariable Long gid, @PathVariable Long uid) {
+    public ResponseEntity<Void> removeMemberFromGroup(@PathVariable Long gid, @PathVariable Long uid) {
 
         GroupMember.GroupMemberKey key = new GroupMember.GroupMemberKey(uid, gid);
 
@@ -121,12 +130,14 @@ public class GroupController {
             groupMemberService.deleteByGroupMemberKey(key);
             return ResponseEntity.ok().build();
         }
+
         return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Group> deactivate(@PathVariable Long id) {
-        groupService.deactivate(id);
+
+        groupService.inactivate(id);
 
         return groupService.get(id)
                 .map(ResponseEntity::ok)
@@ -135,10 +146,22 @@ public class GroupController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Group> activate(@PathVariable Long id) {
+
         groupService.activate(id);
 
         return groupService.get(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("{gid}/posts")
+    public ResponseEntity<List<PostDTO>> getAllPostsInGroup(@PathVariable Long gid) {
+
+        List<PostDTO> postDtoList = Arrays.asList(modelMapper.map(postService.getAllPostInGroup(gid), PostDTO[].class));
+
+        return ResponseEntity.ok(postDtoList);
+    }
+
+
+
 }

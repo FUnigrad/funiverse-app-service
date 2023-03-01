@@ -44,7 +44,7 @@ public class CurriculumService implements ICurriculumService {
     }
 
     @Override
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         curriculumRepository.updateIsActive(key, false);
     }
 

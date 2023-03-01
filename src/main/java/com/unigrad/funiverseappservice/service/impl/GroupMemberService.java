@@ -56,7 +56,7 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
-    public void deactivate(GroupMember.GroupMemberKey key) {
+    public void inactivate(GroupMember.GroupMemberKey key) {
 
     }
 

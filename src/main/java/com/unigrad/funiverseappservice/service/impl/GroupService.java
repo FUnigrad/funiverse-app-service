@@ -52,7 +52,7 @@ public class GroupService implements IGroupService {
 
     @Override
     @Transactional
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         groupRepository.updateIsActive(key,false);
     }
 

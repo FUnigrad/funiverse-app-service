@@ -47,7 +47,7 @@ public class SyllabusService implements ISyllabusService {
 
     @Override
     @Transactional
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         syllabusRepository.updateIsActive(key, false);
     }
 

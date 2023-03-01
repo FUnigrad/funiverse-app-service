@@ -48,7 +48,7 @@ public class UserDetailService implements IUserDetailService {
 
     @Override
     @Transactional
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         userDetailRepository.updateIsActive(key, false);
     }
 

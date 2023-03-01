@@ -63,7 +63,7 @@ public class MajorController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Major> deactivate(@PathVariable Long id) {
 
-        majorService.deactivate(id);
+        majorService.inactivate(id);
 
         return majorService.get(id)
                 .map(ResponseEntity::ok)

@@ -44,7 +44,7 @@ public class MajorService implements IMajorService {
     }
 
     @Override
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         majorRepository.updateIsActive(key, false);
     }
 

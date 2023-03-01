@@ -66,7 +66,7 @@ public class SyllabusController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Syllabus> deactivate(@PathVariable Long id) {
-        syllabusService.deactivate(id);
+        syllabusService.inactivate(id);
 
         return syllabusService.get(id)
                 .map(ResponseEntity::ok)

@@ -17,7 +17,7 @@ public interface IBaseService<T, K> {
 
     void activate(K key);
 
-    void deactivate(K key);
+    void inactivate(K key);
 
     boolean isExist(K key);
 

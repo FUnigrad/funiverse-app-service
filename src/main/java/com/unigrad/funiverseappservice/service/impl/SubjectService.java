@@ -51,7 +51,7 @@ public class SubjectService implements ISubjectService{
 
     @Transactional
     @Override
-    public void deactivate(Long key) {
+    public void inactivate(Long key) {
         subjectRepository.updateIsActive(key, false);
     }
 

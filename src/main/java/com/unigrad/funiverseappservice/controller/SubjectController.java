@@ -77,7 +77,7 @@ public class SubjectController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Subject> deactivate(@PathVariable Long id) {
-        subjectService.deactivate(id);
+        subjectService.inactivate(id);
 
         return subjectService.get(id)
                 .map(ResponseEntity::ok)

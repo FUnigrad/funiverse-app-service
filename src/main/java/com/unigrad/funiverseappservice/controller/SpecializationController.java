@@ -63,7 +63,7 @@ public class SpecializationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Specialization> deactivate(@PathVariable Long id) {
 
-        specializationService.deactivate(id);
+        specializationService.inactivate(id);
 
         return specializationService.get(id)
                 .map(ResponseEntity::ok)
