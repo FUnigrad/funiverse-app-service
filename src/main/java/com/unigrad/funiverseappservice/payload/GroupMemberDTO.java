@@ -1,4 +1,4 @@
-package com.unigrad.funiverseappservice.dto;
+package com.unigrad.funiverseappservice.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDTO {
-    private String content;
-    private Long ownerId;
+public class GroupMemberDTO {
+    private Long userId;
     private Long groupId;
+    private boolean isGroupAdmin;
 }

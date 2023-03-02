@@ -1,7 +1,14 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.payload.response.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.ISyllabusService;
+import com.unigrad.funiverseappservice.util.Converter;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("curriculum")
@@ -23,8 +32,17 @@ public class CurriculumController {
 
     private final ICurriculumService curriculumService;
 
-    public CurriculumController(ICurriculumService curriculumService) {
+    private final ICurriculumPlanService curriculumPlanService;
+
+    private final ISyllabusService syllabusService;
+
+    private final Converter converter;
+
+    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, Converter converter) {
         this.curriculumService = curriculumService;
+        this.curriculumPlanService = curriculumPlanService;
+        this.syllabusService = syllabusService;
+        this.converter = converter;
     }
 
     @GetMapping
@@ -80,5 +98,78 @@ public class CurriculumController {
         return curriculumService.get(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/syllabus")
+    public ResponseEntity<String> addSyllabusToCurriculum(@RequestBody CurriculumPlanDTO curriculumPlanDTO, @PathVariable Long id) {
+        Optional<Curriculum> curriculumOpt = curriculumService.get(id);
+        Optional<Syllabus> syllabusOpt = syllabusService.get(curriculumPlanDTO.getSyllabus().getId());
+
+        if (syllabusOpt.isEmpty()) {
+            throw new EntityNotFoundException("Syllabus ID %s not exist".formatted(curriculumPlanDTO.getSyllabus().getId()));
+        }
+
+        if (curriculumOpt.isPresent()) {
+
+            if (curriculumPlanService.isExist(new CurriculumPlan.CurriculumPlanKey(id, syllabusOpt.get().getId()))) {
+                return ResponseEntity.badRequest().body("Syllabus %s is already exist in Curriculum!".formatted(syllabusOpt.get().getCode()));
+            }
+
+            CurriculumPlan curriculumPlan = converter.convert(curriculumPlanDTO, CurriculumPlan.class);
+            curriculumPlan.setCurriculum(curriculumOpt.get());
+            curriculumPlan = curriculumPlanService.save(curriculumPlan);
+
+            return ResponseEntity.ok(curriculumPlan.getCurriculum().getId().toString());
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/syllabus")
+    public ResponseEntity<CurriculumPlanDTO> editSyllabusInCurriculum(@RequestBody CurriculumPlanDTO curriculumPlanDTO, @PathVariable Long id) {
+        Optional<Curriculum> curriculumOpt = curriculumService.get(id);
+        Optional<Syllabus> syllabusOpt = syllabusService.get(curriculumPlanDTO.getSyllabus().getId());
+
+        if (syllabusOpt.isEmpty()) {
+            throw new EntityNotFoundException("Syllabus ID %s not exist".formatted(curriculumPlanDTO.getSyllabus().getId()));
+        }
+
+        if (curriculumOpt.isPresent()) {
+
+            if (curriculumPlanService.isExist(new CurriculumPlan.CurriculumPlanKey(id, syllabusOpt.get().getId()))) {
+
+                CurriculumPlan curriculumPlan = converter.convert(curriculumPlanDTO, CurriculumPlan.class);
+                curriculumPlan.setCurriculum(curriculumOpt.get());
+                curriculumPlan = curriculumPlanService.save(curriculumPlan);
+
+                return ResponseEntity.ok(converter.convert(curriculumPlan, CurriculumPlanDTO.class));
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{cid}/syllabus/{sid}")
+    public ResponseEntity<Void> removeSyllabusToCurriculum(@PathVariable Long cid, @PathVariable Long sid) {
+        if (curriculumPlanService.removeSyllabusFromCurriculum(sid, cid)) {
+
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/syllabus")
+    public ResponseEntity<List<CurriculumPlanDTO>> getAllSyllabusInCurriculum(@PathVariable Long id) {
+        Optional<Curriculum> curriculum = curriculumService.get(id);
+
+        if (curriculum.isPresent()) {
+            List<CurriculumPlan> curriculumPlans = curriculumPlanService.getAllByCurriculumId(curriculum.get().getId());
+            List<CurriculumPlanDTO> curriculumPlanDTOs = Arrays.stream(converter.convert(curriculumPlans, CurriculumPlanDTO[].class)).toList();
+
+            return ResponseEntity.ok(curriculumPlanDTOs);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }

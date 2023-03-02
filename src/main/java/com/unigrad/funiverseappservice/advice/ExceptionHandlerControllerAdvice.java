@@ -2,6 +2,7 @@ package com.unigrad.funiverseappservice.advice;
 
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.exception.UnexpectedEnumValueException;
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.query.SemanticException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,6 +40,18 @@ public class ExceptionHandlerControllerAdvice {
     @ExceptionHandler(value = SemanticException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleSemanticException(SemanticException ex, WebRequest request) {
+
+        return new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+    }
+
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
 
         return new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),

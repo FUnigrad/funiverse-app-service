@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.dto.CommentDTO;
-import com.unigrad.funiverseappservice.dto.PostDTO;
+import com.unigrad.funiverseappservice.payload.CommentDTO;
+import com.unigrad.funiverseappservice.payload.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IPostService;

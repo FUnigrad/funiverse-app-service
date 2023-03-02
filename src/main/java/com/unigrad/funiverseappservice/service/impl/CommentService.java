@@ -1,6 +1,6 @@
 package com.unigrad.funiverseappservice.service.impl;
 
-import com.unigrad.funiverseappservice.dto.CommentDTO;
+import com.unigrad.funiverseappservice.payload.CommentDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Comment;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;

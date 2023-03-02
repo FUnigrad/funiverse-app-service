@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.dto.GroupMemberDTO;
-import com.unigrad.funiverseappservice.dto.PostDTO;
+import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
+import com.unigrad.funiverseappservice.payload.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
@@ -46,7 +46,7 @@ public class GroupController {
 
     @PostMapping
     public ResponseEntity<Group> create(@RequestBody Group newGroup) {
-
+        //todo: use Group DTO and check class when create course
         Group.Type newGroupType = newGroup.getType();
 
         switch (newGroupType) {
@@ -161,7 +161,4 @@ public class GroupController {
 
         return ResponseEntity.ok(postDtoList);
     }
-
-
-
 }

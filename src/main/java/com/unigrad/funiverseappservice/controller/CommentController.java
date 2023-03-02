@@ -1,6 +1,6 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.dto.CommentDTO;
+import com.unigrad.funiverseappservice.payload.CommentDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Comment;
 import com.unigrad.funiverseappservice.service.ICommentService;
 import org.modelmapper.ModelMapper;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("comment")
