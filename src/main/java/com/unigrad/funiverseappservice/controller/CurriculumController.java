@@ -1,6 +1,6 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.payload.response.CurriculumPlanDTO;
+import com.unigrad.funiverseappservice.payload.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
@@ -63,7 +63,10 @@ public class CurriculumController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody Curriculum curriculum) {
+    public ResponseEntity<String> save(@RequestBody Curriculum curriculum) {
+        curriculum.setCode(curriculumService.generateCode(curriculum));
+        curriculum.setName(curriculumService.generateName(curriculum));
+
         Curriculum newCurriculum = curriculumService.save(curriculum);
 
         URI location = ServletUriComponentsBuilder
@@ -71,7 +74,7 @@ public class CurriculumController {
                 .path("/{id}")
                 .buildAndExpand(newCurriculum.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(newCurriculum.getId().toString());
     }
 
     @PutMapping

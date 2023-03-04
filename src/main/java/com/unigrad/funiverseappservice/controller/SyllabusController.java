@@ -45,7 +45,7 @@ public class SyllabusController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody Syllabus syllabus) {
+    public ResponseEntity<String> save(@RequestBody Syllabus syllabus) {
         Syllabus newSyllabus = syllabusService.save(syllabus);
 
         URI location = ServletUriComponentsBuilder
@@ -53,7 +53,7 @@ public class SyllabusController {
                 .path("/{id}")
                 .buildAndExpand(newSyllabus.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(newSyllabus.getId().toString());
     }
 
     @PutMapping

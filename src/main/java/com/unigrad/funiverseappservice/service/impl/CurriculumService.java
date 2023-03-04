@@ -1,11 +1,18 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.Major;
+import com.unigrad.funiverseappservice.entity.academic.Specialization;
+import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.repository.ICurriculumRepository;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.IMajorService;
+import com.unigrad.funiverseappservice.service.ISpecializationService;
+import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +21,21 @@ public class CurriculumService implements ICurriculumService {
 
     private final ICurriculumRepository curriculumRepository;
 
-    public CurriculumService(ICurriculumRepository curriculumRepository) {
+    private final IMajorService majorService;
+
+    private final ISpecializationService specializationService;
+
+    private final ITermService termService;
+
+    private final String NAME_TEMPLATE = "Bachelor Program of %s, %s Major";
+
+    private final String CODE_TEMPLATE = "B%s_%s_%s";
+
+    public CurriculumService(ICurriculumRepository curriculumRepository, IMajorService majorService, ISpecializationService specializationService, ITermService termService) {
         this.curriculumRepository = curriculumRepository;
+        this.majorService = majorService;
+        this.specializationService = specializationService;
+        this.termService = termService;
     }
 
     @Override
@@ -35,6 +55,14 @@ public class CurriculumService implements ICurriculumService {
 
     @Override
     public Curriculum save(Curriculum entity) {
+        Optional<Term> term = termService.get(entity.getStartedTerm().getSeason(), entity.getStartedTerm().getYear());
+
+        if (term.isPresent()) {
+            entity.setStartedTerm(term.get());
+        } else {
+            entity.setStartedTerm(termService.save(entity.getStartedTerm()));
+        }
+
         return curriculumRepository.save(entity);
     }
 
@@ -56,5 +84,31 @@ public class CurriculumService implements ICurriculumService {
     @Override
     public List<Curriculum> search(EntitySpecification<Curriculum> specification) {
         return curriculumRepository.findAll(specification);
+    }
+
+    @Override
+    public String generateName(Curriculum curriculum) {
+        Optional<Major> majorOpt = majorService.get(curriculum.getMajor().getId());
+        Optional<Specialization> specializationOpt = specializationService.get(curriculum.getSpecialization().getId());
+
+        if (majorOpt.isPresent() && specializationOpt.isPresent()) {
+
+            return NAME_TEMPLATE.formatted(majorOpt.get().getName(), specializationOpt.get().getName());
+        }
+
+        return null;
+    }
+
+    @Override
+    public String generateCode(Curriculum curriculum) {
+        Optional<Major> majorOpt = majorService.get(curriculum.getMajor().getId());
+        Optional<Specialization> specializationOpt = specializationService.get(curriculum.getSpecialization().getId());
+
+        if (majorOpt.isPresent() && specializationOpt.isPresent()) {
+
+            return CODE_TEMPLATE.formatted(majorOpt.get().getCode(), specializationOpt.get().getCode(), curriculum.getSchoolYear());
+        }
+
+        return null;
     }
 }

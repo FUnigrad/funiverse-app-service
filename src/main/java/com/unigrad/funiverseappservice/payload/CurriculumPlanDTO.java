@@ -1,4 +1,4 @@
-package com.unigrad.funiverseappservice.payload.response;
+package com.unigrad.funiverseappservice.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
