@@ -68,4 +68,9 @@ public class TermController {
 
         return ResponseEntity.ok(converter.convert(Workspace.get().getCurrentTerm(), TermDTO.class));
     }
+    @GetMapping("next")
+    public ResponseEntity<TermDTO> startNewTerm() {
+
+        return ResponseEntity.ok(converter.convert(termService.startNewTerm(), TermDTO.class));
+    }
 }

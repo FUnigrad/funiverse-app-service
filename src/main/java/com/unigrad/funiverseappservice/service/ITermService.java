@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface ITermService extends IBaseService<Term, Long>{
 
     Optional<Term> get(Term.Season season, String year);
+
+    Term startNewTerm();
 }
