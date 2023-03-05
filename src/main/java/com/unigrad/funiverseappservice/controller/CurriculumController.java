@@ -1,12 +1,15 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.payload.StudentDTO;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
+import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.Converter;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +40,15 @@ public class CurriculumController {
 
     private final ISyllabusService syllabusService;
 
+    private final IUserDetailService userDetailService;
+
     private final Converter converter;
 
-    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, Converter converter) {
+    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, IUserDetailService userDetailService, Converter converter) {
         this.curriculumService = curriculumService;
         this.curriculumPlanService = curriculumPlanService;
         this.syllabusService = syllabusService;
+        this.userDetailService = userDetailService;
         this.converter = converter;
     }
 
@@ -174,5 +181,49 @@ public class CurriculumController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("{id}/students")
+    public ResponseEntity<List<StudentDTO>> addStudentToCurriculum(@PathVariable Long id, @RequestBody List<Long> studentIds) {
+        Optional<Curriculum> curriculum = curriculumService.get(id);
+        List<StudentDTO> studentDTOList = new ArrayList<>();
+
+        if (curriculum.isPresent()) {
+            for (Long studentId : studentIds) {
+                Optional<UserDetail> student = userDetailService.get(studentId);
+
+                if (student.isPresent()) {
+                    student.get().setCurriculum(curriculum.get());
+
+                    userDetailService.save(student.get());
+                    studentDTOList.add(converter.convert(student, StudentDTO.class));
+                }
+            }
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(studentDTOList);
+    }
+
+    @DeleteMapping("{id}/students")
+    public ResponseEntity<Void> removeStudentFromCurriculum(@PathVariable Long id, @RequestBody List<Long> studentIds) {
+        Optional<Curriculum> curriculum = curriculumService.get(id);
+
+        if (curriculum.isPresent()) {
+            for (Long studentId : studentIds) {
+                Optional<UserDetail> student = userDetailService.get(studentId);
+
+                if (student.isPresent() && student.get().getCurriculum().getId().equals(curriculum.get().getId())) {
+                    student.get().setCurriculum(null);
+
+                    userDetailService.save(student.get());
+                }
+            }
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
