@@ -5,7 +5,7 @@ import com.unigrad.funiverseappservice.payload.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
-import com.unigrad.funiverseappservice.payload.StudentDTO;
+import com.unigrad.funiverseappservice.payload.UserDTO;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
@@ -183,10 +183,16 @@ public class CurriculumController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("{id}/students")
+    public ResponseEntity<List<UserDTO>> getStudentsInCurriculum(@PathVariable Long id) {
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(curriculumService.getUsersInCurriculum(id), UserDTO[].class)).toList());
+    }
+
     @PostMapping("{id}/students")
-    public ResponseEntity<List<StudentDTO>> addStudentToCurriculum(@PathVariable Long id, @RequestBody List<Long> studentIds) {
+    public ResponseEntity<List<UserDTO>> addStudentToCurriculum(@PathVariable Long id, @RequestBody List<Long> studentIds) {
         Optional<Curriculum> curriculum = curriculumService.get(id);
-        List<StudentDTO> studentDTOList = new ArrayList<>();
+        List<UserDTO> userDTOList = new ArrayList<>();
 
         if (curriculum.isPresent()) {
             for (Long studentId : studentIds) {
@@ -196,14 +202,14 @@ public class CurriculumController {
                     student.get().setCurriculum(curriculum.get());
 
                     userDetailService.save(student.get());
-                    studentDTOList.add(dtoConverter.convert(student, StudentDTO.class));
+                    userDTOList.add(dtoConverter.convert(student, UserDTO.class));
                 }
             }
         } else {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(studentDTOList);
+        return ResponseEntity.ok(userDTOList);
     }
 
     @DeleteMapping("{id}/students")

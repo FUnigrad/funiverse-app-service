@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.service;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 
@@ -12,4 +13,6 @@ public interface IGroupMemberService extends IBaseService<GroupMember, GroupMemb
     void deleteByGroupMemberKey(GroupMember.GroupMemberKey key);
 
     GroupMember addMemberToGroup(GroupMemberDTO groupMemberDTO);
+
+    List<UserDetail> getAllUsersInGroup(Long id);
 }

@@ -1,15 +1,16 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
-import com.unigrad.funiverseappservice.payload.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
+import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
+import com.unigrad.funiverseappservice.payload.PostDTO;
+import com.unigrad.funiverseappservice.payload.UserDTO;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
+import com.unigrad.funiverseappservice.util.DTOConverter;
 import io.micrometer.common.util.StringUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,13 +36,13 @@ public class GroupController {
 
     private final IPostService postService;
 
-    private final ModelMapper modelMapper;
+    private final DTOConverter dtoConverter;
 
-    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IPostService postService, ModelMapper modelMapper) {
+    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IPostService postService, DTOConverter dtoConverter) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
         this.postService = postService;
-        this.modelMapper = modelMapper;
+        this.dtoConverter = dtoConverter;
     }
 
     @PostMapping
@@ -157,8 +158,14 @@ public class GroupController {
     @GetMapping("{gid}/posts")
     public ResponseEntity<List<PostDTO>> getAllPostsInGroup(@PathVariable Long gid) {
 
-        List<PostDTO> postDtoList = Arrays.asList(modelMapper.map(postService.getAllPostInGroup(gid), PostDTO[].class));
+        List<PostDTO> postDtoList = Arrays.asList(dtoConverter.convert(postService.getAllPostInGroup(gid), PostDTO[].class));
 
         return ResponseEntity.ok(postDtoList);
+    }
+
+    @GetMapping("{id}/users")
+    public ResponseEntity<List<UserDTO>> getUsersInGroup(@PathVariable Long id) {
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(groupMemberService.getAllUsersInGroup(id), UserDTO[].class)).toList());
     }
 }

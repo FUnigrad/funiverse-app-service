@@ -61,4 +61,9 @@ public class UserDetailService implements IUserDetailService {
     public List<UserDetail> search(EntitySpecification<UserDetail> specification) {
         return userDetailRepository.findAll(specification);
     }
+
+    @Override
+    public List<UserDetail> getAllUsersHaveNoCurriculum() {
+        return userDetailRepository.getAllUsersHaveNoCurriculum();
+    }
 }

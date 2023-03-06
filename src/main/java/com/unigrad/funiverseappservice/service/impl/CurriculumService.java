@@ -4,6 +4,7 @@ import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Major;
 import com.unigrad.funiverseappservice.entity.academic.Specialization;
 import com.unigrad.funiverseappservice.entity.academic.Term;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.ICurriculumRepository;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IMajorService;
@@ -12,7 +13,6 @@ import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,5 +110,10 @@ public class CurriculumService implements ICurriculumService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<UserDetail> getUsersInCurriculum(Long id) {
+        return curriculumRepository.getUsersInCurriculum(id);
     }
 }
