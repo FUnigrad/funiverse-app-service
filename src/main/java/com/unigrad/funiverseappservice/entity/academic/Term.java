@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.entity.academic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.unigrad.funiverseappservice.entity.Workspace;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -41,6 +43,10 @@ public class Term {
     @OneToMany(mappedBy = "startedTerm")
     @JsonIgnore
     private List<Curriculum> curricula;
+
+    @OneToOne(mappedBy = "currentTerm")
+    @JsonIgnore
+    private Workspace workspace;
 
     public enum Season {
         SPRING,

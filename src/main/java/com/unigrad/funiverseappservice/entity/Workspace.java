@@ -1,37 +1,35 @@
 package com.unigrad.funiverseappservice.entity;
 
 import com.unigrad.funiverseappservice.entity.academic.Term;
-import jakarta.annotation.PostConstruct;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
-
+@Entity
 @Getter
 @Setter
-@Component
+@NoArgsConstructor
+@AllArgsConstructor
 public class Workspace {
 
-    private static Workspace WORKSPACE = new Workspace();
-
-    @PostConstruct
-    private void init() {
-        WORKSPACE.setId(1L);
-        WORKSPACE.setName("FPT University Da Nang");
-        WORKSPACE.setCode("FUDN");
-        WORKSPACE.setCurrentTerm(new Term(Term.Season.SPRING, "2023"));
-    }
-
-    public static Workspace get() {
-        return WORKSPACE;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Long workspaceId;
 
     private String name;
 
     private String code;
 
+    @OneToOne
+    @JoinColumn
     private Term currentTerm;
 }

@@ -10,7 +10,7 @@ import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
-import com.unigrad.funiverseappservice.util.Converter;
+import com.unigrad.funiverseappservice.util.DTOConverter;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,14 +42,14 @@ public class CurriculumController {
 
     private final IUserDetailService userDetailService;
 
-    private final Converter converter;
+    private final DTOConverter dtoConverter;
 
-    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, IUserDetailService userDetailService, Converter converter) {
+    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, IUserDetailService userDetailService, DTOConverter dtoConverter) {
         this.curriculumService = curriculumService;
         this.curriculumPlanService = curriculumPlanService;
         this.syllabusService = syllabusService;
         this.userDetailService = userDetailService;
-        this.converter = converter;
+        this.dtoConverter = dtoConverter;
     }
 
     @GetMapping
@@ -125,7 +125,7 @@ public class CurriculumController {
                 return ResponseEntity.badRequest().body("Syllabus %s is already exist in Curriculum!".formatted(syllabusOpt.get().getCode()));
             }
 
-            CurriculumPlan curriculumPlan = converter.convert(curriculumPlanDTO, CurriculumPlan.class);
+            CurriculumPlan curriculumPlan = dtoConverter.convert(curriculumPlanDTO, CurriculumPlan.class);
             curriculumPlan.setCurriculum(curriculumOpt.get());
             curriculumPlan = curriculumPlanService.save(curriculumPlan);
 
@@ -148,11 +148,11 @@ public class CurriculumController {
 
             if (curriculumPlanService.isExist(new CurriculumPlan.CurriculumPlanKey(id, syllabusOpt.get().getId()))) {
 
-                CurriculumPlan curriculumPlan = converter.convert(curriculumPlanDTO, CurriculumPlan.class);
+                CurriculumPlan curriculumPlan = dtoConverter.convert(curriculumPlanDTO, CurriculumPlan.class);
                 curriculumPlan.setCurriculum(curriculumOpt.get());
                 curriculumPlan = curriculumPlanService.save(curriculumPlan);
 
-                return ResponseEntity.ok(converter.convert(curriculumPlan, CurriculumPlanDTO.class));
+                return ResponseEntity.ok(dtoConverter.convert(curriculumPlan, CurriculumPlanDTO.class));
             }
         }
 
@@ -175,7 +175,7 @@ public class CurriculumController {
 
         if (curriculum.isPresent()) {
             List<CurriculumPlan> curriculumPlans = curriculumPlanService.getAllByCurriculumId(curriculum.get().getId());
-            List<CurriculumPlanDTO> curriculumPlanDTOs = Arrays.stream(converter.convert(curriculumPlans, CurriculumPlanDTO[].class)).toList();
+            List<CurriculumPlanDTO> curriculumPlanDTOs = Arrays.stream(dtoConverter.convert(curriculumPlans, CurriculumPlanDTO[].class)).toList();
 
             return ResponseEntity.ok(curriculumPlanDTOs);
         }
@@ -196,7 +196,7 @@ public class CurriculumController {
                     student.get().setCurriculum(curriculum.get());
 
                     userDetailService.save(student.get());
-                    studentDTOList.add(converter.convert(student, StudentDTO.class));
+                    studentDTOList.add(dtoConverter.convert(student, StudentDTO.class));
                 }
             }
         } else {

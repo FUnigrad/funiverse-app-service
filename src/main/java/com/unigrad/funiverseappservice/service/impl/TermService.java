@@ -1,6 +1,5 @@
 package com.unigrad.funiverseappservice.service.impl;
 
-import com.unigrad.funiverseappservice.entity.Workspace;
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.repository.ITermRepository;
 import com.unigrad.funiverseappservice.service.ITermService;
@@ -62,35 +61,5 @@ public class TermService implements ITermService {
     @Override
     public Optional<Term> get(Term.Season season, String year) {
         return termRepository.getBySeasonAndYear(season, year);
-    }
-
-    @Override
-    public Term startNewTerm() {
-        Term currentTerm = Workspace.get().getCurrentTerm();
-        Term.Season currentSeason = currentTerm.getSeason();
-        Term.Season nextSeason = currentTerm.getSeason();
-        String currentYear = currentTerm.getYear();
-        String nextYear = currentTerm.getYear();
-
-        switch (currentSeason) {
-            case SPRING -> {
-                nextSeason = Term.Season.SUMMER;
-                nextYear = currentYear;
-            }
-            case SUMMER -> {
-                nextSeason = Term.Season.FALL;
-                nextYear = currentYear;
-            }
-            default -> {
-                nextSeason = Term.Season.SPRING;
-                nextYear = String.valueOf(Integer.parseInt(currentYear) + 1);
-            }
-        }
-
-        Optional<Term> newTerm = get(nextSeason, nextYear);
-
-        return newTerm.isPresent()
-                ? newTerm.get()
-                : save(new Term(nextSeason, nextYear));
     }
 }

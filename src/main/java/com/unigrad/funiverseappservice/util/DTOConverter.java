@@ -8,7 +8,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class Converter {
+public class DTOConverter {
 
     private final ModelMapper modelMapper;
 
