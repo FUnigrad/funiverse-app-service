@@ -18,6 +18,6 @@ public interface IGroupMemberRepository extends JpaRepository<GroupMember, Group
     @Query(value = "select g.user from GroupMember g where g.group.id = :id")
     List<UserDetail> getAllUsersInGroup(Long id);
 
-    @Query(value = "select distinct g.user from GroupMember g where g.group.id != :id")
+    @Query(value = "select g.user from GroupMember g where g.group.id != :id group by g.user.id")
     List<UserDetail> getAllUsersNotInGroup(Long id);
 }

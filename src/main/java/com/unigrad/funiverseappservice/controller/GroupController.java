@@ -2,6 +2,7 @@ package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.PostDTO;
@@ -9,6 +10,7 @@ import com.unigrad.funiverseappservice.payload.UserDTO;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
+import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("group")
@@ -34,13 +37,16 @@ public class GroupController {
 
     private final IGroupMemberService groupMemberService;
 
+    private final IUserDetailService userDetailService;
+
     private final IPostService postService;
 
     private final DTOConverter dtoConverter;
 
-    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IPostService postService, DTOConverter dtoConverter) {
+    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IUserDetailService userDetailService, IPostService postService, DTOConverter dtoConverter) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
+        this.userDetailService = userDetailService;
         this.postService = postService;
         this.dtoConverter = dtoConverter;
     }
@@ -114,10 +120,20 @@ public class GroupController {
                 : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/add-member")
-    public ResponseEntity<Void> addNewMemberToGroup(@RequestBody GroupMemberDTO groupMemberDTO) {
+    @PostMapping("/{id}/members")
+    public ResponseEntity<Void> addNewMemberToGroup(@PathVariable Long id, @RequestBody List<Long> memberIds) {
 
-        groupMemberService.addMemberToGroup(groupMemberDTO);
+        Optional<Group> groupOpt = groupService.get(id);
+
+        if (groupOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        for (Long memberId : memberIds) {
+            Optional<UserDetail> member = userDetailService.get(memberId);
+
+            member.ifPresent(userDetail -> groupMemberService.addMemberToGroup(new GroupMemberDTO(userDetail.getId(), groupOpt.get().getId(), false)));
+        }
 
         return ResponseEntity.ok().build();
     }
@@ -168,4 +184,6 @@ public class GroupController {
 
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(groupMemberService.getAllUsersInGroup(id), UserDTO[].class)).toList());
     }
+
+    //todo set admin of group
 }

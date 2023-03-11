@@ -295,4 +295,6 @@ public class CurriculumController {
                                 CurriculumPlanDTO[].class)).toList())
                 .build());
     }
+
+    //todo remove combo from curriculum
 }

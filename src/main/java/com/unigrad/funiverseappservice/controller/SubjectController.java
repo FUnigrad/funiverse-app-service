@@ -83,4 +83,6 @@ public class SubjectController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    //todo get syllabus list in subject
 }
