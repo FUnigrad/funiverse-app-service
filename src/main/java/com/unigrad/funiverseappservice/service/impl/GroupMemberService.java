@@ -98,11 +98,6 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
-    public List<UserDetail> getAllUsersNotInGroup(Long id) {
-        return groupMemberRepository.getAllUsersNotInGroup(id);
-    }
-
-    @Override
     public List<GroupMember> search(EntitySpecification<GroupMember> specification) {
         return null;
     }

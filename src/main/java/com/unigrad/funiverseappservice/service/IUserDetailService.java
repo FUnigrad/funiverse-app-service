@@ -9,4 +9,6 @@ import java.util.List;
 public interface IUserDetailService extends IBaseService<UserDetail, Long> {
 
     List<UserDetail> getAllUsersHaveNoCurriculum();
+
+    List<UserDetail> getAllUsersNotInGroup(Long id);
 }

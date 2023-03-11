@@ -66,4 +66,9 @@ public class UserDetailService implements IUserDetailService {
     public List<UserDetail> getAllUsersHaveNoCurriculum() {
         return userDetailRepository.getAllUsersHaveNoCurriculum();
     }
+
+    @Override
+    public List<UserDetail> getAllUsersNotInGroup(Long id) {
+        return userDetailRepository.getAllUsersNotInGroup(id);
+    }
 }

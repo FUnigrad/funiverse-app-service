@@ -110,6 +110,6 @@ public class UserController {
     @GetMapping("group/none")
     public ResponseEntity<List<UserDTO>> getUsersNotInGroup(@RequestParam Long id) {
 
-        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(groupMemberService.getAllUsersNotInGroup(id), UserDTO[].class)).toList());
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(userDetailService.getAllUsersNotInGroup(id), UserDTO[].class)).toList());
     }
 }

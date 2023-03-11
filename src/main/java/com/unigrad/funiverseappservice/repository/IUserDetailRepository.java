@@ -11,4 +11,8 @@ public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long>
 
     @Query(value = "select u from UserDetail u where u.curriculum = null")
     List<UserDetail> getAllUsersHaveNoCurriculum();
+
+    @Query(value = "select ud from UserDetail ud where ud.id not in " +
+            "(select gm.user.id from GroupMember gm where gm.group.id = :id)")
+    List<UserDetail> getAllUsersNotInGroup(Long id);
 }

@@ -15,6 +15,4 @@ public interface IGroupMemberService extends IBaseService<GroupMember, GroupMemb
     GroupMember addMemberToGroup(GroupMemberDTO groupMemberDTO);
 
     List<UserDetail> getAllUsersInGroup(Long id);
-
-    List<UserDetail> getAllUsersNotInGroup(Long id);
 }
