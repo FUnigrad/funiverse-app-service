@@ -1,7 +1,9 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Subject;
+import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
 import com.unigrad.funiverseappservice.service.ISubjectService;
+import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("subject")
@@ -24,8 +26,11 @@ public class SubjectController {
 
     private final ISubjectService subjectService;
 
-    public SubjectController(ISubjectService subjectService) {
+    private final DTOConverter dtoConverter;
+
+    public SubjectController(ISubjectService subjectService, DTOConverter dtoConverter) {
         this.subjectService = subjectService;
+        this.dtoConverter = dtoConverter;
     }
 
     @GetMapping
@@ -84,5 +89,11 @@ public class SubjectController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //todo get syllabus list in subject
+    @GetMapping("/{id}/syllabus")
+    public ResponseEntity<List<EntityBaseDTO>> getSyllabiInSubject(@PathVariable Long id) {
+
+        return subjectService.get(id)
+                .map(subject -> ResponseEntity.ok(Arrays.stream(dtoConverter.convert(subject.getSyllabi(), EntityBaseDTO[].class)).toList()))
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
