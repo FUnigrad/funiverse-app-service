@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -104,5 +105,11 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getUsersWithNoCurriculum() {
 
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(userDetailService.getAllUsersHaveNoCurriculum(), UserDTO[].class)).toList());
+    }
+
+    @GetMapping("group/none")
+    public ResponseEntity<List<UserDTO>> getUsersNotInGroup(@RequestParam Long id) {
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(groupMemberService.getAllUsersNotInGroup(id), UserDTO[].class)).toList());
     }
 }

@@ -1,21 +1,17 @@
 package com.unigrad.funiverseappservice.payload;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CurriculumPlanDTO {
+public class ComboDTO extends EntityBaseDTO {
 
-    private EntityBaseDTO syllabus;
-
-    private byte semester;
-
-    private boolean isComboPlan;
+    List<EntityBaseDTO> syllabi;
 }

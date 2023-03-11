@@ -78,4 +78,6 @@ public class MajorController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    //todo get list spec in major
 }

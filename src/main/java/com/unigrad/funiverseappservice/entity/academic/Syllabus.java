@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.entity.academic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.converter.SyllabusConverter;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,11 +46,11 @@ public class Syllabus {
 
     private boolean isActive;
 
-    private Integer duration;
 
     @Convert(converter = SyllabusConverter.class)
     private List<Syllabus> preRequisite;
 
+    @Column(columnDefinition = "text")
     private String description;
 
     private byte minAvgMarkToPass;
@@ -65,4 +66,9 @@ public class Syllabus {
     @OneToMany(mappedBy = "syllabus")
     @JsonIgnore
     private List<Slot> slots;
+
+    private boolean isSyllabusCombo = false;
+
+    @Convert(converter = SyllabusConverter.class)
+    private List<Syllabus> referenceSyllabusInCombo;
 }

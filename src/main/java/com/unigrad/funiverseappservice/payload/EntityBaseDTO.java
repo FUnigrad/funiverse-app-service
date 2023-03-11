@@ -1,7 +1,6 @@
 package com.unigrad.funiverseappservice.payload;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,12 +9,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CurriculumPlanDTO {
+public class EntityBaseDTO {
 
-    private EntityBaseDTO syllabus;
+    private Long id;
 
-    private byte semester;
+    private String name;
 
-    private boolean isComboPlan;
+    private String code;
+
+    private boolean isActive;
 }

@@ -32,9 +32,5 @@ public class Major {
 
     @OneToMany(mappedBy = "major")
     @JsonIgnore
-    List<Curriculum> curriculums;
-
-    @OneToMany(mappedBy = "major")
-    @JsonIgnore
     List<Specialization> specializations;
 }

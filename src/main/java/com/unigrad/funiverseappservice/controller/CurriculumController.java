@@ -1,15 +1,21 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.academic.Combo;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.payload.ComboPlanDTO;
 import com.unigrad.funiverseappservice.payload.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
 import com.unigrad.funiverseappservice.payload.UserDTO;
+import com.unigrad.funiverseappservice.payload.response.ListComboResponse;
+import com.unigrad.funiverseappservice.service.IComboService;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("curriculum")
@@ -42,13 +45,19 @@ public class CurriculumController {
 
     private final IUserDetailService userDetailService;
 
+    private final IComboService comboService;
+
+    private final IWorkspaceService workspaceService;
+
     private final DTOConverter dtoConverter;
 
-    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, IUserDetailService userDetailService, DTOConverter dtoConverter) {
+    public CurriculumController(ICurriculumService curriculumService, ICurriculumPlanService curriculumPlanService, ISyllabusService syllabusService, IUserDetailService userDetailService, IComboService comboService, IWorkspaceService workspaceService, DTOConverter dtoConverter) {
         this.curriculumService = curriculumService;
         this.curriculumPlanService = curriculumPlanService;
         this.syllabusService = syllabusService;
         this.userDetailService = userDetailService;
+        this.comboService = comboService;
+        this.workspaceService = workspaceService;
         this.dtoConverter = dtoConverter;
     }
 
@@ -71,6 +80,12 @@ public class CurriculumController {
 
     @PostMapping
     public ResponseEntity<String> save(@RequestBody Curriculum curriculum) {
+
+        //calculates school year
+        Long foundedYear = workspaceService.get().getFoundedYear();
+        Long curriculumYear = Long.valueOf(curriculum.getStartedTerm().getYear());
+
+        curriculum.setSchoolYear("K%s".formatted(curriculumYear - foundedYear +1));
         curriculum.setCode(curriculumService.generateCode(curriculum));
         curriculum.setName(curriculumService.generateName(curriculum));
 
@@ -175,8 +190,8 @@ public class CurriculumController {
 
         if (curriculum.isPresent()) {
             List<CurriculumPlan> curriculumPlans = curriculumPlanService.getAllByCurriculumId(curriculum.get().getId());
-            List<CurriculumPlanDTO> curriculumPlanDTOs = Arrays.stream(dtoConverter.convert(curriculumPlans, CurriculumPlanDTO[].class)).toList();
-
+            List<CurriculumPlanDTO> curriculumPlanDTOs = new ArrayList<>(Arrays.stream(dtoConverter.convert(curriculumPlans, CurriculumPlanDTO[].class)).toList());
+            curriculumPlanDTOs.sort(Comparator.comparing(CurriculumPlanDTO::getSemester));
             return ResponseEntity.ok(curriculumPlanDTOs);
         }
 
@@ -231,5 +246,53 @@ public class CurriculumController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("{id}/combos")
+    public ResponseEntity<ListComboResponse> getComboInCurriculum(@PathVariable Long id) {
+        Optional<Curriculum> curriculumOpt = curriculumService.get(id);
+
+        if (curriculumOpt.isPresent()) {
+            List<Combo> combos = comboService.getAllByCurriculumId(id);
+            ListComboResponse listComboResponse = new ListComboResponse(
+                    dtoConverter.convert(curriculumOpt.get(), EntityBaseDTO.class),
+                    Arrays.stream(dtoConverter.convert(combos, EntityBaseDTO[].class)).toList()
+            );
+
+            return ResponseEntity.ok(listComboResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("{id}/combos")
+    public ResponseEntity<Combo> addComboToCurriculum(@PathVariable Long id, @RequestBody ComboPlanDTO comboPlanDTO) {
+        Optional<Curriculum> curriculumOpt = curriculumService.get(id);
+
+        if (curriculumOpt.isPresent()) {
+            comboPlanDTO.setCurriculum(dtoConverter.convert(curriculumOpt.get(), EntityBaseDTO.class));
+
+            return ResponseEntity.ok(comboService.addComboToCurriculum(comboPlanDTO));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("{curriculumId}/combos/{comboId}")
+    public ResponseEntity<ComboPlanDTO> getComboPlan(@PathVariable Long curriculumId, @PathVariable Long comboId) {
+        Optional<Curriculum> curriculumOpt = curriculumService.get(curriculumId);
+        Optional<Combo> comboOpt = comboService.get(comboId);
+
+        if (curriculumOpt.isEmpty() || comboOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ComboPlanDTO.builder()
+                .combo(dtoConverter.convert(comboOpt.get(), EntityBaseDTO.class))
+                .curriculum(dtoConverter.convert(curriculumOpt.get(), EntityBaseDTO.class))
+                .comboPlans(Arrays.stream(dtoConverter
+                        .convert(curriculumPlanService.getAllComboPlanByCurriculumIdAndComboId(curriculumId, comboId),
+                                CurriculumPlanDTO[].class)).toList())
+                .build());
     }
 }

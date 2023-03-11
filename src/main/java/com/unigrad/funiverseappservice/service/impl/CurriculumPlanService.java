@@ -66,6 +66,11 @@ public class CurriculumPlanService implements ICurriculumPlanService {
     }
 
     @Override
+    public List<CurriculumPlan> getAllComboPlanByCurriculumId(Long curriculumId) {
+        return curriculumPlanRepository.getAllByCurriculum_IdAndComboPlan(curriculumId, true);
+    }
+
+    @Override
     public boolean removeSyllabusFromCurriculum(Long syllabusId, Long curriculumId) {
         CurriculumPlan.CurriculumPlanKey curriculumPlanKey = new CurriculumPlan.CurriculumPlanKey(curriculumId, syllabusId);
 
@@ -76,5 +81,10 @@ public class CurriculumPlanService implements ICurriculumPlanService {
         }
 
         return false;
+    }
+
+    @Override
+    public List<CurriculumPlan> getAllComboPlanByCurriculumIdAndComboId(Long curriculumId, Long comboId) {
+        return curriculumPlanRepository.getAllByCurriculumAndCombo(curriculumId, comboId);
     }
 }

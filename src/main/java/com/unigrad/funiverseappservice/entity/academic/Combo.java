@@ -1,13 +1,14 @@
 package com.unigrad.funiverseappservice.entity.academic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.unigrad.funiverseappservice.entity.converter.SyllabusConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,8 +20,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Subject {
+public class Combo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,10 @@ public class Subject {
 
     private boolean isActive;
 
-    @OneToMany(mappedBy = "subject")
-    @JsonIgnore
+    @Convert(converter = SyllabusConverter.class)
     private List<Syllabus> syllabi;
+
+    @OneToMany(mappedBy = "combo")
+    @JsonIgnore
+    private List<CurriculumPlan> curriculumPlans;
 }

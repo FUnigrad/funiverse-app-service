@@ -6,16 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CurriculumPlanDTO {
+public class ComboPlanDTO {
 
-    private EntityBaseDTO syllabus;
+    private EntityBaseDTO combo;
 
-    private byte semester;
+    private EntityBaseDTO curriculum;
 
-    private boolean isComboPlan;
+    private List<CurriculumPlanDTO> comboPlans;
 }

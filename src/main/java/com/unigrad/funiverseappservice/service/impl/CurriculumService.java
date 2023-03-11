@@ -1,13 +1,11 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
-import com.unigrad.funiverseappservice.entity.academic.Major;
 import com.unigrad.funiverseappservice.entity.academic.Specialization;
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.ICurriculumRepository;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
-import com.unigrad.funiverseappservice.service.IMajorService;
 import com.unigrad.funiverseappservice.service.ISpecializationService;
 import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
@@ -21,19 +19,12 @@ public class CurriculumService implements ICurriculumService {
 
     private final ICurriculumRepository curriculumRepository;
 
-    private final IMajorService majorService;
-
     private final ISpecializationService specializationService;
 
     private final ITermService termService;
 
-    private final String NAME_TEMPLATE = "Bachelor Program of %s, %s Major";
-
-    private final String CODE_TEMPLATE = "B%s_%s_%s";
-
-    public CurriculumService(ICurriculumRepository curriculumRepository, IMajorService majorService, ISpecializationService specializationService, ITermService termService) {
+    public CurriculumService(ICurriculumRepository curriculumRepository, ISpecializationService specializationService, ITermService termService) {
         this.curriculumRepository = curriculumRepository;
-        this.majorService = majorService;
         this.specializationService = specializationService;
         this.termService = termService;
     }
@@ -57,11 +48,7 @@ public class CurriculumService implements ICurriculumService {
     public Curriculum save(Curriculum entity) {
         Optional<Term> term = termService.get(entity.getStartedTerm().getSeason(), entity.getStartedTerm().getYear());
 
-        if (term.isPresent()) {
-            entity.setStartedTerm(term.get());
-        } else {
-            entity.setStartedTerm(termService.save(entity.getStartedTerm()));
-        }
+        entity.setStartedTerm(term.orElseGet(() -> termService.save(entity.getStartedTerm())));
 
         return curriculumRepository.save(entity);
     }
@@ -88,28 +75,18 @@ public class CurriculumService implements ICurriculumService {
 
     @Override
     public String generateName(Curriculum curriculum) {
-        Optional<Major> majorOpt = majorService.get(curriculum.getMajor().getId());
+        String NAME_TEMPLATE = "Bachelor Program of %s, %s Major";
         Optional<Specialization> specializationOpt = specializationService.get(curriculum.getSpecialization().getId());
 
-        if (majorOpt.isPresent() && specializationOpt.isPresent()) {
-
-            return NAME_TEMPLATE.formatted(majorOpt.get().getName(), specializationOpt.get().getName());
-        }
-
-        return null;
+        return specializationOpt.map(specialization -> NAME_TEMPLATE.formatted(specialization.getMajor().getName(), specialization.getName())).orElse(null);
     }
 
     @Override
     public String generateCode(Curriculum curriculum) {
-        Optional<Major> majorOpt = majorService.get(curriculum.getMajor().getId());
+        String CODE_TEMPLATE = "B%s_%s_%s";
         Optional<Specialization> specializationOpt = specializationService.get(curriculum.getSpecialization().getId());
 
-        if (majorOpt.isPresent() && specializationOpt.isPresent()) {
-
-            return CODE_TEMPLATE.formatted(majorOpt.get().getCode(), specializationOpt.get().getCode(), curriculum.getSchoolYear());
-        }
-
-        return null;
+        return specializationOpt.map(specialization -> CODE_TEMPLATE.formatted(specialization.getMajor().getCode(), specialization.getCode(), curriculum.getSchoolYear())).orElse(null);
     }
 
     @Override

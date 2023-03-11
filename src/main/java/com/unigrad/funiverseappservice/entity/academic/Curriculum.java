@@ -40,10 +40,6 @@ public class Curriculum {
 
     @ManyToOne
     @JoinColumn
-    private Major major;
-
-    @ManyToOne
-    @JoinColumn
     private Specialization specialization;
 
     @ManyToOne

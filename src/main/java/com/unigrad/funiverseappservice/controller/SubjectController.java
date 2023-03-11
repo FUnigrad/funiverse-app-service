@@ -35,15 +35,6 @@ public class SubjectController {
                 ? subjectService.getAll()
                 : subjectService.getByCode(code);
 
-        for (Subject subject : subjects) {
-            if (subject.isCombo() && !subject.getSubjects().isEmpty()) {
-                subject.setSubjects(subject.getSubjects().stream()
-                        .map(subjectInCombo -> subjectService.get(subjectInCombo.getId()).get())
-                        .collect(Collectors.toList())
-                );
-            }
-        }
-
         return ResponseEntity.ok(subjects);
     }
 

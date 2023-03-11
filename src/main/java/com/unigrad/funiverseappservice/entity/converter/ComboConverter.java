@@ -1,6 +1,6 @@
 package com.unigrad.funiverseappservice.entity.converter;
 
-import com.unigrad.funiverseappservice.entity.academic.Subject;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Converter
-public class ComboConverter implements AttributeConverter<List<Subject>, String> {
+public class ComboConverter implements AttributeConverter<List<Syllabus>, String> {
 
     @Override
-    public String convertToDatabaseColumn(List<Subject> attribute) {
+    public String convertToDatabaseColumn(List<Syllabus> attribute) {
 
         if (attribute == null) {
             return null;
         }
 
         return attribute.stream()
-                .map(Subject::getId)
+                .map(Syllabus::getId)
                 .map(Object::toString)
                 .collect(Collectors.joining(","));
     }
 
     @Override
-    public List<Subject> convertToEntityAttribute(String dbData) {
+    public List<Syllabus> convertToEntityAttribute(String dbData) {
 
         if (dbData == null || dbData.isBlank()) {
             return null;
@@ -35,9 +35,9 @@ public class ComboConverter implements AttributeConverter<List<Subject>, String>
                 .stream(dbData.split(","))
                 .toList()
                 .stream()
-                .map(subjectId -> Subject
+                .map(syllabusId -> Syllabus
                         .builder()
-                        .id(Long.valueOf(subjectId))
+                        .id(Long.valueOf(syllabusId))
                         .build())
                 .collect(Collectors.toList());
     }

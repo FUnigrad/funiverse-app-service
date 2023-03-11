@@ -10,5 +10,9 @@ public interface ICurriculumPlanService extends IBaseService<CurriculumPlan, Cur
 
     List<CurriculumPlan> getAllByCurriculumId(Long curriculumId);
 
+    List<CurriculumPlan> getAllComboPlanByCurriculumId(Long curriculumId);
+
+    List<CurriculumPlan> getAllComboPlanByCurriculumIdAndComboId(Long curriculumId, Long comboId);
+
     boolean removeSyllabusFromCurriculum(Long syllabusId, Long curriculumId);
 }

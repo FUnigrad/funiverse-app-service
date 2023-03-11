@@ -9,11 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDTO extends EntityBaseDTO {
 
-    private Long id;
-
-    private String code;
-
-    private String name;
+    private String email;
 }
