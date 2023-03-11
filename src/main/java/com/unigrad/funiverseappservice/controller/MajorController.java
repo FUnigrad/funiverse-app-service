@@ -1,7 +1,9 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Major;
+import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
 import com.unigrad.funiverseappservice.service.IMajorService;
+import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("major")
@@ -22,8 +26,11 @@ public class MajorController {
 
     private final IMajorService majorService;
 
-    public MajorController(IMajorService majorService) {
+    private final DTOConverter dtoConverter;
+
+    public MajorController(IMajorService majorService, DTOConverter dtoConverter) {
         this.majorService = majorService;
+        this.dtoConverter = dtoConverter;
     }
 
     @GetMapping
@@ -79,5 +86,14 @@ public class MajorController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //todo get list spec in major
+    @GetMapping("/{id}/specializations")
+    public ResponseEntity<List<EntityBaseDTO>> getAllSpecializationInMajor(@PathVariable Long id) {
+        Optional<Major> majorOpt = majorService.get(id);
+
+        return majorOpt.map(major ->
+                ResponseEntity.ok(Arrays.stream(dtoConverter.convert(major.getSpecializations(),
+                        EntityBaseDTO[].class)).toList()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
+    }
 }
