@@ -5,6 +5,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
+import com.unigrad.funiverseappservice.payload.MemberDTO;
 import com.unigrad.funiverseappservice.payload.PostDTO;
 import com.unigrad.funiverseappservice.payload.UserDTO;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
@@ -28,6 +29,8 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("group")
@@ -180,10 +183,35 @@ public class GroupController {
     }
 
     @GetMapping("{id}/users")
-    public ResponseEntity<List<UserDTO>> getUsersInGroup(@PathVariable Long id) {
+    public ResponseEntity<List<MemberDTO>> getUsersInGroup(@PathVariable Long id) {
+        List<UserDetail> members = groupMemberService.getAllUsersInGroup(id);
+        List<MemberDTO> memberDTOs = Arrays.stream(dtoConverter.convert(members, MemberDTO[].class)).toList();
 
-        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(groupMemberService.getAllUsersInGroup(id), UserDTO[].class)).toList());
+        for (MemberDTO memberDTO : memberDTOs) {
+            Optional<GroupMember> groupMember = groupMemberService.get(new GroupMember.GroupMemberKey(memberDTO.getId(), id));
+
+            //noinspection OptionalGetWithoutIsPresent
+            memberDTO.setGroupAdmin(groupMember.get().isGroupAdmin());
+        }
+        return ResponseEntity.ok(memberDTOs);
     }
 
-    //todo set admin of group
+    @PutMapping("{groupId}/users/{userId}/set-admin")
+    public ResponseEntity<GroupMemberDTO> setAdminOfGroup(@PathVariable Long groupId, @PathVariable Long userId) {
+        Optional<Group> groupOpt = groupService.get(groupId);
+        Optional<UserDetail> userDetailOpt = userDetailService.get(userId);
+
+        if (groupOpt.isEmpty() || userDetailOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Optional<GroupMember> groupMemberOpt = groupMemberService.get(new GroupMember.GroupMemberKey(userId, groupId));
+
+        if (groupMemberOpt.isPresent()) {
+            groupMemberOpt.get().setGroupAdmin(true);
+            return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
 }
