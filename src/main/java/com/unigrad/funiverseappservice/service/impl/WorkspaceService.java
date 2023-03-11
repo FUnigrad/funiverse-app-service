@@ -23,7 +23,7 @@ public class WorkspaceService implements IWorkspaceService {
 
     @Override
     public Workspace get() {
-        return workspace;
+        return workspaceRepository.findAll().get(0);
     }
 
     @Override
@@ -37,11 +37,12 @@ public class WorkspaceService implements IWorkspaceService {
 
     @Override
     public Term getCurrentTerm() {
-        return workspace.getCurrentTerm();
+        return get().getCurrentTerm();
     }
 
     @Override
     public Term startNewTerm() {
+        workspace = get();
         workspace.setCurrentTerm(getNextTerm());
 
         return save(workspace).getCurrentTerm();
