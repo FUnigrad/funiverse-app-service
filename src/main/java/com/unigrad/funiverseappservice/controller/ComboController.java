@@ -1,10 +1,10 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Combo;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.payload.ComboDTO;
 import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
 import com.unigrad.funiverseappservice.service.IComboService;
-import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,10 +28,13 @@ public class ComboController {
 
     private final IComboService comboService;
 
+    private final ISyllabusService syllabusService;
+
     private final DTOConverter dtoConverter;
 
-    public ComboController(IComboService comboService, ISyllabusService syllabusService, ICurriculumService curriculumService, DTOConverter dtoConverter) {
+    public ComboController(IComboService comboService, ISyllabusService syllabusService, DTOConverter dtoConverter) {
         this.comboService = comboService;
+        this.syllabusService = syllabusService;
         this.dtoConverter = dtoConverter;
     }
 
@@ -44,7 +48,15 @@ public class ComboController {
     public ResponseEntity<ComboDTO> getById(@PathVariable Long id) {
 
         return comboService.get(id)
-                .map(combo -> ResponseEntity.ok(dtoConverter.convert(combo, ComboDTO.class)))
+                .map(combo -> {
+                    List<Syllabus> syllabi = new ArrayList<>();
+                    for (Syllabus syllabus : combo.getSyllabi()) {
+                        //noinspection OptionalGetWithoutIsPresent
+                        syllabi.add(syllabusService.get(syllabus.getId()).get());
+                    }
+                    combo.setSyllabi(syllabi);
+                    return ResponseEntity.ok(dtoConverter.convert(combo, ComboDTO.class));
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
