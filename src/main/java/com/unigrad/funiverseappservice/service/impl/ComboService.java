@@ -71,7 +71,7 @@ public class ComboService implements IComboService {
 
     @Override
     public List<Combo> search(EntitySpecification<Combo> specification) {
-        return null;
+        return comboRepository.findAll(specification);
     }
 
     @Override

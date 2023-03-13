@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +32,9 @@ public class SearchController {
 
     private final ISpecializationService specializationService;
 
-    public SearchController(ISyllabusService syllabusService, ICurriculumService curriculumService, IUserDetailService userDetailService, IGroupService groupService, ISubjectService subjectService, IMajorService majorService, ISpecializationService specializationService) {
+    private final IComboService comboService;
+
+    public SearchController(ISyllabusService syllabusService, ICurriculumService curriculumService, IUserDetailService userDetailService, IGroupService groupService, ISubjectService subjectService, IMajorService majorService, ISpecializationService specializationService, IComboService comboService) {
         this.syllabusService = syllabusService;
         this.curriculumService = curriculumService;
         this.userDetailService = userDetailService;
@@ -41,6 +42,7 @@ public class SearchController {
         this.subjectService = subjectService;
         this.majorService = majorService;
         this.specializationService = specializationService;
+        this.comboService = comboService;
     }
 
 
@@ -93,8 +95,12 @@ public class SearchController {
 
                 return specializationService.search(specification);
             }
-        }
+            case "combo" -> {
+                EntitySpecification<Combo> specification = new EntitySpecification<>(searchCriteria);
 
-        return List.of();
+                return comboService.search(specification);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + entity);
+        }
     }
 }
