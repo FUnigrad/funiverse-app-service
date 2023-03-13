@@ -65,4 +65,14 @@ public class GroupService implements IGroupService {
     public List<Group> search(EntitySpecification<Group> specification) {
         return groupRepository.findAll(specification);
     }
+
+    @Override
+    public boolean isNameExist(String name, Group.Type type) {
+        return groupRepository.isNameExist(name, type);
+    }
+
+    @Override
+    public int getNextNameOrderForClass(String name) {
+        return groupRepository.getNextNameOrderForClass(name);
+    }
 }

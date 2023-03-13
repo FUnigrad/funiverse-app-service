@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
@@ -7,7 +8,7 @@ import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyExceptio
 import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.MemberDTO;
 import com.unigrad.funiverseappservice.payload.PostDTO;
-import com.unigrad.funiverseappservice.payload.UserDTO;
+import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
@@ -30,8 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
-
 @RestController
 @RequestMapping("group")
 public class GroupController {
@@ -44,30 +43,37 @@ public class GroupController {
 
     private final IPostService postService;
 
+    private final ICurriculumService curriculumService;
+
     private final DTOConverter dtoConverter;
 
-    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IUserDetailService userDetailService, IPostService postService, DTOConverter dtoConverter) {
+    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IUserDetailService userDetailService, IPostService postService, ICurriculumService curriculumService, DTOConverter dtoConverter) {
         this.groupService = groupService;
         this.groupMemberService = groupMemberService;
         this.userDetailService = userDetailService;
         this.postService = postService;
+        this.curriculumService = curriculumService;
         this.dtoConverter = dtoConverter;
     }
 
     @PostMapping
     public ResponseEntity<Group> create(@RequestBody Group newGroup) {
-        //todo: use Group DTO and check class when create course
+
         Group.Type newGroupType = newGroup.getType();
 
         switch (newGroupType) {
 
             case CLASS -> {
-                if (StringUtils.isBlank(newGroup.getName())) {
-                    throw new MissingRequiredPropertyException("Name");
-                }
-                if (newGroup.getCurriculum() == null) {
+                Optional<Curriculum> curriculumOpt = curriculumService.get(newGroup.getCurriculum().getId());
+
+                if (curriculumOpt.isEmpty()) {
                     throw new MissingRequiredPropertyException("Curriculum");
                 }
+
+                String name = curriculumOpt.get().getSpecialization().getCode() + curriculumOpt.get().getSchoolYear().substring(1);
+                int order = groupService.getNextNameOrderForClass(name);
+                name += String.format("%02d", order);
+                newGroup.setName(name);
             }
 
             case COURSE -> {
@@ -78,7 +84,7 @@ public class GroupController {
                 if (newGroup.getSyllabus() == null) {
                     throw new MissingRequiredPropertyException("Syllabus");
                 }
-
+                //todo need Class to copy students to this group
                 newGroup.setName("COURSE ");
             }
 
