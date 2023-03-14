@@ -41,7 +41,7 @@ public class ComboController {
     @GetMapping
     public ResponseEntity<List<EntityBaseDTO>> get() {
 
-        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(comboService.getAll(), EntityBaseDTO[].class)).toList());
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(comboService.getAllActive(), EntityBaseDTO[].class)).toList());
     }
 
     @GetMapping("/{id}")

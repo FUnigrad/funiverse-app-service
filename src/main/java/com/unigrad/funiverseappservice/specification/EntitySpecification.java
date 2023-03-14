@@ -38,6 +38,7 @@ public class EntitySpecification<T> implements Specification<T> {
                     }
                 }
             }
+            predicates.add(criteriaBuilder.isTrue(root.get("isActive")));
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

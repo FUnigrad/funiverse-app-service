@@ -29,7 +29,7 @@ public class SpecializationController {
     @GetMapping
     public ResponseEntity<List<Specialization>> getAll() {
 
-        return ResponseEntity.ok(specializationService.getAll());
+        return ResponseEntity.ok(specializationService.getAllActive());
     }
 
     @GetMapping("/{id}")

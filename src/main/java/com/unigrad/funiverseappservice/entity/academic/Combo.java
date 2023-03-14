@@ -30,7 +30,7 @@ public class Combo {
 
     private String code;
 
-    private boolean isActive;
+    private boolean isActive = true;
 
     @Convert(converter = SyllabusConverter.class)
     private List<Syllabus> syllabi;

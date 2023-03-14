@@ -41,7 +41,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
 
-        return ResponseEntity.ok(userDetailService.getAll());
+        return ResponseEntity.ok(userDetailService.getAllActive());
     }
 
     @GetMapping("/{id}/groups")

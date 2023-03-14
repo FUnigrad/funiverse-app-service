@@ -25,7 +25,7 @@ public class MajorService implements IMajorService {
 
     @Override
     public List<Major> getAllActive() {
-        return null;
+        return majorRepository.findAllByActiveIsTrue();
     }
 
     @Override

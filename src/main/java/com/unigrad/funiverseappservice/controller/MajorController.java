@@ -36,7 +36,7 @@ public class MajorController {
     @GetMapping
     public ResponseEntity<List<Major>> getAll() {
 
-        return ResponseEntity.ok(majorService.getAll());
+        return ResponseEntity.ok(majorService.getAllActive());
     }
 
     @GetMapping("/{id}")

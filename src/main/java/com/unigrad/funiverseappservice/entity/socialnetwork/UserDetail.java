@@ -51,7 +51,7 @@ public class UserDetail {
 
     private String phoneNumber;
 
-    private boolean isActive;
+    private boolean isActive = true;
 
     @ManyToOne
     @JoinColumn

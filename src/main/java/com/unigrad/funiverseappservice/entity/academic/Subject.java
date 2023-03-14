@@ -30,7 +30,7 @@ public class Subject {
 
     private String code;
 
-    private boolean isActive;
+    private boolean isActive = true;
 
     @OneToMany(mappedBy = "subject")
     @JsonIgnore

@@ -40,7 +40,7 @@ public class ComboService implements IComboService {
 
     @Override
     public List<Combo> getAllActive() {
-        return null;
+        return comboRepository.findAllByActiveIsTrue();
     }
 
     @Override

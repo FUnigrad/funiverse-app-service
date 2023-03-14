@@ -25,7 +25,7 @@ public class SpecializationService implements ISpecializationService {
 
     @Override
     public List<Specialization> getAllActive() {
-        return null;
+        return specializationRepository.findAllByActiveIsTrue();
     }
 
     @Override

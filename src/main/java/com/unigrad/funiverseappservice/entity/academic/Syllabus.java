@@ -44,7 +44,7 @@ public class Syllabus {
 
     private byte noSlot;
 
-    private boolean isActive;
+    private boolean isActive = true;
 
 
     @Convert(converter = SyllabusConverter.class)

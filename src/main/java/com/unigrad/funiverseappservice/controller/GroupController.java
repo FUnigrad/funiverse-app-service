@@ -116,7 +116,7 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<List<Group>> getAll() {
 
-        List<Group> subjects = groupService.getAll();
+        List<Group> subjects = groupService.getAllActive();
 
         return ResponseEntity.ok(subjects);
     }

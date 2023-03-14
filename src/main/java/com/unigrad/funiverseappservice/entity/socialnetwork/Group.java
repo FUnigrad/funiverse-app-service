@@ -44,7 +44,7 @@ public class Group {
 
     private LocalDateTime createdDateTime;
 
-    private boolean isActive;
+    private boolean isActive = true;
 
     @ManyToOne
     @JoinColumn

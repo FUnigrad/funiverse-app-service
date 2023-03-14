@@ -59,6 +59,6 @@ public class TermController {
     @GetMapping
     public ResponseEntity<List<TermDTO>> getAll() {
 
-        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(termService.getAll(), TermDTO[].class)).toList());
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(termService.getAllActive(), TermDTO[].class)).toList());
     }
 }

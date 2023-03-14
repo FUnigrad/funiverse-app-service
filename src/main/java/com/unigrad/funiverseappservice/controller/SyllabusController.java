@@ -31,7 +31,7 @@ public class SyllabusController {
     public ResponseEntity<List<Syllabus>> getAll(@RequestParam(required = false) String code) {
 
         List<Syllabus> syllabi = code == null
-                ? syllabusService.getAll() : List.of();
+                ? syllabusService.getAllActive() : List.of();
 
         return ResponseEntity.ok(syllabi);
     }
