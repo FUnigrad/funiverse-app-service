@@ -4,6 +4,7 @@ import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class SyllabusConverter implements AttributeConverter<List<Syllabus>, Str
     public List<Syllabus> convertToEntityAttribute(String dbData) {
 
         if (dbData == null || dbData.isBlank()) {
-            return null;
+            return new ArrayList<>();
         }
 
         return Arrays
