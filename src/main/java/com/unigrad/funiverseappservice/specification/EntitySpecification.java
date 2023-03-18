@@ -41,6 +41,12 @@ public class EntitySpecification<T> implements Specification<T> {
             predicates.add(criteriaBuilder.isTrue(root.get("isActive")));
         }
 
+        if (searchCriteria.size() == 2
+                && searchCriteria.stream().anyMatch(criteria -> criteria.getField().equalsIgnoreCase("name"))
+                && searchCriteria.stream().anyMatch(criteria -> criteria.getField().equalsIgnoreCase("code"))) {
+            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+        }
+
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 
