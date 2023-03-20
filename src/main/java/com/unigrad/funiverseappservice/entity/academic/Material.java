@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.entity.academic;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class Material {
 
     private String fileUrl;
 
+    @Column(columnDefinition = "text")
     private String description;
 
     @ManyToOne

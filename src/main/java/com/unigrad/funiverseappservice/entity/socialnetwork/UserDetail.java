@@ -2,6 +2,7 @@ package com.unigrad.funiverseappservice.entity.socialnetwork;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -32,6 +33,7 @@ public class UserDetail {
     private Long id;
 
     @NonNull
+    @Column(columnDefinition = "nvarchar(255)")
     private String name;
 
     private String code;
@@ -42,9 +44,11 @@ public class UserDetail {
     private String schoolYear;
 
     @Email
+    @Column(unique = true)
     private String personalMail;
 
     @Email
+    @Column(unique = true)
     private String eduMail;
 
     private String avatar;

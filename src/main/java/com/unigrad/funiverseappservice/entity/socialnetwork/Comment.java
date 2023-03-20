@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.entity.socialnetwork;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +33,7 @@ public class Comment {
     @JoinColumn
     private Post post;
 
+    @Column(columnDefinition = "text")
     private String content;
 
     private LocalDateTime createdDateTime;

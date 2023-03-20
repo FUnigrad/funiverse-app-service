@@ -32,6 +32,7 @@ public class Syllabus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "nvarchar(255)")
     private String name;
 
     @ManyToOne

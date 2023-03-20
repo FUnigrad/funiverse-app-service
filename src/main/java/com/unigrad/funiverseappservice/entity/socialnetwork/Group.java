@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.entity.socialnetwork;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -33,6 +34,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "nvarchar(255)")
     private String name;
 
     @Enumerated(EnumType.STRING)

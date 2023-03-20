@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.entity.academic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,12 +29,14 @@ public class Curriculum {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "nvarchar(255)")
     private String name;
 
     private String code;
 
     private String schoolYear;
 
+    @Column(columnDefinition = "text")
     private String description;
 
     private boolean isActive = true;
