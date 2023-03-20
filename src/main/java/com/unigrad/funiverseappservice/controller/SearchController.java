@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("search")
@@ -106,12 +107,12 @@ public class SearchController {
                 EntitySpecification<Combo> specification = new EntitySpecification<>(searchCriteria);
                 List<Combo> combos = comboService.search(specification);
 
-                List<Syllabus> syllabi = new ArrayList<>();
                 for (Combo combo : combos) {
-                    for (Syllabus syllabus : combo.getSyllabi()) {
-                        //noinspection OptionalGetWithoutIsPresent
-                        syllabi.add(syllabusService.get(syllabus.getId()).get());
-                    }
+                    //noinspection OptionalGetWithoutIsPresent
+                    List<Syllabus> syllabi = combo.getSyllabi().stream()
+                            .map(syllabus -> syllabusService.get(syllabus.getId()).get())
+                            .collect(Collectors.toList());
+
                     combo.setSyllabi(syllabi);
                 }
 
