@@ -38,6 +38,8 @@ public class UserDetail {
 
     private String code;
 
+    private String identifyNumber;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
