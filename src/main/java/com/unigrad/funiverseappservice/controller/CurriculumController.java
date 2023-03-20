@@ -92,7 +92,7 @@ public class CurriculumController {
         return ResponseEntity.created(location).body(newCurriculum.getId().toString());
     }
 
-    @PatchMapping
+    @PutMapping
     public ResponseEntity<Curriculum> update(@RequestBody Curriculum curriculum) {
 
         return curriculumService.isExist(curriculum.getId())
