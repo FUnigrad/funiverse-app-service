@@ -73,7 +73,7 @@ jobs:
         run: echo "VERSION=${{needs.build-and-push.outputs.version}}" >> $GITHUB_ENV
       - name: Update Manifest
         run: |
-          cd config/4-backend
+          cd config/backend
           sed -i "s+${{env.IMAGE_NAME}}.*+${{env.IMAGE_NAME}}@${{env.VERSION}}+g" 5-app-service-deployment.yaml
       - name: Commit and push
         run: |
