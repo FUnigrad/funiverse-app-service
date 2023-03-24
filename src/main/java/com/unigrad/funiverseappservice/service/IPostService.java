@@ -9,7 +9,5 @@ public interface IPostService extends IBaseService<Post, Long> {
 
     void deleteById(Long id);
 
-    Post addNewFromDTO(PostDTO postDTO);
-
     List<Post> getAllPostInGroup(Long groupId);
 }

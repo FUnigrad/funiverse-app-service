@@ -220,4 +220,6 @@ public class GroupController {
 
         return ResponseEntity.notFound().build();
     }
+
+    //todo un-set admin
 }

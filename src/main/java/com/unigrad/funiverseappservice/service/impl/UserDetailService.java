@@ -71,4 +71,9 @@ public class UserDetailService implements IUserDetailService {
     public List<UserDetail> getAllUsersNotInGroup(Long id) {
         return userDetailRepository.getAllUsersNotInGroup(id);
     }
+
+    @Override
+    public Optional<UserDetail> findByPersonalMail(String personalMail) {
+        return userDetailRepository.findByPersonalMail(personalMail);
+    }
 }

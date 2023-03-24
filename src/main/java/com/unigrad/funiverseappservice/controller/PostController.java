@@ -36,10 +36,10 @@ public class PostController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Void> create(@RequestBody PostDTO newPost) {
 
-        postService.addNewFromDTO(newPost);
+
 
         return ResponseEntity.ok().build();
     }

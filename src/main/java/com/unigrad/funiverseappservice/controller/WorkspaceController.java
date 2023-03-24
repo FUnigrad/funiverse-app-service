@@ -26,7 +26,6 @@ public class WorkspaceController {
     }
 
     @PostMapping
-    @PutMapping
     private ResponseEntity<Workspace> save(@RequestBody Workspace workspace) {
 
         return ResponseEntity.ok(workspaceService.save(workspace));

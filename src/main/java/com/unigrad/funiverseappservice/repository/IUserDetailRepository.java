@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long> {
@@ -15,4 +16,6 @@ public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long>
     @Query(value = "select ud from UserDetail ud where ud.id not in " +
             "(select gm.user.id from GroupMember gm where gm.group.id = :id)")
     List<UserDetail> getAllUsersNotInGroup(Long id);
+
+    Optional<UserDetail> findByPersonalMail(String personalMail);
 }

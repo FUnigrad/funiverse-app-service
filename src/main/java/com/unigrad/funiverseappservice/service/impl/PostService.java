@@ -76,24 +76,6 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public Post addNewFromDTO(PostDTO postDTO) {
-
-        Optional<UserDetail> userDetail = userDetailService.get(postDTO.getOwnerId());
-        Optional<Group> group = groupService.get(postDTO.getGroupId());
-        LocalDateTime date = LocalDateTime.now();
-
-        Post post = new Post();
-        post.setContent(postDTO.getContent());
-        post.setGroup(group.get());
-        post.setOwner(userDetail.get());
-        post.setCreatedDateTime(date);
-
-        postRepository.save(post);
-
-        return post;
-    }
-
-    @Override
     public List<Post> getAllPostInGroup(Long groupId) {
         return postRepository.getAllByGroup_Id(groupId);
     }

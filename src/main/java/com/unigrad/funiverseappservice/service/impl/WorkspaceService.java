@@ -28,8 +28,6 @@ public class WorkspaceService implements IWorkspaceService {
 
     @Override
     public Workspace save(Workspace workspace) {
-        Term newTerm = termService.get(workspace.getCurrentTerm().getSeason(), workspace.getCurrentTerm().getYear()).orElseGet(() -> termService.save(workspace.getCurrentTerm()));
-        workspace.setCurrentTerm(newTerm);
 
         this.workspace = workspaceRepository.save(workspace);
         return workspace;
