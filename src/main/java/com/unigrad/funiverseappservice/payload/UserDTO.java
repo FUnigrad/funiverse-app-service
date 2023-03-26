@@ -11,5 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserDTO extends EntityBaseDTO {
 
-    private String email;
+    private String eduMail;
 }

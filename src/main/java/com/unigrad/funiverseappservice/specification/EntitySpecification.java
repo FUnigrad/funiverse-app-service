@@ -45,7 +45,7 @@ public class EntitySpecification<T> implements Specification<T> {
                     }
                 }
             }
-            predicates.add(criteriaBuilder.isTrue(root.get("active")));
+            predicates.add(criteriaBuilder.isTrue(root.get("isActive")));
         }
 
         if (searchCriteria.size() == 2
