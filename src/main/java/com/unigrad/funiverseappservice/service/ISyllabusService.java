@@ -9,4 +9,6 @@ import java.util.List;
 public interface ISyllabusService extends IBaseService<Syllabus, Long> {
 
     List<Syllabus> updateSyllabusCombo(long curriculumId, String comboCode);
+
+    List<Syllabus> getReadySyllabusForAdding(Long curriculumId);
 }

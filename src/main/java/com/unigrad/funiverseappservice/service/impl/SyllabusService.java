@@ -140,4 +140,9 @@ public class SyllabusService implements ISyllabusService {
         }
         return result;
     }
+
+    @Override
+    public List<Syllabus> getReadySyllabusForAdding(Long curriculumId) {
+        return syllabusRepository.getReadySyllabusForAdding(curriculumId);
+    }
 }

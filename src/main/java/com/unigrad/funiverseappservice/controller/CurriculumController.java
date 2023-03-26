@@ -18,6 +18,7 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -290,4 +291,18 @@ public class CurriculumController {
     }
 
     //todo remove combo from curriculum
+
+    //get Syllabus ready for adding to Curriculum
+    @GetMapping("{id}/syllabus/get-ready")
+    public ResponseEntity<List<EntityBaseDTO>> getReadySyllabusForAdding(@PathVariable Long id) {
+        Optional<Curriculum> curriculumOptional = curriculumService.get(id);
+
+        if (curriculumOptional.isPresent()) {
+            List<Syllabus> syllabi = syllabusService.getReadySyllabusForAdding(id);
+
+            return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(syllabi, EntityBaseDTO[].class)).toList());
+        }
+
+        return ResponseEntity.notFound().build();
+    }
 }
