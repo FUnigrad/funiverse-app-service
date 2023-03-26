@@ -1,15 +1,17 @@
-package com.unigrad.funiverseappservice.payload;
+package com.unigrad.funiverseappservice.payload.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO extends EntityBaseDTO {
+public class ComboDTO extends EntityBaseDTO {
 
-    private String eduMail;
+    List<EntityBaseDTO> syllabi;
 }

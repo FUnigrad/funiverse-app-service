@@ -1,6 +1,6 @@
 package com.unigrad.funiverseappservice.service.impl;
 
-import com.unigrad.funiverseappservice.payload.CommentDTO;
+import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Comment;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
@@ -34,23 +34,6 @@ public class CommentService implements ICommentService {
     @Override
     public void deleteById(Long id) {
         commentRepository.deleteById(id);
-    }
-
-    @Override
-    public Comment addFromDTO(CommentDTO commentDTO) {
-
-        Optional<UserDetail> userDetail = userDetailService.get(commentDTO.getOwnerId());
-        Optional<Post> post = postService.get(commentDTO.getPostId());
-        LocalDateTime date = LocalDateTime.now();
-        Comment comment = new Comment();
-
-        comment.setOwner(userDetail.get());
-        comment.setPost(post.get());
-        comment.setContent(commentDTO.getContent());
-        comment.setCreatedDateTime(date);
-
-        commentRepository.save(comment);
-        return comment;
     }
 
     @Override

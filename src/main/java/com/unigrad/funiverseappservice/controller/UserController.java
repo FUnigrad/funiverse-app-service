@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.payload.UserDTO;
+import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;

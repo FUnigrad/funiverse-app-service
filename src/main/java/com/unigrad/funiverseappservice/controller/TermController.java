@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Term;
-import com.unigrad.funiverseappservice.payload.TermDTO;
+import com.unigrad.funiverseappservice.payload.DTO.TermDTO;
 import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;

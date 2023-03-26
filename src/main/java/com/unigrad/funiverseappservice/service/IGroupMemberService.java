@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.service;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
+import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 
 import java.util.List;

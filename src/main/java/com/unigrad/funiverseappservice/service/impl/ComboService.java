@@ -3,7 +3,7 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.academic.Combo;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
-import com.unigrad.funiverseappservice.payload.ComboPlanDTO;
+import com.unigrad.funiverseappservice.payload.DTO.ComboPlanDTO;
 import com.unigrad.funiverseappservice.repository.IComboRepository;
 import com.unigrad.funiverseappservice.service.IComboService;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;

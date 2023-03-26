@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.service;
 
 import com.unigrad.funiverseappservice.entity.academic.Combo;
-import com.unigrad.funiverseappservice.payload.ComboPlanDTO;
+import com.unigrad.funiverseappservice.payload.DTO.ComboPlanDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

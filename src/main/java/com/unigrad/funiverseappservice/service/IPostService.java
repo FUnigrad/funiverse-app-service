@@ -1,6 +1,5 @@
 package com.unigrad.funiverseappservice.service;
 
-import com.unigrad.funiverseappservice.payload.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 
 import java.util.List;

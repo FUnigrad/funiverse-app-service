@@ -1,6 +1,6 @@
 package com.unigrad.funiverseappservice.payload.response;
 
-import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
+import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,10 +1,16 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.payload.CommentDTO;
-import com.unigrad.funiverseappservice.payload.PostDTO;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
+import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.service.ICommentService;
+import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
+import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.util.DTOConverter;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("post")
+@RequiredArgsConstructor
 public class PostController {
 
     private final IPostService postService;
@@ -30,29 +38,42 @@ public class PostController {
 
     private final ModelMapper modelMapper;
 
-    public PostController(IPostService postService, ICommentService commentService, ModelMapper modelMapper) {
-        this.postService = postService;
-        this.commentService = commentService;
-        this.modelMapper = modelMapper;
-    }
+    private final IUserDetailService userDetailService;
+
+    private final IGroupService groupService;
+
+    private final DTOConverter dtoConverter;
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody PostDTO newPost) {
+        Optional<UserDetail> userDetailOptional = userDetailService.get(newPost.getOwnerId());
+        Optional<Group> groupOptional = groupService.get(newPost.getGroupId());
 
+        if (userDetailOptional.isPresent() && groupOptional.isPresent()) {
+            Post post = Post.builder()
+                    .content(newPost.getContent())
+                    .group(groupOptional.get())
+                    .owner(userDetailOptional.get())
+                    .createdDateTime(LocalDateTime.now())
+                    .build();
+            postService.save(post);
+            return ResponseEntity.ok().build();
+        }
 
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Post> update(@RequestBody String content, @PathVariable Long id) {
 
-        Optional<Post> post = postService.get(id);
-        post.get().setContent(content);
+        Optional<Post> postOptional = postService.get(id);
 
-        return postService.isExist(id)
-                ? ResponseEntity.ok(postService.save(post.get()))
-                : ResponseEntity.notFound().build();
+        return postOptional
+                .map(post -> {
+                    post.setContent(content);
+                    return ResponseEntity.ok(postService.save(post));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -65,10 +86,10 @@ public class PostController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{pid}")
-    public ResponseEntity<Post> getById(@PathVariable Long pid) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Post> getById(@PathVariable Long id) {
 
-        return postService.get(pid)
+        return postService.get(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -77,7 +98,7 @@ public class PostController {
     @GetMapping("/{pid}/comments")
     public ResponseEntity<List<CommentDTO>> getAllCommentsInPost(@PathVariable Long pid) {
 
-        List<CommentDTO> commentDTOList = Arrays.asList(modelMapper.map(commentService.getAllCommentsInPost(pid), CommentDTO[].class));
+        List<CommentDTO> commentDTOList = Arrays.stream(dtoConverter.convert(commentService.getAllCommentsInPost(pid), CommentDTO[].class)).toList();
 
         return ResponseEntity.ok(commentDTOList);
     }

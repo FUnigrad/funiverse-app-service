@@ -1,14 +1,14 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Combo;
-import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.payload.ComboPlanDTO;
-import com.unigrad.funiverseappservice.payload.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
-import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
-import com.unigrad.funiverseappservice.payload.UserDTO;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.payload.DTO.ComboPlanDTO;
+import com.unigrad.funiverseappservice.payload.DTO.CurriculumPlanDTO;
+import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
+import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.payload.response.ListComboResponse;
 import com.unigrad.funiverseappservice.service.IComboService;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
@@ -18,13 +18,24 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("curriculum")

@@ -2,8 +2,8 @@ package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Combo;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
-import com.unigrad.funiverseappservice.payload.ComboDTO;
-import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
+import com.unigrad.funiverseappservice.payload.DTO.ComboDTO;
+import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
 import com.unigrad.funiverseappservice.service.IComboService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
 import com.unigrad.funiverseappservice.util.DTOConverter;

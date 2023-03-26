@@ -1,10 +1,22 @@
 package com.unigrad.funiverseappservice.controller;
 
-import com.unigrad.funiverseappservice.entity.academic.*;
+import com.unigrad.funiverseappservice.entity.academic.Combo;
+import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.Major;
+import com.unigrad.funiverseappservice.entity.academic.Specialization;
+import com.unigrad.funiverseappservice.entity.academic.Subject;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.payload.ComboDTO;
-import com.unigrad.funiverseappservice.service.*;
+import com.unigrad.funiverseappservice.payload.DTO.ComboDTO;
+import com.unigrad.funiverseappservice.service.IComboService;
+import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.IGroupService;
+import com.unigrad.funiverseappservice.service.IMajorService;
+import com.unigrad.funiverseappservice.service.ISpecializationService;
+import com.unigrad.funiverseappservice.service.ISubjectService;
+import com.unigrad.funiverseappservice.service.ISyllabusService;
+import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import com.unigrad.funiverseappservice.specification.SearchCriteria;
 import com.unigrad.funiverseappservice.util.DTOConverter;

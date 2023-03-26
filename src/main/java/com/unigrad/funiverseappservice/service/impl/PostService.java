@@ -1,9 +1,6 @@
 package com.unigrad.funiverseappservice.service.impl;
 
-import com.unigrad.funiverseappservice.payload.PostDTO;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
-import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.IPostRepository;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
@@ -11,7 +8,6 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

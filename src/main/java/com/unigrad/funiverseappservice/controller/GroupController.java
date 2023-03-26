@@ -5,9 +5,9 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
-import com.unigrad.funiverseappservice.payload.GroupMemberDTO;
-import com.unigrad.funiverseappservice.payload.MemberDTO;
-import com.unigrad.funiverseappservice.payload.PostDTO;
+import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
+import com.unigrad.funiverseappservice.payload.DTO.MemberDTO;
+import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
@@ -16,6 +16,8 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,7 +60,6 @@ public class GroupController {
 
     @PostMapping
     public ResponseEntity<Group> create(@RequestBody Group newGroup) {
-
         Group.Type newGroupType = newGroup.getType();
 
         switch (newGroupType) {
@@ -93,6 +94,17 @@ public class GroupController {
                     throw new MissingRequiredPropertyException("Name");
                 }
             }
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetail userDetail = (UserDetail) authentication.getPrincipal();
+
+        if (!userDetail.isAdmin()) {
+            newGroup = Group.builder()
+                    .name(newGroup.getName())
+                    .type(Group.Type.NORMAL)
+                    .build();
         }
 
         Group returnGroup = groupService.save(newGroup);

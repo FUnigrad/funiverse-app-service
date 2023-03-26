@@ -52,7 +52,9 @@ public class SecurityConfiguration {
 
         http
                 .authorizeHttpRequests()
-//                .requestMatchers("/api/syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("/api/syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("/api/group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("/api/post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .anyRequest().permitAll()
                 ;
 

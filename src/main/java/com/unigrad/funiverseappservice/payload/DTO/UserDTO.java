@@ -1,4 +1,4 @@
-package com.unigrad.funiverseappservice.payload;
+package com.unigrad.funiverseappservice.payload.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupMemberDTO {
-    private Long userId;
-    private Long groupId;
-    private boolean isGroupAdmin;
+public class UserDTO extends EntityBaseDTO {
+
+    private String eduMail;
 }

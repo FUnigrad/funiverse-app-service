@@ -99,7 +99,7 @@ public class UserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        return eduMail;
+        return personalMail;
     }
 
     @Override
@@ -120,5 +120,10 @@ public class UserDetail implements UserDetails {
     @Override
     public boolean isEnabled() {
         return isActive;
+    }
+
+    @JsonIgnore
+    public boolean isAdmin() {
+        return Role.WORKSPACE_ADMIN.equals(role);
     }
 }

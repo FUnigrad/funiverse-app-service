@@ -1,4 +1,4 @@
-package com.unigrad.funiverseappservice.payload;
+package com.unigrad.funiverseappservice.payload.request;
 
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import lombok.AllArgsConstructor;
@@ -10,11 +10,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TermDTO {
+public class OnBoardingRequest {
 
-    private Long id;
+    private int foundedYear;
 
-    private Term.Season season;
+    private Term currentTerm;
 
-    private String year;
+    private String logoImage;
 }

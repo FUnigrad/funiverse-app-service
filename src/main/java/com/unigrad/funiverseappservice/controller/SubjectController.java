@@ -1,7 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Subject;
-import com.unigrad.funiverseappservice.payload.EntityBaseDTO;
+import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
 import com.unigrad.funiverseappservice.service.ISubjectService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
