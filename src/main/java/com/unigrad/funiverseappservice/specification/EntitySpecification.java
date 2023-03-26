@@ -37,6 +37,13 @@ public class EntitySpecification<T> implements Specification<T> {
                         predicates.add(criteriaBuilder.equal(root.get(criteria.getField()), criteria.getValue()));
                     }
                 }
+                case "bool" -> {
+                    if (criteria.getValue().equals("true")) {
+                        predicates.add(criteriaBuilder.isTrue(root.get(criteria.getField())));
+                    } else {
+                        predicates.add(criteriaBuilder.isFalse(root.get(criteria.getField())));
+                    }
+                }
             }
             predicates.add(criteriaBuilder.isTrue(root.get("isActive")));
         }
