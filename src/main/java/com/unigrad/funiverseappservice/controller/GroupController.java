@@ -16,6 +16,7 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -32,6 +34,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("group")
@@ -120,29 +123,60 @@ public class GroupController {
     @GetMapping("/{id}")
     public ResponseEntity<Group> getById(@PathVariable Long id) {
 
-        return groupService.get(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Optional<Group> groupOptional = groupService.get(id);
+
+        if (groupOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!userDetail.isAdmin()) {
+            if (groupMemberService.isGroupMember(userDetail.getId(), id)) {
+                return ResponseEntity.ok(groupOptional.get());
+            } else {
+                throw new AccessDeniedException("You don not have permission to perform this action");
+            }
+        }
+
+        return ResponseEntity.ok(groupOptional.get());
     }
 
     @GetMapping
     public ResponseEntity<List<Group>> getAll() {
 
-        List<Group> subjects = groupService.getAllActive();
+        List<Group> groups = groupService.getAllActive();
 
-        return ResponseEntity.ok(subjects);
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!userDetail.isAdmin()) {
+            groups = groups.stream()
+                    .filter(group -> groupMemberService.isGroupMember(userDetail.getId(), group.getId()))
+                    .collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok(groups);
     }
 
     @PutMapping
     public ResponseEntity<Group> update(@RequestBody Group group) {
 
-        return groupService.isExist(group.getId())
-                ? ResponseEntity.ok(groupService.save(group))
-                : ResponseEntity.notFound().build();
+        if (!groupService.isExist(group.getId())) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (userDetail.isAdmin() || groupMemberService.isGroupAdmin(userDetail.getId(), group.getId())) {
+            return ResponseEntity.ok(groupService.save(group));
+        } else {
+            throw new AccessDeniedException("You don not have permission to perform this action");
+        }
     }
 
     @PostMapping("/{id}/members")
     public ResponseEntity<Void> addNewMemberToGroup(@PathVariable Long id, @RequestBody List<Long> memberIds) {
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Group> groupOpt = groupService.get(id);
 
@@ -150,36 +184,54 @@ public class GroupController {
             return ResponseEntity.notFound().build();
         }
 
-        for (Long memberId : memberIds) {
-            Optional<UserDetail> member = userDetailService.get(memberId);
+        if (groupMemberService.isGroupAdmin(userDetail.getId(), id) || userDetail.isAdmin()) {
+            for (Long memberId : memberIds) {
+                Optional<UserDetail> memberOptional = userDetailService.get(memberId);
 
-            member.ifPresent(userDetail -> groupMemberService.addMemberToGroup(new GroupMemberDTO(userDetail.getId(), groupOpt.get().getId(), false)));
+                memberOptional.ifPresent(member -> groupMemberService.addMemberToGroup(new GroupMemberDTO(member.getId(), groupOpt.get().getId(), false)));
+            }
+
+            return ResponseEntity.ok().build();
+        } else {
+            throw new AccessDeniedException("You don not have permission to perform this action");
         }
-
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{gid}/user/{uid}")
     public ResponseEntity<Void> removeMemberFromGroup(@PathVariable Long gid, @PathVariable Long uid) {
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         GroupMember.GroupMemberKey key = new GroupMember.GroupMemberKey(uid, gid);
 
-        if (groupMemberService.isExist(key)) {
-            groupMemberService.deleteByGroupMemberKey(key);
-            return ResponseEntity.ok().build();
+        if (!groupMemberService.isExist(key)) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.notFound().build();
+        if (groupMemberService.isGroupAdmin(userDetail.getId(), gid) || userDetail.isAdmin()) {
+
+            groupMemberService.deleteByGroupMemberKey(key);
+            return ResponseEntity.ok().build();
+        } else {
+            throw new AccessDeniedException("You don not have permission to perform this action");
+        }
+
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Group> deactivate(@PathVariable Long id) {
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        groupService.inactivate(id);
+        if (!groupService.isExist(id)) {
+            return ResponseEntity.notFound().build();
+        }
 
-        return groupService.get(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        if (groupMemberService.isGroupAdmin(userDetail.getId(), id) || userDetail.isAdmin()) {
+
+            groupService.inactivate(id);
+            return ResponseEntity.ok().build();
+        } else {
+            throw new AccessDeniedException("You don not have permission to perform this action");
+        }
     }
 
     @PutMapping("/{id}")
@@ -215,23 +267,22 @@ public class GroupController {
     }
 
     @PutMapping("{groupId}/users/{userId}/set-admin")
-    public ResponseEntity<GroupMemberDTO> setAdminOfGroup(@PathVariable Long groupId, @PathVariable Long userId) {
-        Optional<Group> groupOpt = groupService.get(groupId);
-        Optional<UserDetail> userDetailOpt = userDetailService.get(userId);
-
-        if (groupOpt.isEmpty() || userDetailOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<GroupMemberDTO> setAdminOfGroup(@PathVariable Long groupId, @PathVariable Long userId, @RequestParam boolean value) {
 
         Optional<GroupMember> groupMemberOpt = groupMemberService.get(new GroupMember.GroupMemberKey(userId, groupId));
 
         if (groupMemberOpt.isPresent()) {
-            groupMemberOpt.get().setGroupAdmin(true);
-            return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.notFound().build();
-    }
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-    //todo un-set admin
+        if (userDetail.isAdmin() || groupMemberService.isGroupAdmin(userDetail.getId(), groupId)) {
+
+            groupMemberOpt.get().setGroupAdmin(value);
+            return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));
+        } else {
+            throw new AccessDeniedException("You don not have permission to perform this action");
+        }
+    }
 }

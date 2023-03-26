@@ -98,6 +98,16 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
+    public boolean isGroupAdmin(Long userId, Long groupId) {
+        return groupMemberRepository.isGroupAdmin(userId, groupId);
+    }
+
+    @Override
+    public boolean isGroupMember(Long userId, Long groupId) {
+        return groupMemberRepository.isGroupMember(userId, groupId);
+    }
+
+    @Override
     public List<GroupMember> search(EntitySpecification<GroupMember> specification) {
         return null;
     }

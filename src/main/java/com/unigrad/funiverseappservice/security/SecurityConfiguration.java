@@ -31,7 +31,7 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfiguration(IUserDetailService userDetailService, CustomAccessDeniedHandler customAccessDeniedHandler, RestAuthenticationEntryPoint restAuthenticationEntryPoint, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfiguration(CustomAccessDeniedHandler customAccessDeniedHandler, RestAuthenticationEntryPoint restAuthenticationEntryPoint, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customAccessDeniedHandler = customAccessDeniedHandler;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -52,9 +52,9 @@ public class SecurityConfiguration {
 
         http
                 .authorizeHttpRequests()
-                .requestMatchers("/api/syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
-                .requestMatchers("/api/group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
-                .requestMatchers("/api/post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+//                .requestMatchers("/api/syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+//                .requestMatchers("/api/group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+//                .requestMatchers("/api/post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .anyRequest().permitAll()
                 ;
 

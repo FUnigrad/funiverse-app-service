@@ -27,7 +27,7 @@ public class CommentController {
 
     @PostMapping()
     public ResponseEntity<Comment> create(@RequestBody Comment newComment) {
-        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication();
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         newComment.setOwner(userDetail);
 
@@ -44,7 +44,7 @@ public class CommentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Comment> update(@RequestBody String content, @PathVariable Long id) {
-        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication();
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Comment> commentOptional = commentService.get(id);
 
@@ -65,7 +65,7 @@ public class CommentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 
-        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication();
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Comment> commentOptional = commentService.get(id);
 
