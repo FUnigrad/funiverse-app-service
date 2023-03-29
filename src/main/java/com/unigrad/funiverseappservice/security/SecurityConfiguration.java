@@ -52,9 +52,18 @@ public class SecurityConfiguration {
 
         http
                 .authorizeHttpRequests()
-//                .requestMatchers("/api/syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
-//                .requestMatchers("/api/group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
-//                .requestMatchers("/api/post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("subject/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("curriculum/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("major/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("term/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("specialization/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("user/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("search/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .anyRequest().permitAll()
                 ;
 

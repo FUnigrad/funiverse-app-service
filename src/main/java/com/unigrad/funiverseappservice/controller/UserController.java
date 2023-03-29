@@ -1,10 +1,13 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
+import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +23,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("user")
+@RequiredArgsConstructor
 public class UserController {
 
     private final GroupMemberService groupMemberService;
@@ -32,11 +37,7 @@ public class UserController {
 
     private final DTOConverter dtoConverter;
 
-    public UserController(GroupMemberService groupMemberService, UserDetailService userDetailService, DTOConverter dtoConverter) {
-        this.groupMemberService = groupMemberService;
-        this.userDetailService = userDetailService;
-        this.dtoConverter = dtoConverter;
-    }
+    private final IEventService eventService;
 
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
@@ -111,5 +112,16 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getUsersNotInGroup(@RequestParam Long id) {
 
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(userDetailService.getAllUsersNotInGroup(id), UserDTO[].class)).toList());
+    }
+
+    @GetMapping("{id}/event")
+    public ResponseEntity<List<Event>> getListEvent(@PathVariable Long id) {
+        Optional<UserDetail> userDetailOptional = userDetailService.get(id);
+
+        if (userDetailOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(eventService.getAllForUser(id));
     }
 }

@@ -1,17 +1,20 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.service.ICommentService;
+import com.unigrad.funiverseappservice.service.IEventService;
+import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import com.unigrad.funiverseappservice.util.Utils;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,27 +39,69 @@ public class PostController {
 
     private final ICommentService commentService;
 
-    private final ModelMapper modelMapper;
-
     private final IUserDetailService userDetailService;
 
     private final IGroupService groupService;
+
+    private final IEventService eventService;
+
+    private final IGroupMemberService groupMemberService;
 
     private final DTOConverter dtoConverter;
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody PostDTO newPost) {
-        Optional<UserDetail> userDetailOptional = userDetailService.get(newPost.getOwnerId());
+        Optional<UserDetail> ownerOptional = userDetailService.get(newPost.getOwnerId());
         Optional<Group> groupOptional = groupService.get(newPost.getGroupId());
 
-        if (userDetailOptional.isPresent() && groupOptional.isPresent()) {
-            Post post = Post.builder()
+        if (ownerOptional.isPresent() && groupOptional.isPresent()) {
+
+            Post post = postService.save(Post.builder()
                     .content(newPost.getContent())
                     .group(groupOptional.get())
-                    .owner(userDetailOptional.get())
+                    .owner(ownerOptional.get())
                     .createdDateTime(LocalDateTime.now())
-                    .build();
-            postService.save(post);
+                    .build()
+            );
+
+            // event for user who are mentioned
+            List<Long> mentionUserIds = Utils.extractUserFromContent(newPost.getContent());
+
+            mentionUserIds
+                    .forEach(userId -> {
+                        Optional<UserDetail> userDetail = userDetailService.get(userId);
+
+                        if (userDetail.isPresent()) {
+                            Event event = Event.builder()
+                                    .actor(ownerOptional.get())
+                                    .receiver(userDetail.get())
+                                    .type(Event.Type.MENTION)
+                                    .sourceId(post.getId())
+                                    .sourceType(Event.SourceType.POST)
+                                    .createdTime(LocalDateTime.now())
+                                    .build();
+
+                            eventService.save(event);
+                        }
+                    });
+
+            // event for all users in group
+            List<UserDetail> members = groupMemberService.getAllUsersInGroup(groupOptional.get().getId());
+
+            members
+                    .forEach(user -> {
+                        Event event = Event.builder()
+                                .actor(ownerOptional.get())
+                                .receiver(user)
+                                .type(Event.Type.MENTION)
+                                .sourceId(post.getId())
+                                .sourceType(Event.SourceType.POST)
+                                .createdTime(LocalDateTime.now())
+                                .build();
+
+                        eventService.save(event);
+                    });
+
             return ResponseEntity.ok().build();
         }
 
@@ -68,12 +113,33 @@ public class PostController {
 
         Optional<Post> postOptional = postService.get(id);
 
-        return postOptional
-                .map(post -> {
-                    post.setContent(content);
-                    return ResponseEntity.ok(postService.save(post));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if (postOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Long> mentionUserIds = Utils.extractUserFromContent(content);
+
+        mentionUserIds
+                .forEach(userId -> {
+                    Optional<UserDetail> userDetail = userDetailService.get(userId);
+
+                    if (userDetail.isPresent()) {
+                        Event event = Event.builder()
+                                .actor(postOptional.get().getOwner())
+                                .receiver(userDetail.get())
+                                .type(Event.Type.MENTION)
+                                .sourceId(id)
+                                .sourceType(Event.SourceType.POST)
+                                .createdTime(LocalDateTime.now())
+                                .build();
+
+                        eventService.save(event);
+                    }
+                });
+
+        postOptional.get().setContent(content);
+
+        return ResponseEntity.ok(postService.save(postOptional.get()));
     }
 
     @DeleteMapping("/{id}")

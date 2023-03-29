@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
@@ -9,12 +10,14 @@ import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.MemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import io.micrometer.common.util.StringUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +42,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("group")
+@RequiredArgsConstructor
 public class GroupController {
 
     private final IGroupService groupService;
@@ -50,16 +55,9 @@ public class GroupController {
 
     private final ICurriculumService curriculumService;
 
-    private final DTOConverter dtoConverter;
+    private final IEventService eventService;
 
-    public GroupController(IGroupService groupService, IGroupMemberService groupMemberService, IUserDetailService userDetailService, IPostService postService, ICurriculumService curriculumService, DTOConverter dtoConverter) {
-        this.groupService = groupService;
-        this.groupMemberService = groupMemberService;
-        this.userDetailService = userDetailService;
-        this.postService = postService;
-        this.curriculumService = curriculumService;
-        this.dtoConverter = dtoConverter;
-    }
+    private final DTOConverter dtoConverter;
 
     @PostMapping
     public ResponseEntity<Group> create(@RequestBody Group newGroup) {
@@ -107,6 +105,7 @@ public class GroupController {
             newGroup = Group.builder()
                     .name(newGroup.getName())
                     .type(Group.Type.NORMAL)
+                    .isActive(true)
                     .build();
         }
 
@@ -188,7 +187,20 @@ public class GroupController {
             for (Long memberId : memberIds) {
                 Optional<UserDetail> memberOptional = userDetailService.get(memberId);
 
-                memberOptional.ifPresent(member -> groupMemberService.addMemberToGroup(new GroupMemberDTO(member.getId(), groupOpt.get().getId(), false)));
+                memberOptional.ifPresent(member -> {
+                    groupMemberService.addMemberToGroup(new GroupMemberDTO(member.getId(), groupOpt.get().getId(), false));
+
+                    Event event = Event.builder()
+                            .actor(userDetail)
+                            .receiver(member)
+                            .sourceId(groupOpt.get().getId())
+                            .sourceType(Event.SourceType.GROUP)
+                            .type(Event.Type.ADD_TO_GROUP)
+                            .createdTime(LocalDateTime.now())
+                            .build();
+
+                    eventService.save(event);
+                });
             }
 
             return ResponseEntity.ok().build();
@@ -271,7 +283,7 @@ public class GroupController {
 
         Optional<GroupMember> groupMemberOpt = groupMemberService.get(new GroupMember.GroupMemberKey(userId, groupId));
 
-        if (groupMemberOpt.isPresent()) {
+        if (groupMemberOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
@@ -280,6 +292,21 @@ public class GroupController {
         if (userDetail.isAdmin() || groupMemberService.isGroupAdmin(userDetail.getId(), groupId)) {
 
             groupMemberOpt.get().setGroupAdmin(value);
+
+            if (value) {
+                //noinspection OptionalGetWithoutIsPresent
+                Event event = Event.builder()
+                        .actor(userDetail)
+                        .receiver(userDetailService.get(userId).get())
+                        .sourceId(groupService.get(groupId).get().getId())
+                        .sourceType(Event.SourceType.GROUP)
+                        .type(Event.Type.SET_GROUP_ADMIN)
+                        .createdTime(LocalDateTime.now())
+                        .build();
+
+                eventService.save(event);
+            }
+
             return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));
         } else {
             throw new AccessDeniedException("You don not have permission to perform this action");

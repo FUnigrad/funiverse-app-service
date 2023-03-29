@@ -35,38 +35,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String userEmail;
-        final String domain = request.getHeader("Origin");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD");
+        response.setHeader("Access-Control-Allow-Headers",
+                "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, No-Auth");
 
-        // todo need to authorize services
-        if ("3.1.47.236:30001".equals(domain) || "http://localhost:63342/".equals(domain)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (authHeader == null) {
-            jwt = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiV09SS1NQQUNFX0FETUlOIiwiZG9tYWluIjoiZGV2LmZ1bml2ZXJzZS53b3JsZCIsInVzZXJuYW1lIjoidGhhbmguYnVpLmJhb0BnbWFpbC5jb20iLCJzdWIiOiJ0aGFuaC5idWkuYmFvQGdtYWlsLmNvbSIsImlhdCI6MTY4MDA2MTQyMiwiZXhwIjoxNjgwMjM0MjIyfQ.CpQiyigvoNvteH7KwIB4bqVM4jwyZTUT12sTUzUs1mw";
+        if (request.getMethod().equals("OPTIONS")) {
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
         } else {
-            jwt = authHeader.substring(7);
-        }
-        userEmail = jwtService.extractUsername(jwt);
+            final String authHeader = request.getHeader("Authorization");
+            final String jwt;
+            final String userEmail;
+            final String domain = request.getHeader("Origin");
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            // todo need to authorize services
+            if ("3.1.47.236:30001".equals(domain) || "http://localhost:63342/".equals(domain)) {
+                filterChain.doFilter(request, response);
+                return;
             }
+
+            jwt = authHeader.substring(7);
+
+            userEmail = jwtService.extractUsername(jwt);
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
     }
 }

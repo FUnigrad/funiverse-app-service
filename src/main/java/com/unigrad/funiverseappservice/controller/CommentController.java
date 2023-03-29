@@ -1,8 +1,12 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.Comment;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.service.ICommentService;
+import com.unigrad.funiverseappservice.service.IEventService;
+import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -25,13 +31,39 @@ public class CommentController {
 
     private final ICommentService commentService;
 
+    private final IUserDetailService userDetailService;
+
+    private final IEventService eventService;
+
     @PostMapping()
     public ResponseEntity<Comment> create(@RequestBody Comment newComment) {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         newComment.setOwner(userDetail);
 
-        return ResponseEntity.ok().body(commentService.save(newComment));
+        Comment comment = commentService.save(newComment);
+
+        List<Long> mentionUserIds = Utils.extractUserFromContent(newComment.getContent());
+
+        mentionUserIds
+                .forEach(userId -> {
+                    Optional<UserDetail> user = userDetailService.get(userId);
+
+                    if (user.isPresent()) {
+                        Event event = Event.builder()
+                                .actor(comment.getOwner())
+                                .receiver(user.get())
+                                .type(Event.Type.MENTION)
+                                .sourceId(comment.getId())
+                                .sourceType(Event.SourceType.POST)
+                                .createdTime(LocalDateTime.now())
+                                .build();
+
+                        eventService.save(event);
+                    }
+                });
+
+        return ResponseEntity.ok().body(comment);
     }
 
     @GetMapping("/{id}")
@@ -53,6 +85,26 @@ public class CommentController {
                     if (comment.getOwner().getId().equals(userDetail.getId())) {
                         comment.setContent(content);
                         commentService.save(comment);
+
+                        List<Long> mentionUserIds = Utils.extractUserFromContent(content);
+
+                        mentionUserIds
+                                .forEach(userId -> {
+                                    Optional<UserDetail> user = userDetailService.get(userId);
+
+                                    if (user.isPresent()) {
+                                        Event event = Event.builder()
+                                                .actor(comment.getOwner())
+                                                .receiver(user.get())
+                                                .type(Event.Type.MENTION)
+                                                .sourceId(comment.getId())
+                                                .sourceType(Event.SourceType.POST)
+                                                .createdTime(LocalDateTime.now())
+                                                .build();
+
+                                        eventService.save(event);
+                                    }
+                                });
 
                         return ResponseEntity.ok(comment);
                     } else {

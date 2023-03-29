@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Event {
 
     @Id
@@ -37,17 +39,31 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    private Long sourceId;
+
+    @Enumerated(EnumType.STRING)
+    private SourceType sourceType;
+
     private LocalDateTime createdTime;
 
-    private boolean isRead;
+    private boolean isRead = false;
 
     @Getter
     @AllArgsConstructor
     public enum Type {
-        MENTION(" mention you in "),
-        NEW_POST(" posted a post "),
-        NEW_COMMENT(" comment in post ");
+        MENTION,
+        NEW_POST,
+        NEW_COMMENT,
+        REACTION,
+        SET_GROUP_ADMIN,
+        ADD_TO_GROUP;
+    }
 
-        private final String text;
+    @Getter
+    @AllArgsConstructor
+    public enum SourceType {
+        GROUP,
+        POST,
+        COMMENT
     }
 }
