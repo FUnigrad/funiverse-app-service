@@ -13,5 +13,5 @@ public interface IWorkspaceService {
 
     Term getNextTerm();
 
-    Term startNewTerm();
+    Term startNewTerm(String startDateString);
 }

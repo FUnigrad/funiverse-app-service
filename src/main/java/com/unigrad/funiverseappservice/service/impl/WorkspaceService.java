@@ -1,25 +1,30 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.Workspace;
+import com.unigrad.funiverseappservice.entity.academic.Season;
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.repository.IWorkspaceRepository;
+import com.unigrad.funiverseappservice.service.ISeasonService;
 import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
 @Service
+@RequiredArgsConstructor
 public class WorkspaceService implements IWorkspaceService {
 
     private Workspace workspace;
 
     private final IWorkspaceRepository workspaceRepository;
 
-    private final ITermService termService;
+    private final ISeasonService seasonService;
 
-    public WorkspaceService(IWorkspaceRepository workspaceRepository, ITermService termService) {
-        this.workspaceRepository = workspaceRepository;
-        this.termService = termService;
-    }
+    private final ITermService termService;
 
     @Override
     public Workspace get() {
@@ -28,7 +33,14 @@ public class WorkspaceService implements IWorkspaceService {
 
     @Override
     public Workspace save(Workspace workspace) {
-
+        if (workspace.getCurrentTerm() != null) {
+            if (termService.get(workspace.getCurrentTerm().getSeason().getId(), workspace.getCurrentTerm().getYear()).isEmpty()) {
+                Term currentTerm = newTerm(workspace.getCurrentTerm().getSeason(), workspace.getCurrentTerm().getYear());
+                workspace.setCurrentTerm(currentTerm);
+            } else {
+                workspace.setCurrentTerm(termService.get(workspace.getCurrentTerm().getSeason().getId(), workspace.getCurrentTerm().getYear()).get());
+            }
+        }
         this.workspace = workspaceRepository.save(workspace);
         return workspace;
     }
@@ -39,9 +51,13 @@ public class WorkspaceService implements IWorkspaceService {
     }
 
     @Override
-    public Term startNewTerm() {
+    public Term startNewTerm(String startDateString) {
+        LocalDate startDate = LocalDate.parse(startDateString, DateTimeFormatter.ISO_LOCAL_DATE);
         workspace = get();
-        workspace.setCurrentTerm(getNextTerm());
+
+        Term nextTerm = getNextTerm();
+        nextTerm.setStartDate(startDate);
+        workspace.setCurrentTerm(nextTerm);
 
         return save(workspace).getCurrentTerm();
     }
@@ -49,26 +65,21 @@ public class WorkspaceService implements IWorkspaceService {
     @Override
     public Term getNextTerm() {
         Term currentTerm = getCurrentTerm();
-        Term.Season currentSeason = currentTerm.getSeason();
-        Term.Season nextSeason;
+        Season currentSeason = currentTerm.getSeason();
+        Season nextSeason = seasonService.getNextSeasonOf(currentSeason);
+
         String currentYear = currentTerm.getYear();
-        String nextYear;
+        String nextYear = seasonService.isLastSeason(currentSeason.getOrdinalNumber())
+                ? String.valueOf(Integer.parseInt(currentYear) + 1)
+                : currentYear;
 
-        switch (currentSeason) {
-            case SPRING -> {
-                nextSeason = Term.Season.SUMMER;
-                nextYear = currentYear;
-            }
-            case SUMMER -> {
-                nextSeason = Term.Season.FALL;
-                nextYear = currentYear;
-            }
-            default -> {
-                nextSeason = Term.Season.SPRING;
-                nextYear = String.valueOf(Integer.parseInt(currentYear) + 1);
-            }
-        }
+        Optional<Term> nextTermOptional = termService.get(nextSeason.getId(), nextYear);
 
-        return new Term(nextSeason, nextYear);
+        return nextTermOptional.orElseGet(() -> termService.save(new Term(nextSeason, nextYear)));
+    }
+
+    private Term newTerm(Season season, String year) {
+
+        return termService.save(new Term(season, year));
     }
 }

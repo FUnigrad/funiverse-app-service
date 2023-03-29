@@ -58,6 +58,7 @@ public class SecurityConfiguration {
                 .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("major/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("term/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("season/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("specialization/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())

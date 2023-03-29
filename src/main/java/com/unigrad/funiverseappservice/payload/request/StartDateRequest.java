@@ -1,4 +1,4 @@
-package com.unigrad.funiverseappservice.payload.DTO;
+package com.unigrad.funiverseappservice.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TermDTO {
+public class StartDateRequest {
 
-    private Long id;
-
-    private Long seasonId;
-
-    private String year;
+    String startDate;
 }

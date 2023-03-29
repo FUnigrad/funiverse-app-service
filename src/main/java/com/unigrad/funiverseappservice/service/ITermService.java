@@ -8,5 +8,5 @@ import java.util.Optional;
 @Service
 public interface ITermService extends IBaseService<Term, Long>{
 
-    Optional<Term> get(Term.Season season, String year);
+    Optional<Term> get(Long seasonId, String year);
 }

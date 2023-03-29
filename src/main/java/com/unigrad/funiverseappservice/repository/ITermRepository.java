@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ITermRepository extends JpaRepository<Term, Long> {
 
-    Optional<Term> getBySeasonAndYear(Term.Season season, String year);
+    Optional<Term> getBySeasonIdAndYear(Long seasonId, String year);
 }

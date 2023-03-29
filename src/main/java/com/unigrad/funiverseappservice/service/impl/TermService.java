@@ -59,7 +59,7 @@ public class TermService implements ITermService {
     }
 
     @Override
-    public Optional<Term> get(Term.Season season, String year) {
-        return termRepository.getBySeasonAndYear(season, year);
+    public Optional<Term> get(Long seasonId, String year) {
+        return termRepository.getBySeasonIdAndYear(seasonId, year);
     }
 }

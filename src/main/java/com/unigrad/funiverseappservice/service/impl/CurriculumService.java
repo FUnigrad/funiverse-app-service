@@ -46,7 +46,7 @@ public class CurriculumService implements ICurriculumService {
 
     @Override
     public Curriculum save(Curriculum entity) {
-        Optional<Term> term = termService.get(entity.getStartedTerm().getSeason(), entity.getStartedTerm().getYear());
+        Optional<Term> term = termService.get(entity.getStartedTerm().getSeason().getId(), entity.getStartedTerm().getYear());
 
         entity.setStartedTerm(term.orElseGet(() -> termService.save(entity.getStartedTerm())));
 

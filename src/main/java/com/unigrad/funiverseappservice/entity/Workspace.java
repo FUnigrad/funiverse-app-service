@@ -29,4 +29,6 @@ public class Workspace {
     private Term currentTerm;
 
     private Long foundedYear;
+
+    private Integer slotDurationInMin;
 }

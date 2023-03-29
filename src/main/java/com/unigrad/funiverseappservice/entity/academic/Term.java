@@ -3,11 +3,11 @@ package com.unigrad.funiverseappservice.entity.academic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.Workspace;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -24,16 +25,19 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(name = "term_UK", columnNames = {"season", "year"}))
+@Table(uniqueConstraints = @UniqueConstraint(name = "term_UK", columnNames = {"season_id", "year"}))
 public class Term {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn
     private Season season;
 
     private String year;
+
+    private LocalDate startDate;
 
     public Term(Season season, String year) {
         this.season = season;
@@ -48,14 +52,8 @@ public class Term {
     @JsonIgnore
     private Workspace workspace;
 
-    public enum Season {
-        SPRING,
-        SUMMER,
-        FALL
-    }
-
     @Override
     public String toString() {
-        return "%s %s".formatted(season, year);
+        return "%s %s".formatted(season.getName(), year);
     }
 }

@@ -1,16 +1,13 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.Workspace;
-import com.unigrad.funiverseappservice.payload.DTO.TermDTO;
+import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.payload.request.OnBoardingRequest;
+import com.unigrad.funiverseappservice.payload.request.StartDateRequest;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("workspace")
@@ -25,27 +22,43 @@ public class WorkspaceController {
         this.dtoConverter = dtoConverter;
     }
 
+    @GetMapping
+    private ResponseEntity<Workspace> get() {
+
+        return ResponseEntity.ok(workspaceService.get());
+    }
+
     @PostMapping
     private ResponseEntity<Workspace> save(@RequestBody Workspace workspace) {
 
         return ResponseEntity.ok(workspaceService.save(workspace));
     }
 
-    @GetMapping("term/current")
-    public ResponseEntity<TermDTO> getCurrent() {
+    @PutMapping
+    private ResponseEntity<Workspace> update(@RequestBody Workspace workspace) {
 
-        return ResponseEntity.ok(dtoConverter.convert(workspaceService.getCurrentTerm(), TermDTO.class));
+        if (!workspaceService.get().getId().equals(workspace.getId())) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(workspaceService.save(workspace));
+    }
+
+    @GetMapping("term/current")
+    public ResponseEntity<Term> getCurrent() {
+
+        return ResponseEntity.ok(workspaceService.getCurrentTerm());
     }
     @GetMapping("term/next")
-    public ResponseEntity<TermDTO> getNextTerm() {
+    public ResponseEntity<Term> getNextTerm() {
 
-        return ResponseEntity.ok(dtoConverter.convert(workspaceService.getNextTerm(), TermDTO.class));
+        return ResponseEntity.ok(workspaceService.getNextTerm());
     }
 
     @PostMapping("term/start-new")
-    public ResponseEntity<TermDTO> startNewTerm() {
+    public ResponseEntity<Term> startNewTerm(@RequestBody StartDateRequest startDateRequest) {
 
-        return ResponseEntity.ok(dtoConverter.convert(workspaceService.startNewTerm(), TermDTO.class));
+        return ResponseEntity.ok(workspaceService.startNewTerm(startDateRequest.getStartDate()));
     }
 
     @PostMapping("onboarding")
