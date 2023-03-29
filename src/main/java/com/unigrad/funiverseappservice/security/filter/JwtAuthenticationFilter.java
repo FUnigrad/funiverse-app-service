@@ -41,13 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String domain = request.getHeader("Origin");
 
         // todo need to authorize services
-        if ("3.1.47.236:30001".equals(domain)) {
+        if ("3.1.47.236:30001".equals(domain) || "http://localhost:63342/".equals(domain)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         if (authHeader == null) {
-            jwt = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiV09SS1NQQUNFX0FETUlOIiwidXNlcm5hbWUiOiJ0aGFuaC5idWkuYmFvQGdtYWlsLmNvbSIsIndvcmtzcGFjZUlkIjoyLCJzdWIiOiJ0aGFuaC5idWkuYmFvQGdtYWlsLmNvbSIsImlhdCI6MTY3OTg4NzgzNSwiZXhwIjoxNjgwMDYwNjM1fQ.0wVnQJocMe3qq--AYFAJo1gp-ojSm8FZgKFSpWySmM0";
+            jwt = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiV09SS1NQQUNFX0FETUlOIiwiZG9tYWluIjoiZGV2LmZ1bml2ZXJzZS53b3JsZCIsInVzZXJuYW1lIjoidGhhbmguYnVpLmJhb0BnbWFpbC5jb20iLCJzdWIiOiJ0aGFuaC5idWkuYmFvQGdtYWlsLmNvbSIsImlhdCI6MTY4MDA2MTQyMiwiZXhwIjoxNjgwMjM0MjIyfQ.CpQiyigvoNvteH7KwIB4bqVM4jwyZTUT12sTUzUs1mw";
         } else {
             jwt = authHeader.substring(7);
         }

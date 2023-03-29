@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.repository.ICurriculumPlanRepository;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
@@ -81,6 +82,12 @@ public class CurriculumPlanService implements ICurriculumPlanService {
         }
 
         return false;
+    }
+
+    @Override
+    public List<Syllabus> getAllAvailableSyllabus(Long id, boolean isCombo) {
+        return isCombo ? curriculumPlanRepository.getAllSyllabusNotInCombo(id)
+                : curriculumPlanRepository.getAllSyllabusNotInCurriculum(id);
     }
 
     @Override

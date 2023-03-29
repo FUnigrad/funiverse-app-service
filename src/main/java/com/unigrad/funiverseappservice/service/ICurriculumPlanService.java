@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.service;
 
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface ICurriculumPlanService extends IBaseService<CurriculumPlan, Cur
     List<CurriculumPlan> getAllComboPlanByCurriculumIdAndComboId(Long curriculumId, Long comboId);
 
     boolean removeSyllabusFromCurriculum(Long syllabusId, Long curriculumId);
+
+    List<Syllabus> getAllAvailableSyllabus(Long id, boolean isCombo);
 }

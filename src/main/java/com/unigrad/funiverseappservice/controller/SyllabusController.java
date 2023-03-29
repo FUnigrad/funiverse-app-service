@@ -1,7 +1,13 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
+import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
+import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
+import com.unigrad.funiverseappservice.util.DTOConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,17 +21,22 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("syllabus")
+@RequiredArgsConstructor
 public class SyllabusController {
 
     private final ISyllabusService syllabusService;
 
-    public SyllabusController(ISyllabusService syllabusService) {
-        this.syllabusService = syllabusService;
-    }
+    private final ICurriculumService curriculumService;
+
+    private final ICurriculumPlanService curriculumPlanService;
+
+    private final DTOConverter dtoConverter;
 
     @GetMapping
     public ResponseEntity<List<Syllabus>> getAll(@RequestParam(required = false) String code) {
@@ -80,5 +91,20 @@ public class SyllabusController {
         return syllabusService.get(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("available")
+    public ResponseEntity<List<EntityBaseDTO>> getAllSyllabusNotInCurriculum(@RequestParam Long id, @RequestParam String type) {
+        Optional<Curriculum> curriculumOptional = curriculumService.get(id);
+
+        if (curriculumOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(
+                curriculumPlanService.getAllAvailableSyllabus(id, "combo".equals(type)),
+                EntityBaseDTO[].class
+        )).toList());
+
     }
 }
