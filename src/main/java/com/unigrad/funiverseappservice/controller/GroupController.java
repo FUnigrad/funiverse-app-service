@@ -60,7 +60,7 @@ public class GroupController {
     private final DTOConverter dtoConverter;
 
     @PostMapping
-    public ResponseEntity<Group> create(@RequestBody Group newGroup) {
+    public ResponseEntity<Long> create(@RequestBody Group newGroup) {
         Group.Type newGroupType = newGroup.getType();
 
         switch (newGroupType) {
@@ -97,6 +97,8 @@ public class GroupController {
             }
         }
 
+        Group returnGroup;
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDetail userDetail = (UserDetail) authentication.getPrincipal();
@@ -106,17 +108,23 @@ public class GroupController {
                     .name(newGroup.getName())
                     .type(Group.Type.NORMAL)
                     .isActive(true)
+                    .createdDateTime(LocalDateTime.now())
+                    .isPrivate(true)
                     .build();
-        }
 
-        Group returnGroup = groupService.save(newGroup);
+            returnGroup = groupService.save(newGroup);
+
+            groupMemberService.addMemberToGroup(new GroupMemberDTO(userDetail.getId(), returnGroup.getId(), true));
+        } else {
+            returnGroup = groupService.save(newGroup);
+        }
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(returnGroup.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(returnGroup.getId());
     }
 
     @GetMapping("/{id}")
