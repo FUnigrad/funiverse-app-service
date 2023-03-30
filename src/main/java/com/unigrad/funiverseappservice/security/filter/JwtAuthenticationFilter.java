@@ -49,12 +49,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String userEmail;
             final String domain = request.getHeader("Origin");
 
-            // todo need to authorize services
-            if ("3.1.47.236:30001".equals(domain) || "http://localhost:63342/".equals(domain)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
             if (authHeader == null || !authHeader.startsWith("Bearer")) {
                 filterChain.doFilter(request, response);
                 return;

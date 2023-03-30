@@ -52,21 +52,26 @@ public class SecurityConfiguration {
 
         http
                 .authorizeHttpRequests()
+                // admin
                 .requestMatchers("subject/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("curriculum/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("workspace/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.SYSTEM_ADMIN.toString())
+                .requestMatchers("user/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.SYSTEM_ADMIN.toString())
                 .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("major/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("term/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("season/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("specialization/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
-                .requestMatchers("user/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
-                .requestMatchers("group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("group/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("search/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                // user
+                .requestMatchers("group/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("user/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
-                .requestMatchers("search/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
-                .anyRequest().permitAll()
+                .requestMatchers("search/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .anyRequest().authenticated()
                 ;
 
         return http.build();

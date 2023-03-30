@@ -2,12 +2,17 @@ package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
+import com.unigrad.funiverseappservice.service.IAuthenCommunicateService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,6 +45,8 @@ public class UserController {
 
     private final IEventService eventService;
 
+    private final IAuthenCommunicateService authenCommunicateService;
+
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
 
@@ -64,14 +71,39 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<Void> save(@RequestBody UserDetail userDetail) {
+    @PostMapping("admin")
+    public ResponseEntity<Void> saveAuthen(@RequestBody UserDetail userDetail, HttpServletRequest request) {
+
         UserDetail newUserDetail = userDetailService.save(userDetail);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(newUserDetail.getId()).toUri();
+
+
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity<Void> save(@RequestBody UserDetail userDetail, HttpServletRequest request) {
+
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (!authenCommunicateService.saveUser(userDetail, token)) {
+            throw new ServiceCommunicateException("An error occurs when call to Authen Service");
+        }
+
+        UserDetail newUserDetail = userDetailService.save(userDetail);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newUserDetail.getId()).toUri();
+
+
 
         return ResponseEntity.created(location).build();
     }

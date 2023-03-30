@@ -31,4 +31,6 @@ public class Workspace {
     private Long foundedYear;
 
     private Integer slotDurationInMin;
+
+    private String domain;
 }
