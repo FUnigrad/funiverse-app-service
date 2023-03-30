@@ -50,7 +50,7 @@ public class PostController {
     private final DTOConverter dtoConverter;
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody PostDTO newPost) {
+    public ResponseEntity<Long> create(@RequestBody PostDTO newPost) {
         Optional<UserDetail> ownerOptional = userDetailService.get(newPost.getOwnerId());
         Optional<Group> groupOptional = groupService.get(newPost.getGroupId());
 
@@ -102,7 +102,7 @@ public class PostController {
                         eventService.save(event);
                     });
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(post.getId());
         }
 
         return ResponseEntity.notFound().build();

@@ -94,17 +94,20 @@ public class SyllabusController {
     }
 
     @GetMapping("available")
-    public ResponseEntity<List<EntityBaseDTO>> getAllSyllabusNotInCurriculum(@RequestParam Long id, @RequestParam String type) {
+    public ResponseEntity<List<EntityBaseDTO>> getAllSyllabusNotInCurriculum(@RequestParam Long id, @RequestParam String type, @RequestParam String value) {
         Optional<Curriculum> curriculumOptional = curriculumService.get(id);
 
         if (curriculumOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
+        List<Syllabus> results = curriculumPlanService.getAllAvailableSyllabus(id, "combo".equals(type));
+
+        results = results.stream().filter(syllabus -> syllabus.getCode().contains(value) || syllabus.getName().contains(value)).toList();
+
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(
-                curriculumPlanService.getAllAvailableSyllabus(id, "combo".equals(type)),
+                results,
                 EntityBaseDTO[].class
         )).toList());
-
     }
 }

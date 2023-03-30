@@ -61,10 +61,11 @@ public class SecurityConfiguration {
                 .requestMatchers("season/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("specialization/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("user/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("group/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("user/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
-                .requestMatchers("search/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("search/**").hasAnyAuthority(Role.WORKSPACE_ADMIN.toString(), Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .anyRequest().permitAll()
                 ;
 

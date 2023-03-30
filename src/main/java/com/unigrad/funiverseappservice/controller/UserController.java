@@ -9,6 +9,7 @@ import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -123,5 +124,13 @@ public class UserController {
         }
 
         return ResponseEntity.ok(eventService.getAllForUser(id));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDetail> getMe() {
+
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return ResponseEntity.ok(userDetail);
     }
 }
