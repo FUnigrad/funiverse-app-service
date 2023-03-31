@@ -1,10 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
-import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
-import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.entity.socialnetwork.*;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.MemberDTO;
@@ -16,6 +13,7 @@ import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import com.unigrad.funiverseappservice.util.Utils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -264,12 +262,71 @@ public class GroupController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("{gid}/posts")
+    @GetMapping("{gid}/post")
     public ResponseEntity<List<PostDTO>> getAllPostsInGroup(@PathVariable Long gid) {
 
         List<PostDTO> postDtoList = Arrays.asList(dtoConverter.convert(postService.getAllPostInGroup(gid), PostDTO[].class));
 
         return ResponseEntity.ok(postDtoList);
+    }
+
+    @PostMapping("{id}/post")
+    public ResponseEntity<PostDTO> createPost(@RequestBody Post newPost, @PathVariable Long id) {
+        Optional<Group> groupOptional = groupService.get(id);
+        UserDetail owner = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (groupOptional.isPresent()) {
+
+            Post post = postService.save(Post.builder()
+                    .content(newPost.getContent())
+                    .group(groupOptional.get())
+                    .owner(owner)
+                    .createdDateTime(LocalDateTime.now())
+                    .build()
+            );
+
+            // event for user who are mentioned
+            List<Long> mentionUserIds = Utils.extractUserFromContent(newPost.getContent());
+
+            mentionUserIds
+                    .forEach(userId -> {
+                        Optional<UserDetail> userDetail = userDetailService.get(userId);
+
+                        if (userDetail.isPresent()) {
+                            Event event = Event.builder()
+                                    .actor(owner)
+                                    .receiver(userDetail.get())
+                                    .type(Event.Type.MENTION)
+                                    .sourceId(post.getId())
+                                    .sourceType(Event.SourceType.POST)
+                                    .createdTime(LocalDateTime.now())
+                                    .build();
+
+                            eventService.save(event);
+                        }
+                    });
+
+            // event for all users in group
+            List<UserDetail> members = groupMemberService.getAllUsersInGroup(groupOptional.get().getId());
+
+            members
+                    .forEach(user -> {
+                        Event event = Event.builder()
+                                .actor(owner)
+                                .receiver(user)
+                                .type(Event.Type.MENTION)
+                                .sourceId(post.getId())
+                                .sourceType(Event.SourceType.POST)
+                                .createdTime(LocalDateTime.now())
+                                .build();
+
+                        eventService.save(event);
+                    });
+
+            return ResponseEntity.ok().body(dtoConverter.convert(post, PostDTO.class));
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("{id}/users")

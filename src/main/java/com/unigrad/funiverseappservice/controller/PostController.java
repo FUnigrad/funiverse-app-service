@@ -1,21 +1,21 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.Comment;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
-import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
+import com.unigrad.funiverseappservice.payload.request.UpdateContentRequest;
 import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IEventService;
-import com.unigrad.funiverseappservice.service.IGroupMemberService;
-import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,75 +41,12 @@ public class PostController {
 
     private final IUserDetailService userDetailService;
 
-    private final IGroupService groupService;
-
     private final IEventService eventService;
-
-    private final IGroupMemberService groupMemberService;
 
     private final DTOConverter dtoConverter;
 
-    @PostMapping
-    public ResponseEntity<Long> create(@RequestBody PostDTO newPost) {
-        Optional<UserDetail> ownerOptional = userDetailService.get(newPost.getOwnerId());
-        Optional<Group> groupOptional = groupService.get(newPost.getGroupId());
-
-        if (ownerOptional.isPresent() && groupOptional.isPresent()) {
-
-            Post post = postService.save(Post.builder()
-                    .content(newPost.getContent())
-                    .group(groupOptional.get())
-                    .owner(ownerOptional.get())
-                    .createdDateTime(LocalDateTime.now())
-                    .build()
-            );
-
-            // event for user who are mentioned
-            List<Long> mentionUserIds = Utils.extractUserFromContent(newPost.getContent());
-
-            mentionUserIds
-                    .forEach(userId -> {
-                        Optional<UserDetail> userDetail = userDetailService.get(userId);
-
-                        if (userDetail.isPresent()) {
-                            Event event = Event.builder()
-                                    .actor(ownerOptional.get())
-                                    .receiver(userDetail.get())
-                                    .type(Event.Type.MENTION)
-                                    .sourceId(post.getId())
-                                    .sourceType(Event.SourceType.POST)
-                                    .createdTime(LocalDateTime.now())
-                                    .build();
-
-                            eventService.save(event);
-                        }
-                    });
-
-            // event for all users in group
-            List<UserDetail> members = groupMemberService.getAllUsersInGroup(groupOptional.get().getId());
-
-            members
-                    .forEach(user -> {
-                        Event event = Event.builder()
-                                .actor(ownerOptional.get())
-                                .receiver(user)
-                                .type(Event.Type.MENTION)
-                                .sourceId(post.getId())
-                                .sourceType(Event.SourceType.POST)
-                                .createdTime(LocalDateTime.now())
-                                .build();
-
-                        eventService.save(event);
-                    });
-
-            return ResponseEntity.ok().body(post.getId());
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Post> update(@RequestBody String content, @PathVariable Long id) {
+    public ResponseEntity<Post> update(@RequestBody UpdateContentRequest content, @PathVariable Long id) {
 
         Optional<Post> postOptional = postService.get(id);
 
@@ -117,7 +54,13 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
 
-        List<Long> mentionUserIds = Utils.extractUserFromContent(content);
+        UserDetail currentUser = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!postOptional.get().getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Current user don't have permission to edit this post");
+        }
+
+        List<Long> mentionUserIds = Utils.extractUserFromContent(content.getContent());
 
         mentionUserIds
                 .forEach(userId -> {
@@ -137,7 +80,7 @@ public class PostController {
                     }
                 });
 
-        postOptional.get().setContent(content);
+        postOptional.get().setContent(content.getContent());
 
         return ResponseEntity.ok(postService.save(postOptional.get()));
     }
@@ -145,11 +88,21 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 
-        if (postService.isExist(id)) {
-            postService.deleteById(id);
-            return ResponseEntity.ok().build();
+        Optional<Post> postOptional = postService.get(id);
+
+        if (postOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        UserDetail currentUser = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!postOptional.get().getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Current user don't have permission to delete this post");
+        }
+
+        postService.deleteById(id);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
@@ -161,11 +114,49 @@ public class PostController {
     }
 
 
-    @GetMapping("/{pid}/comments")
+    @GetMapping("/{pid}/comment")
     public ResponseEntity<List<CommentDTO>> getAllCommentsInPost(@PathVariable Long pid) {
 
         List<CommentDTO> commentDTOList = Arrays.stream(dtoConverter.convert(commentService.getAllCommentsInPost(pid), CommentDTO[].class)).toList();
 
         return ResponseEntity.ok(commentDTOList);
+    }
+
+    @PostMapping("{id}/comment")
+    public ResponseEntity<CommentDTO> createComment(@RequestBody Comment newComment, @PathVariable Long id) {
+        Optional<Post> postOptional = postService.get(id);
+
+        if (postOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        newComment.setOwner(userDetail);
+        newComment.setPost(postOptional.get());
+
+        Comment comment = commentService.save(newComment);
+
+        List<Long> mentionUserIds = Utils.extractUserFromContent(newComment.getContent());
+
+        mentionUserIds
+                .forEach(userId -> {
+                    Optional<UserDetail> user = userDetailService.get(userId);
+
+                    if (user.isPresent()) {
+                        Event event = Event.builder()
+                                .actor(comment.getOwner())
+                                .receiver(user.get())
+                                .type(Event.Type.MENTION)
+                                .sourceId(comment.getId())
+                                .sourceType(Event.SourceType.POST)
+                                .createdTime(LocalDateTime.now())
+                                .build();
+
+                        eventService.save(event);
+                    }
+                });
+
+        return ResponseEntity.ok().body(dtoConverter.convert(comment, CommentDTO.class));
     }
 }

@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.controller;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Comment;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.payload.request.UpdateContentRequest;
 import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
@@ -35,37 +36,6 @@ public class CommentController {
 
     private final IEventService eventService;
 
-    @PostMapping()
-    public ResponseEntity<Comment> create(@RequestBody Comment newComment) {
-        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        newComment.setOwner(userDetail);
-
-        Comment comment = commentService.save(newComment);
-
-        List<Long> mentionUserIds = Utils.extractUserFromContent(newComment.getContent());
-
-        mentionUserIds
-                .forEach(userId -> {
-                    Optional<UserDetail> user = userDetailService.get(userId);
-
-                    if (user.isPresent()) {
-                        Event event = Event.builder()
-                                .actor(comment.getOwner())
-                                .receiver(user.get())
-                                .type(Event.Type.MENTION)
-                                .sourceId(comment.getId())
-                                .sourceType(Event.SourceType.POST)
-                                .createdTime(LocalDateTime.now())
-                                .build();
-
-                        eventService.save(event);
-                    }
-                });
-
-        return ResponseEntity.ok().body(comment);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<Comment> getById(@PathVariable Long id) {
 
@@ -75,7 +45,7 @@ public class CommentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Comment> update(@RequestBody String content, @PathVariable Long id) {
+    public ResponseEntity<Comment> update(@RequestBody UpdateContentRequest contentRequest, @PathVariable Long id) {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Comment> commentOptional = commentService.get(id);
@@ -83,10 +53,10 @@ public class CommentController {
         return commentOptional
                 .map(comment -> {
                     if (comment.getOwner().getId().equals(userDetail.getId())) {
-                        comment.setContent(content);
+                        comment.setContent(contentRequest.getContent());
                         commentService.save(comment);
 
-                        List<Long> mentionUserIds = Utils.extractUserFromContent(content);
+                        List<Long> mentionUserIds = Utils.extractUserFromContent(contentRequest.getContent());
 
                         mentionUserIds
                                 .forEach(userId -> {
@@ -126,7 +96,7 @@ public class CommentController {
                 commentService.deleteById(id);
                 return ResponseEntity.ok().build();
             } else {
-                throw new AccessDeniedException("You don't have permission to edit this comment");
+                throw new AccessDeniedException("You don't have permission to delete this comment");
             }
         }
 
