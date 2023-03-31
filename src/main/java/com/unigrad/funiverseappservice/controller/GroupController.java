@@ -1,16 +1,26 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
-import com.unigrad.funiverseappservice.entity.socialnetwork.*;
+import com.unigrad.funiverseappservice.entity.academic.Slot;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.MemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
+import com.unigrad.funiverseappservice.payload.DTO.SlotDTO;
+import com.unigrad.funiverseappservice.payload.request.CreateSlotRequest;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
+import com.unigrad.funiverseappservice.service.ISlotService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.Utils;
@@ -33,6 +43,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +65,8 @@ public class GroupController {
     private final ICurriculumService curriculumService;
 
     private final IEventService eventService;
+
+    private final ISlotService slotService;
 
     private final DTOConverter dtoConverter;
 
@@ -377,4 +390,114 @@ public class GroupController {
             throw new AccessDeniedException("You don not have permission to perform this action");
         }
     }
+
+    @PostMapping("{id}/slot")
+    public ResponseEntity<List<SlotDTO>> createSlotForSyllabus(@PathVariable Long id, @RequestBody List<CreateSlotRequest> createSlotRequests) {
+        Optional<Group> groupOptional = groupService.get(id);
+
+        if (groupOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
+            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+        }
+
+        List<Slot> results = new ArrayList<>();
+        
+        Syllabus syllabus = groupOptional.get().getSyllabus();
+
+        for (int i = 1; i < syllabus.getNoSlot(); i+=createSlotRequests.size()) {
+            for (int j = 0; j < createSlotRequests.size(); j++) {
+                Slot newSlot = Slot.builder()
+                        .no(i + j)
+                        .order(createSlotRequests.get(j).getOrder())
+                        .group(groupOptional.get())
+                        .room(createSlotRequests.get(j).getRoom())
+                        .dayOfWeek(createSlotRequests.get(j).getDayOfWeek())
+                        .build();
+
+                results.add(slotService.save(newSlot));
+            }
+        }
+
+        return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(results, SlotDTO[].class)).toList());
+    }
+
+    @PostMapping("{id}/single-slot")
+    public ResponseEntity<SlotDTO> createSlotForSyllabus(@PathVariable Long id, @RequestBody Slot slot) {
+        Optional<Group> groupOptional = groupService.get(id);
+
+        if (groupOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
+            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+        }
+
+        slot.setGroup(groupOptional.get());
+
+        return ResponseEntity.ok().body(dtoConverter.convert(slotService.save(slot), SlotDTO.class));
+    }
+
+    @GetMapping("{id}/slot")
+    public ResponseEntity<List<SlotDTO>> getSlotOfGroup(@PathVariable Long id) {
+        Optional<Group> groupOptional = groupService.get(id);
+
+        if (groupOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
+            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+        }
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(slotService.getAllSlotsInGroup(id), SlotDTO[].class)).toList());
+    }
+
+    @PutMapping("{id}/slot")
+    public ResponseEntity<SlotDTO> updateSlot(@PathVariable Long id, @RequestBody Slot slot) {
+        Optional<Group> groupOptional = groupService.get(id);
+        Optional<Slot> slotOptional = slotService.get(slot.getId());
+
+        if (groupOptional.isEmpty() || slotOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
+            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+        }
+
+        if (!groupOptional.get().getId().equals(slotOptional.get().getGroup().getId())) {
+            throw new InvalidActionOnGroupException("Slot is not belong this Group");
+        }
+
+        slot.setGroup(groupOptional.get());
+
+        return ResponseEntity.ok(dtoConverter.convert(slotService.save(slot), SlotDTO.class));
+    }
+
+    @DeleteMapping("{groupId}/slot/{slotId}")
+    public ResponseEntity<Void> getSlotOfGroup(@PathVariable Long groupId, @PathVariable Long slotId) {
+        Optional<Group> groupOptional = groupService.get(groupId);
+        Optional<Slot> slotOptional = slotService.get(slotId);
+
+        if (groupOptional.isEmpty() || slotOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
+            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+        }
+
+        if (!groupOptional.get().getId().equals(slotOptional.get().getGroup().getId())) {
+            throw new InvalidActionOnGroupException("Slot is not belong this Group");
+        }
+
+        slotService.delete(slotId);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

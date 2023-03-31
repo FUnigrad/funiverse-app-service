@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalTime;
+
 @Entity
 @Getter
 @Setter
@@ -32,5 +34,15 @@ public class Workspace {
 
     private Integer slotDurationInMin;
 
+    private Integer restTimeInMin;
+
     private String domain;
+
+    private LocalTime morningStartTime;
+
+    private LocalTime morningEndTime;
+
+    private LocalTime afternoonStartTime;
+
+    private LocalTime afternoonEndTime;
 }

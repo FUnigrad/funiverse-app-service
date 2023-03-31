@@ -2,6 +2,7 @@ package com.unigrad.funiverseappservice.entity.socialnetwork;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.Slot;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -65,6 +66,10 @@ public class Group {
     @OneToMany(mappedBy = "group")
     @JsonIgnore
     private List<Post> posts;
+
+    @OneToMany(mappedBy = "group")
+    @JsonIgnore
+    private List<Slot> slots;
 
     public enum Type {
         CLASS,

@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.advice;
 
+import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
 import com.unigrad.funiverseappservice.exception.UnexpectedEnumValueException;
@@ -39,7 +40,7 @@ public class ExceptionHandlerControllerAdvice {
         );
     }
 
-    @ExceptionHandler(value = {SemanticException.class, ServiceCommunicateException.class})
+    @ExceptionHandler(value = {SemanticException.class, ServiceCommunicateException.class, InvalidActionOnGroupException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleSemanticException(RuntimeException ex, WebRequest request) {
 

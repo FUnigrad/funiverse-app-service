@@ -7,7 +7,14 @@ import com.unigrad.funiverseappservice.payload.request.StartDateRequest;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("workspace")
@@ -65,5 +72,16 @@ public class WorkspaceController {
     public ResponseEntity<Void> onboarding(@RequestBody OnBoardingRequest request) {
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("no-slot")
+    public ResponseEntity<Long> getNoSlot() {
+        Workspace workspace = workspaceService.get();
+        Integer slotDurationInMin = workspace.getSlotDurationInMin();
+        Integer restTimeInMin = workspace.getRestTimeInMin();
+        long hoursDiff = workspace.getMorningStartTime().until(workspace.getMorningEndTime(), ChronoUnit.MINUTES)
+                + workspace.getAfternoonStartTime().until(workspace.getAfternoonEndTime(), ChronoUnit.MINUTES);
+
+        return ResponseEntity.ok((hoursDiff + restTimeInMin)/(slotDurationInMin + restTimeInMin));
     }
 }

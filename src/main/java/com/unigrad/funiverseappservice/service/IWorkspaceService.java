@@ -14,4 +14,8 @@ public interface IWorkspaceService {
     Term getNextTerm();
 
     Term startNewTerm(String startDateString);
+
+    Integer getSlotDurationInMin();
+
+    Integer getRestTimeInMin();
 }

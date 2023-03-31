@@ -82,4 +82,14 @@ public class WorkspaceService implements IWorkspaceService {
 
         return termService.save(new Term(season, year));
     }
+
+    @Override
+    public Integer getSlotDurationInMin() {
+        return workspaceRepository.getSlotDurationInMin();
+    }
+
+    @Override
+    public Integer getRestTimeInMin() {
+        return workspaceRepository.getRestTimeInMin();
+    }
 }

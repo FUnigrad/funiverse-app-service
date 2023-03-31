@@ -52,6 +52,7 @@ public class SecurityConfiguration {
 
         http
                 .authorizeHttpRequests()
+                .requestMatchers("/actuator/**").permitAll()
                 // admin
                 .requestMatchers("subject/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())

@@ -64,10 +64,6 @@ public class Syllabus {
     @JsonIgnore
     private List<Material> materials;
 
-    @OneToMany(mappedBy = "syllabus")
-    @JsonIgnore
-    private List<Slot> slots;
-
     private boolean isSyllabusCombo = false;
 
     @Convert(converter = SyllabusConverter.class)
