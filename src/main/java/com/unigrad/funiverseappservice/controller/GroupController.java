@@ -10,6 +10,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
+import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
 import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.MemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
@@ -45,6 +46,8 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -276,9 +279,20 @@ public class GroupController {
     }
 
     @GetMapping("{gid}/post")
-    public ResponseEntity<List<PostDTO>> getAllPostsInGroup(@PathVariable Long gid) {
+    public ResponseEntity<List<PostDTO>> getAllPostsInGroup(@PathVariable Long gid,
+                                                            @RequestParam(required = false, defaultValue = "true") boolean isAsc) {
 
         List<PostDTO> postDtoList = Arrays.asList(dtoConverter.convert(postService.getAllPostInGroup(gid), PostDTO[].class));
+
+        postDtoList.sort(Comparator.comparing(PostDTO::getCreatedDateTime));
+
+        if (!isAsc) {
+            Collections.reverse(postDtoList);
+        }
+
+        postDtoList.forEach(
+                post -> post.getComments().sort(Comparator.comparing(CommentDTO::getCreatedDateTime))
+        );
 
         return ResponseEntity.ok(postDtoList);
     }
@@ -500,4 +514,24 @@ public class GroupController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("{id}/academic")
+    public ResponseEntity<Object> getAcademic(@PathVariable Long id) {
+        Optional<Group> groupOptional = groupService.get(id);
+
+        if (groupOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Group group = groupOptional.get();
+
+        if (Group.Type.CLASS.equals(group.getType())) {
+            return ResponseEntity.ok(group.getCurriculum());
+        }
+
+        if (Group.Type.COURSE.equals(group.getType())) {
+            return ResponseEntity.ok(group.getSyllabus());
+        }
+
+        throw new InvalidActionOnGroupException("Can not get Academic information on group %s".formatted(group.getType()));
+    }
 }

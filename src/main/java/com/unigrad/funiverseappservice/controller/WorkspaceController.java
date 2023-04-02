@@ -2,10 +2,14 @@ package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.Workspace;
 import com.unigrad.funiverseappservice.entity.academic.Term;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.payload.request.OnBoardingRequest;
 import com.unigrad.funiverseappservice.payload.request.StartDateRequest;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
+import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,19 +19,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("workspace")
+@RequiredArgsConstructor
 public class WorkspaceController {
 
     private final IWorkspaceService workspaceService;
 
-    private final DTOConverter dtoConverter;
+    private final UserDetailService userDetailService;
 
-    public WorkspaceController(IWorkspaceService workspaceService, DTOConverter dtoConverter) {
-        this.workspaceService = workspaceService;
-        this.dtoConverter = dtoConverter;
-    }
+    private final DTOConverter dtoConverter;
 
     @GetMapping
     private ResponseEntity<Workspace> get() {
@@ -84,4 +88,13 @@ public class WorkspaceController {
 
         return ResponseEntity.ok((hoursDiff + restTimeInMin)/(slotDurationInMin + restTimeInMin));
     }
+
+    @GetMapping("user")
+    public ResponseEntity<List<UserDTO>> getAllUser() {
+
+        List<UserDetail> userDetails = userDetailService.getAll();
+
+        return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(userDetails, UserDTO[].class)).toList());
+    }
+
 }

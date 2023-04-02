@@ -72,6 +72,7 @@ public class SecurityConfiguration {
                 .requestMatchers("post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("user/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("search/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
+                .requestMatchers("workspace/user").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .anyRequest().authenticated()
                 ;
 
