@@ -44,6 +44,9 @@ public class EntitySpecification<T> implements Specification<T> {
                         predicates.add(criteriaBuilder.isFalse(root.get(criteria.getField())));
                     }
                 }
+                case "nmt" -> {
+                    predicates.add(criteriaBuilder.isNotEmpty(root.get(criteria.getField())));
+                }
             }
             predicates.add(criteriaBuilder.isTrue(root.get("isActive")));
         }

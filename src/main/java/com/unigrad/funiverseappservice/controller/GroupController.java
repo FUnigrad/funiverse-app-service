@@ -108,6 +108,10 @@ public class GroupController {
                 if (StringUtils.isBlank(newGroup.getName())) {
                     throw new MissingRequiredPropertyException("Name");
                 }
+
+                if (newGroup.getType().equals(Group.Type.DEPARTMENT)) {
+                    newGroup.setPrivate(false);
+                }
             }
         }
 

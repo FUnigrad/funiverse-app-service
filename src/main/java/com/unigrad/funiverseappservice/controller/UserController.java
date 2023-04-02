@@ -147,15 +147,11 @@ public class UserController {
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(userDetailService.getAllUsersNotInGroup(id), UserDTO[].class)).toList());
     }
 
-    @GetMapping("{id}/event")
-    public ResponseEntity<List<Event>> getListEvent(@PathVariable Long id) {
-        Optional<UserDetail> userDetailOptional = userDetailService.get(id);
+    @GetMapping("event")
+    public ResponseEntity<List<Event>> getListEvent() {
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (userDetailOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(eventService.getAllForUser(id));
+        return ResponseEntity.ok(eventService.getAllForUser(userDetail.getId()));
     }
 
     @GetMapping("/me")

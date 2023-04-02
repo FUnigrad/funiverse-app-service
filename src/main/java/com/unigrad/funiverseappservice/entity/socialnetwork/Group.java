@@ -45,7 +45,7 @@ public class Group {
 
     private String conversationId;
 
-    private boolean isPrivate;
+    private boolean isPrivate = true;
 
     private LocalDateTime createdDateTime;
 

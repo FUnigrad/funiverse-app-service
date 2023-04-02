@@ -1,30 +1,32 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
+import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
+import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.repository.IPostRepository;
-import com.unigrad.funiverseappservice.service.IGroupService;
+import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IPostService;
-import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
+import com.unigrad.funiverseappservice.util.DTOConverter;
+import com.unigrad.funiverseappservice.util.PageConverter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PostService implements IPostService {
 
     private final IPostRepository postRepository;
 
-    private final IUserDetailService userDetailService;
+    private final PageConverter pageConverter;
 
-    private final IGroupService groupService;
+    private final IGroupMemberService groupMemberService;
 
-    public PostService(IPostRepository postRepository, IUserDetailService userDetailService, IGroupService groupService) {
-        this.postRepository = postRepository;
-        this.userDetailService = userDetailService;
-        this.groupService = groupService;
-    }
+    private final DTOConverter dtoConverter;
 
     @Override
     public List<Post> getAll() {
@@ -74,5 +76,27 @@ public class PostService implements IPostService {
     @Override
     public List<Post> getAllPostInGroup(Long groupId) {
         return postRepository.getAllByGroup_Id(groupId);
+    }
+
+    @Override
+    public Page<PostDTO> getAllPostForNewFeed(Long userId, Pageable pageable) {
+        List<Post> posts = postRepository.findAll();
+        List<PostDTO> result = new ArrayList<>();
+
+        for (Post post : posts) {
+            if (!post.getGroup().isPrivate() || groupMemberService.isGroupMember(userId, post.getGroup().getId())) {
+                result.add(dtoConverter.convert(post, PostDTO.class));
+            }
+        }
+
+        result.sort(Comparator.comparing(PostDTO::getCreatedDateTime));
+
+        Collections.reverse(result);
+
+        result.forEach(
+                post -> post.getComments().sort(Comparator.comparing(CommentDTO::getCreatedDateTime))
+        );
+
+        return pageConverter.convert(result, pageable);
     }
 }
