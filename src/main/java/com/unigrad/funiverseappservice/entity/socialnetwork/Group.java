@@ -71,6 +71,10 @@ public class Group {
     @JsonIgnore
     private List<Slot> slots;
 
+    @OneToMany(mappedBy = "group")
+    @JsonIgnore
+    private List<Event> events;
+
     public enum Type {
         CLASS,
         COURSE,

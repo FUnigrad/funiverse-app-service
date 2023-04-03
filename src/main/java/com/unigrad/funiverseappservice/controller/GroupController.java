@@ -221,6 +221,7 @@ public class GroupController {
                             .receiver(member)
                             .sourceId(groupOpt.get().getId())
                             .sourceType(Event.SourceType.GROUP)
+                            .group(groupOpt.get())
                             .type(Event.Type.ADD_TO_GROUP)
                             .createdTime(LocalDateTime.now())
                             .build();
@@ -284,7 +285,7 @@ public class GroupController {
 
     @GetMapping("{gid}/post")
     public ResponseEntity<List<PostDTO>> getAllPostsInGroup(@PathVariable Long gid,
-                                                            @RequestParam(required = false, defaultValue = "true") boolean isAsc) {
+                                                            @RequestParam(required = false, defaultValue = "false") boolean isAsc) {
 
         List<PostDTO> postDtoList = Arrays.asList(dtoConverter.convert(postService.getAllPostInGroup(gid), PostDTO[].class));
 
@@ -323,13 +324,14 @@ public class GroupController {
                     .forEach(userId -> {
                         Optional<UserDetail> userDetail = userDetailService.get(userId);
 
-                        if (userDetail.isPresent()) {
+                        if (userDetail.isPresent() && !userId.equals(owner.getId())) {
                             Event event = Event.builder()
                                     .actor(owner)
                                     .receiver(userDetail.get())
                                     .type(Event.Type.MENTION)
                                     .sourceId(post.getId())
                                     .sourceType(Event.SourceType.POST)
+                                    .group(post.getGroup())
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
@@ -342,16 +344,19 @@ public class GroupController {
 
             members
                     .forEach(user -> {
-                        Event event = Event.builder()
-                                .actor(owner)
-                                .receiver(user)
-                                .type(Event.Type.MENTION)
-                                .sourceId(post.getId())
-                                .sourceType(Event.SourceType.POST)
-                                .createdTime(LocalDateTime.now())
-                                .build();
+                        if (!user.getId().equals(owner.getId())) {
+                            Event event = Event.builder()
+                                    .actor(owner)
+                                    .receiver(user)
+                                    .type(Event.Type.MENTION)
+                                    .sourceId(post.getId())
+                                    .sourceType(Event.SourceType.POST)
+                                    .group(post.getGroup())
+                                    .createdTime(LocalDateTime.now())
+                                    .build();
 
-                        eventService.save(event);
+                            eventService.save(event);
+                        }
                     });
 
             return ResponseEntity.ok().body(dtoConverter.convert(post, PostDTO.class));
@@ -397,6 +402,7 @@ public class GroupController {
                         .sourceId(groupService.get(groupId).get().getId())
                         .sourceType(Event.SourceType.GROUP)
                         .type(Event.Type.SET_GROUP_ADMIN)
+                        .group(groupService.get(groupId).get())
                         .createdTime(LocalDateTime.now())
                         .build();
 

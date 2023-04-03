@@ -41,6 +41,10 @@ public class Event {
 
     private Long sourceId;
 
+    @ManyToOne
+    @JoinColumn
+    private Group group;
+
     @Enumerated(EnumType.STRING)
     private SourceType sourceType;
 

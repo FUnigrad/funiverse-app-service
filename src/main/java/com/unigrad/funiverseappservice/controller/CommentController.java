@@ -61,13 +61,14 @@ public class CommentController {
                                 .forEach(userId -> {
                                     Optional<UserDetail> user = userDetailService.get(userId);
 
-                                    if (user.isPresent()) {
+                                    if (user.isPresent() && !userId.equals(userDetail.getId())) {
                                         Event event = Event.builder()
                                                 .actor(comment.getOwner())
                                                 .receiver(user.get())
                                                 .type(Event.Type.MENTION)
                                                 .sourceId(comment.getId())
                                                 .sourceType(Event.SourceType.POST)
+                                                .group(comment.getPost().getGroup())
                                                 .createdTime(LocalDateTime.now())
                                                 .build();
 

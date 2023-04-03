@@ -28,8 +28,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -148,13 +148,21 @@ public class UserController {
     }
 
     @GetMapping("event")
-    public ResponseEntity<List<Event>> getListEvent() {
+    public ResponseEntity<List<Event>> getListEvent(@RequestParam(defaultValue = "false") boolean unread) {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        return ResponseEntity.ok(eventService.getAllForUser(userDetail.getId()));
+        List<Event> events = eventService.getAllForUser(userDetail.getId());
+
+        if (unread) {
+            events = events.stream().filter(event -> !event.isRead()).toList();
+        }
+
+        events.sort(Comparator.comparing(Event::getCreatedTime).reversed());
+
+        return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/me")
+    @GetMapping("me")
     public ResponseEntity<UserDetail> getMe() {
 
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

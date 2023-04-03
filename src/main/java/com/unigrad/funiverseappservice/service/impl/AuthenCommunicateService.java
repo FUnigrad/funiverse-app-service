@@ -75,7 +75,7 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
             HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
 
             webClient = WebClient.builder()
-                    .baseUrl("http://" + "localhost:8000")
+                    .baseUrl("http://" + AUTHEN_SERVICE_URL)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .defaultHeader(HttpHeaders.AUTHORIZATION, token)
                     .clientConnector(new ReactorClientHttpConnector(httpClient))

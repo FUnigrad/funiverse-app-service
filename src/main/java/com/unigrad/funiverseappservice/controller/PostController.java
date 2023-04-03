@@ -66,13 +66,14 @@ public class PostController {
                 .forEach(userId -> {
                     Optional<UserDetail> userDetail = userDetailService.get(userId);
 
-                    if (userDetail.isPresent()) {
+                    if (userDetail.isPresent() && !userId.equals(currentUser.getId())) {
                         Event event = Event.builder()
                                 .actor(postOptional.get().getOwner())
                                 .receiver(userDetail.get())
                                 .type(Event.Type.MENTION)
                                 .sourceId(id)
                                 .sourceType(Event.SourceType.POST)
+                                .group(postOptional.get().getGroup())
                                 .createdTime(LocalDateTime.now())
                                 .build();
 
@@ -143,13 +144,14 @@ public class PostController {
                 .forEach(userId -> {
                     Optional<UserDetail> user = userDetailService.get(userId);
 
-                    if (user.isPresent()) {
+                    if (user.isPresent() && !userId.equals(userDetail.getId())) {
                         Event event = Event.builder()
                                 .actor(comment.getOwner())
                                 .receiver(user.get())
                                 .type(Event.Type.MENTION)
                                 .sourceId(comment.getId())
                                 .sourceType(Event.SourceType.POST)
+                                .group(postOptional.get().getGroup())
                                 .createdTime(LocalDateTime.now())
                                 .build();
 
