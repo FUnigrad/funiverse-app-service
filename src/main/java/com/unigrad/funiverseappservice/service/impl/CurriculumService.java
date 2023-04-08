@@ -93,4 +93,14 @@ public class CurriculumService implements ICurriculumService {
     public List<UserDetail> getUsersInCurriculum(Long id) {
         return curriculumRepository.getUsersInCurriculum(id);
     }
+
+    @Override
+    public List<Curriculum> getCurriculumByStartedTerm(Long id) {
+        return curriculumRepository.getCurriculumByStartedTermId(id);
+    }
+
+    @Override
+    public List<Curriculum> getCurriculumByCurrentTerm(Long id) {
+        return curriculumRepository.getCurriculumByCurrentTermId(id);
+    }
 }

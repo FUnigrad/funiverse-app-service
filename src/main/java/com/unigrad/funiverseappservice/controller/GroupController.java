@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.controller;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Slot;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
@@ -15,14 +16,17 @@ import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.MemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.payload.DTO.SlotDTO;
-import com.unigrad.funiverseappservice.payload.request.CreateSlotRequest;
+import com.unigrad.funiverseappservice.payload.request.AssignTeacherRequest;
+import com.unigrad.funiverseappservice.payload.request.BulkCreateSlotRequest;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.ISlotService;
+import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.Utils;
 import io.micrometer.common.util.StringUtils;
@@ -43,13 +47,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -68,6 +71,10 @@ public class GroupController {
     private final ICurriculumService curriculumService;
 
     private final IEventService eventService;
+
+    private final IWorkspaceService workspaceService;
+
+    private final ITermService termService;
 
     private final ISlotService slotService;
 
@@ -100,8 +107,16 @@ public class GroupController {
                 if (newGroup.getSyllabus() == null) {
                     throw new MissingRequiredPropertyException("Syllabus");
                 }
+
+                Optional<Group> referenceClass = groupService.get(newGroup.getReferenceClass().getId());
+
+                if (referenceClass.isEmpty()) {
+                    throw new InvalidActionOnGroupException("Reference Clas it not exist");
+                }
+                newGroup.setCurriculum(referenceClass.get().getReferenceClass().getCurriculum());
+
                 //todo need Class to copy students to this group
-                newGroup.setName("COURSE ");
+                newGroup.setName(newGroup.getReferenceClass().getName() + "-" + newGroup.getSyllabus().getCode());
             }
 
             case DEPARTMENT, NORMAL -> {
@@ -416,7 +431,7 @@ public class GroupController {
     }
 
     @PostMapping("{id}/slot")
-    public ResponseEntity<List<SlotDTO>> createSlotForSyllabus(@PathVariable Long id, @RequestBody List<CreateSlotRequest> createSlotRequests) {
+    public ResponseEntity<List<SlotDTO>> createSlotForSyllabus(@PathVariable Long id, @RequestBody BulkCreateSlotRequest bulkCreateSlotRequest) {
         Optional<Group> groupOptional = groupService.get(id);
 
         if (groupOptional.isEmpty()) {
@@ -428,19 +443,41 @@ public class GroupController {
         }
 
         List<Slot> results = new ArrayList<>();
-        
         Syllabus syllabus = groupOptional.get().getSyllabus();
+        LocalDate date = LocalDate.parse(bulkCreateSlotRequest.getStartDate(), DateTimeFormatter.ISO_LOCAL_DATE);
 
-        for (int i = 1; i < syllabus.getNoSlot(); i+=createSlotRequests.size()) {
-            for (int j = 0; j < createSlotRequests.size(); j++) {
+        int noSlot = bulkCreateSlotRequest.getAmount() == null ? syllabus.getNoSlot() : bulkCreateSlotRequest.getAmount();
+        int currentSlotAmount = groupOptional.get().getSlots().size();
+
+        // check if the number of slots is maximum when create in Group Detail
+        if (bulkCreateSlotRequest.getAmount() != null) {
+            if (bulkCreateSlotRequest.getAmount() + currentSlotAmount > syllabus.getNoSlot()) {
+                throw new InvalidActionOnGroupException("Number of slots is maximum");
+            }
+        }
+        int index = 1;
+
+        for (int i = 1; i <= noSlot; i += bulkCreateSlotRequest.getSlots().size()) {
+            for (int j = 0; j < bulkCreateSlotRequest.getSlots().size(); j++) {
+                if (index + j > noSlot) {
+                    break;
+                }
+                // calculate date
+                if (i + j == 1) {
+                    date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.of(bulkCreateSlotRequest.getSlots().get(j).getDayOfWeek())));
+                } else {
+                    date = date.with(TemporalAdjusters.next(DayOfWeek.of(bulkCreateSlotRequest.getSlots().get(j).getDayOfWeek())));
+                }
+
                 Slot newSlot = Slot.builder()
-                        .no(i + j)
-                        .order(createSlotRequests.get(j).getOrder())
+                        .no(currentSlotAmount + i + j)
+                        .order(bulkCreateSlotRequest.getSlots().get(j).getOrder())
                         .group(groupOptional.get())
-                        .room(createSlotRequests.get(j).getRoom())
-                        .dayOfWeek(createSlotRequests.get(j).getDayOfWeek())
+                        .room(bulkCreateSlotRequest.getSlots().get(j).getRoom())
+                        .date(date)
                         .build();
 
+                index++;
                 results.add(slotService.save(newSlot));
             }
         }
@@ -461,6 +498,7 @@ public class GroupController {
         }
 
         slot.setGroup(groupOptional.get());
+        slot.setNo(groupOptional.get().getSlots().size() + 1);
 
         return ResponseEntity.ok().body(dtoConverter.convert(slotService.save(slot), SlotDTO.class));
     }
@@ -543,5 +581,46 @@ public class GroupController {
         }
 
         throw new InvalidActionOnGroupException("Can not get Academic information on group %s".formatted(group.getType()));
+    }
+
+    @PostMapping("assign-teacher")
+    public ResponseEntity<Void> assignTeacherToCourse(@RequestBody List<AssignTeacherRequest> assignTeacherRequests) {
+        for (AssignTeacherRequest assignTeacherRequest : assignTeacherRequests) {
+            Optional<Group> groupOptional = groupService.get(assignTeacherRequest.getGroupId());
+            Optional<UserDetail> userDetailOptional = userDetailService.get(assignTeacherRequest.getTeacherId());
+
+            if (groupOptional.isEmpty() || userDetailOptional.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            groupOptional.get().setTeacher(userDetailOptional.get());
+
+            groupService.save(groupOptional.get());
+            groupMemberService.addMemberToGroup(new GroupMemberDTO(userDetailOptional.get().getId(),
+                    groupOptional.get().getId(),
+                    true));
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("slot/bulk-create")
+    public ResponseEntity<Void> bulkCreateSlot(@RequestBody List<BulkCreateSlotRequest> bulkCreateSlotRequests) {
+
+
+        for (BulkCreateSlotRequest bulkCreateSlotRequest : bulkCreateSlotRequests) {
+            ResponseEntity<List<SlotDTO>> result = createSlotForSyllabus(bulkCreateSlotRequest.getGroupId(), bulkCreateSlotRequest);
+
+            if (result.getStatusCode().isError()) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        Term nextTerm = workspaceService.getNextTerm();
+        nextTerm.setState(Term.State.READY);
+
+        termService.save(nextTerm);
+
+        return ResponseEntity.ok().build();
     }
 }

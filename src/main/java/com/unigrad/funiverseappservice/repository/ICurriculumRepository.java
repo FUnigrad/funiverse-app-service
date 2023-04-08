@@ -8,6 +8,10 @@ import java.util.List;
 
 public interface ICurriculumRepository extends IBaseRepository<Curriculum, Long> {
 
-    @Query(value = "select c.users from Curriculum c")
+    @Query(value = "select c.users from Curriculum c where c.id = :id")
     List<UserDetail> getUsersInCurriculum(Long id);
+
+    List<Curriculum> getCurriculumByStartedTermId(Long id);
+
+    List<Curriculum> getCurriculumByCurrentTermId(Long id);
 }

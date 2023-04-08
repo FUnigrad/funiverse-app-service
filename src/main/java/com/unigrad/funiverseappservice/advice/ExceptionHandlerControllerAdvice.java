@@ -17,56 +17,9 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class ExceptionHandlerControllerAdvice {
-
-    @ExceptionHandler(value = MissingRequiredPropertyException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleMissingRequiredPropertyException(MissingRequiredPropertyException ex, WebRequest request) {
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-    }
-
-    @ExceptionHandler(value = UnexpectedEnumValueException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleUnexpectedEnumValueException(UnexpectedEnumValueException ex, WebRequest request) {
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-    }
-
-    @ExceptionHandler(value = {SemanticException.class, ServiceCommunicateException.class, InvalidActionOnGroupException.class})
+    @ExceptionHandler(value = RuntimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleSemanticException(RuntimeException ex, WebRequest request) {
-
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-    }
-
-    @ExceptionHandler(value = EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
-
-        return new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-    }
-
-    @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex, WebRequest request) {
 
         return new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),

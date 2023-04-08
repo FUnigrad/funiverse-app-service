@@ -6,7 +6,6 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.payload.request.OnBoardingRequest;
-import com.unigrad.funiverseappservice.payload.request.StartDateRequest;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
@@ -72,12 +71,6 @@ public class WorkspaceController {
     public ResponseEntity<Term> getNextTerm() {
 
         return ResponseEntity.ok(workspaceService.getNextTerm());
-    }
-
-    @PostMapping("term/start-new")
-    public ResponseEntity<Term> startNewTerm(@RequestBody StartDateRequest startDateRequest) {
-
-        return ResponseEntity.ok(workspaceService.startNewTerm(startDateRequest.getStartDate()));
     }
 
     @PostMapping("onboarding")

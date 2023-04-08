@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long> {
 
-    @Query(value = "select u from UserDetail u where u.curriculum = null")
+    @Query(value = "select u from UserDetail u where u.curriculum = null and u.role = 'STUDENT'")
     List<UserDetail> getAllUsersHaveNoCurriculum();
 
     @Query(value = "select ud from UserDetail ud where ud.id not in " +
@@ -18,4 +18,7 @@ public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long>
     List<UserDetail> getAllUsersNotInGroup(Long id);
 
     Optional<UserDetail> findByPersonalMail(String personalMail);
+
+    @Query(value = "select count(*) from UserDetail u where (u.role = 'TEACHER' or u.role = 'OFFICER') and u.code like :code%")
+    String getNextUserSeq(String code);
 }

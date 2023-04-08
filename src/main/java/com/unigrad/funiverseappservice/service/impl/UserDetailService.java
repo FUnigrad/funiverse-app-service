@@ -73,6 +73,11 @@ public class UserDetailService implements IUserDetailService {
     }
 
     @Override
+    public String getNextUserSeq(String code) {
+        return userDetailRepository.getNextUserSeq(code);
+    }
+
+    @Override
     public Optional<UserDetail> findByPersonalMail(String personalMail) {
         return userDetailRepository.findByPersonalMail(personalMail);
     }

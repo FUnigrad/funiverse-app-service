@@ -53,6 +53,8 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
                 // admin
                 .requestMatchers("subject/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())

@@ -45,11 +45,13 @@ public class Group {
 
     private String conversationId;
 
-    private boolean isPrivate = true;
-
     private LocalDateTime createdDateTime;
 
     private boolean isActive = true;
+
+    private boolean isPrivate = true;
+
+    private boolean isPublish = true;
 
     @ManyToOne
     @JoinColumn
@@ -63,6 +65,10 @@ public class Group {
     @JoinColumn
     private UserDetail teacher;
 
+    @ManyToOne
+    @JoinColumn
+    private Group referenceClass;
+
     @OneToMany(mappedBy = "group")
     @JsonIgnore
     private List<Post> posts;
@@ -74,6 +80,10 @@ public class Group {
     @OneToMany(mappedBy = "group")
     @JsonIgnore
     private List<Event> events;
+
+    @OneToMany(mappedBy = "referenceClass")
+    @JsonIgnore
+    private List<Group> courses;
 
     public enum Type {
         CLASS,

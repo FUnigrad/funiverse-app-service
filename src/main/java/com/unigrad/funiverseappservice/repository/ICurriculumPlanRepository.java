@@ -27,4 +27,8 @@ public interface ICurriculumPlanRepository extends JpaRepository<CurriculumPlan,
     @Query(value = "select s from Syllabus s where s.isActive = true and s.id not in " +
             "(select cp.syllabus.id from CurriculumPlan cp where cp.combo.id = :comboId and cp.isComboPlan = true)")
     List<Syllabus> getAllSyllabusNotInCombo(Long comboId);
+
+    @Query(value = "select s from Syllabus s join CurriculumPlan cp on s.id = cp.syllabus.id " +
+            "where cp.curriculum.id = :curriculumId and cp.semester = :semester and cp.isComboPlan = false")
+    List<Syllabus> getAllSyllabusByCurriculumIdAndSemester(Long curriculumId, Integer semester);
 }

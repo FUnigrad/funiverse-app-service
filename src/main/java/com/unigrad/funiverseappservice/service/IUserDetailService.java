@@ -14,4 +14,6 @@ public interface IUserDetailService extends IBaseService<UserDetail, Long> {
     List<UserDetail> getAllUsersNotInGroup(Long id);
 
     Optional<UserDetail> findByPersonalMail(String eduMail);
+
+    String getNextUserSeq(String code);
 }

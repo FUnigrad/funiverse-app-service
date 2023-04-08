@@ -2,16 +2,7 @@ package com.unigrad.funiverseappservice.entity.academic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigrad.funiverseappservice.entity.Workspace;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,21 +30,37 @@ public class Term {
 
     private LocalDate startDate;
 
-    public Term(Season season, String year) {
-        this.season = season;
-        this.year = year;
-    }
+    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    private State state = State.PENDING;
 
     @OneToMany(mappedBy = "startedTerm")
     @JsonIgnore
     private List<Curriculum> curricula;
 
+    @OneToMany(mappedBy = "currentTerm")
+    @JsonIgnore
+    private List<Curriculum> currentCurricula;
+
     @OneToOne(mappedBy = "currentTerm")
     @JsonIgnore
     private Workspace workspace;
 
+    public Term(Season season, String year) {
+        this.season = season;
+        this.year = year;
+    }
+
     @Override
     public String toString() {
         return "%s %s".formatted(season.getName(), year);
+    }
+
+    public enum State {
+        PENDING,
+        READY,
+        ONGOING,
+        COMPLETE
     }
 }

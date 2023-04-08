@@ -75,4 +75,14 @@ public class GroupService implements IGroupService {
     public int getNextNameOrderForClass(String name) {
         return groupRepository.getNextNameOrderForClass(name);
     }
+
+    @Override
+    public List<Group> getAllClassByCurriculumId(Long curriculumId) {
+        return groupRepository.getAllClassByCurriculumId(curriculumId);
+    }
+
+    @Override
+    public Optional<Group> getBySyllabusIdAndReferenceClassId(Long syllabusId, Long referenceClassId) {
+        return groupRepository.getBySyllabusIdAndReferenceClassId(syllabusId, referenceClassId);
+    }
 }

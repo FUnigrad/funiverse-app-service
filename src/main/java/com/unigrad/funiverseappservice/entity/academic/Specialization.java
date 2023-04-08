@@ -46,6 +46,8 @@ public class Specialization {
     @JoinColumn
     private Major major;
 
+    private String studentCode;
+
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "specialization")

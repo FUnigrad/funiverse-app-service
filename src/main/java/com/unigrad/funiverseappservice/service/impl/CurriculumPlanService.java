@@ -94,4 +94,9 @@ public class CurriculumPlanService implements ICurriculumPlanService {
     public List<CurriculumPlan> getAllComboPlanByCurriculumIdAndComboId(Long curriculumId, Long comboId) {
         return curriculumPlanRepository.getAllByCurriculumAndCombo(curriculumId, comboId);
     }
+
+    @Override
+    public List<Syllabus> getAllSyllabusByCurriculumIdAndSemester(Long curriculumId, Integer semester) {
+        return curriculumPlanRepository.getAllSyllabusByCurriculumIdAndSemester(curriculumId, semester);
+    }
 }

@@ -89,6 +89,10 @@ public class UserDetail implements UserDetails {
     @JsonIgnore
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "userDetail")
+    @JsonIgnore
+    private List<TimetableEvent> timetableEvents;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

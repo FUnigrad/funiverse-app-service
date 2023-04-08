@@ -49,9 +49,13 @@ public class Curriculum {
     @JoinColumn
     private Term startedTerm;
 
-    private byte noSemester;
+    @ManyToOne
+    @JoinColumn
+    private Term currentTerm;
 
-    private byte currentSemester;
+    private Integer noSemester;
+
+    private Integer currentSemester;
 
     @OneToMany(mappedBy = "curriculum")
     @JsonIgnore

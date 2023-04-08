@@ -51,15 +51,29 @@ public class WorkspaceService implements IWorkspaceService {
     }
 
     @Override
-    public Term startNewTerm(String startDateString) {
+    public Term setStartDate(String startDateString) {
         LocalDate startDate = LocalDate.parse(startDateString, DateTimeFormatter.ISO_LOCAL_DATE);
-        workspace = get();
 
         Term nextTerm = getNextTerm();
         nextTerm.setStartDate(startDate);
-        workspace.setCurrentTerm(nextTerm);
 
-        return save(workspace).getCurrentTerm();
+        return termService.save(nextTerm);
+    }
+
+    @Override
+    public Term startNextTerm() {
+        Term nextTerm = getNextTerm();
+
+        if (nextTerm.getState().equals(Term.State.READY)) {
+            workspace = get();
+            workspace.setCurrentTerm(nextTerm);
+            workspaceRepository.save(workspace);
+
+            nextTerm.setState(Term.State.ONGOING);
+            termService.save(nextTerm);
+        }
+
+        return nextTerm;
     }
 
     @Override

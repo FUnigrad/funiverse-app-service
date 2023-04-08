@@ -96,6 +96,9 @@ public class UserController {
             throw new ServiceCommunicateException("An error occurs when call to Authen Service");
         }
 
+        //generate code
+
+
         UserDetail newUserDetail = userDetailService.save(userDetail);
 
         URI location = ServletUriComponentsBuilder

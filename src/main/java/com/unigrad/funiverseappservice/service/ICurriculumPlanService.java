@@ -18,4 +18,6 @@ public interface ICurriculumPlanService extends IBaseService<CurriculumPlan, Cur
     boolean removeSyllabusFromCurriculum(Long syllabusId, Long curriculumId);
 
     List<Syllabus> getAllAvailableSyllabus(Long id, boolean isCombo);
+
+    List<Syllabus> getAllSyllabusByCurriculumIdAndSemester(Long curriculumId, Integer semester);
 }

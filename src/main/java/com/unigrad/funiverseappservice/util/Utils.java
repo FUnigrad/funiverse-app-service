@@ -24,4 +24,10 @@ public class Utils {
 
         return userIds;
     }
+
+    public static String generateTeacherCode(String name, String number) {
+        String code = "";
+
+        return code;
+    }
 }
