@@ -3,7 +3,6 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.academic.Slot;
 import com.unigrad.funiverseappservice.repository.ISlotRepository;
 import com.unigrad.funiverseappservice.service.ISlotService;
-import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -20,4 +20,8 @@ public interface IGroupRepository extends IBaseRepository<Group, Long> {
     List<Group> getAllClassByCurriculumId(Long curriculumId);
 
     Optional<Group> getBySyllabusIdAndReferenceClassId(Long syllabusId, Long referenceClassId);
+
+    @Query(value = "select g from Group g inner join GroupMember gm on g.id = gm.group.id " +
+            "where g.type = 'CLASS' and gm.user.id = :studentId")
+    Group getClassByStudentId(Long studentId);
 }

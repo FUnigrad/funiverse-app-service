@@ -84,17 +84,6 @@ public class TermController {
         curriculaInNextTerm.addAll(curriculumService.getCurriculumByCurrentTerm(currentTerm.getId()));
         curriculaInNextTerm.addAll(curriculumService.getCurriculumByStartedTerm(nextTerm.getId()));
 
-        // Update next current term
-//        curriculaInNextTerm.forEach(curriculum -> {
-//            // Check if current is last semester
-//            if (curriculum.getCurrentSemester() < curriculum.getNoSemester()) {
-//                curriculum.setCurrentTerm(nextTerm);
-//                curriculum.setCurrentSemester(curriculum.getCurrentSemester() + 1);
-//
-//                curriculumService.save(curriculum);
-//            }
-//        });
-
         // 3. Find syllabus will start
         // One Curriculum -> Many Class
         // One Class -> Many Syllabus
@@ -123,18 +112,6 @@ public class TermController {
         return ResponseEntity.ok(groups);
     }
 
-    @PostMapping("start-new")
-    public ResponseEntity<Term> startNewTerm(@RequestBody StartDateRequest startDateRequest) {
-
-        Term nextTerm = workspaceService.setStartDate(startDateRequest.getStartDate());
-
-        // set date for slot
-
-        // create timetable event
-
-        return ResponseEntity.ok(nextTerm);
-    }
-
     private Group prepareCourseGroup(Syllabus syllabus, Group clazz, Curriculum curriculum) {
         Optional<Group> courseOptional = groupService.getBySyllabusIdAndReferenceClassId(syllabus.getId(), clazz.getId());
 
@@ -159,9 +136,26 @@ public class TermController {
 
     @GetMapping("start-new")
     public ResponseEntity<Term> startNewTerm() {
+        // 1. Get Term information
+        Term currentTerm = workspaceService.getCurrentTerm();
         Term nextTerm = workspaceService.getNextTerm();
 
         if (nextTerm.getState().equals(Term.State.READY)) {
+            // 2. Find all curriculum in next term
+            List<Curriculum> curriculaInNextTerm = new ArrayList<>();
+            curriculaInNextTerm.addAll(curriculumService.getCurriculumByCurrentTerm(currentTerm.getId()));
+            curriculaInNextTerm.addAll(curriculumService.getCurriculumByStartedTerm(nextTerm.getId()));
+
+            // Update next current term
+            curriculaInNextTerm.forEach(curriculum -> {
+                // Check if current is last semester
+                if (curriculum.getCurrentSemester() < curriculum.getNoSemester()) {
+                    curriculum.setCurrentTerm(nextTerm);
+                    curriculum.setCurrentSemester(curriculum.getCurrentSemester() + 1);
+
+                    curriculumService.save(curriculum);
+                }
+            });
             return ResponseEntity.ok(workspaceService.startNextTerm());
         }
 

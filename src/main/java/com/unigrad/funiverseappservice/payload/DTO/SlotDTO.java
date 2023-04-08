@@ -19,7 +19,7 @@ public class SlotDTO {
 
     private Integer order;
 
-    private Integer dayOfWeek;
+    private EntityBaseDTO group;
 
     private String room;
 

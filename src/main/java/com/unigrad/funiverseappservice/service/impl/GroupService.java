@@ -85,4 +85,9 @@ public class GroupService implements IGroupService {
     public Optional<Group> getBySyllabusIdAndReferenceClassId(Long syllabusId, Long referenceClassId) {
         return groupRepository.getBySyllabusIdAndReferenceClassId(syllabusId, referenceClassId);
     }
+
+    @Override
+    public Group getClassByStudentId(Long studentId) {
+        return groupRepository.getClassByStudentId(studentId);
+    }
 }

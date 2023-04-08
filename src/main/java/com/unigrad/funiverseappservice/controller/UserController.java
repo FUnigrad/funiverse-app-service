@@ -1,19 +1,32 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.Workspace;
+import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.Slot;
+import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.TimetableEvent;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
+import com.unigrad.funiverseappservice.payload.DTO.TimetableEventDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.service.IAuthenCommunicateService;
+import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.IEventService;
+import com.unigrad.funiverseappservice.service.IGroupService;
+import com.unigrad.funiverseappservice.service.ITimetableEventService;
+import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import com.unigrad.funiverseappservice.util.SlotCalculator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,9 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,6 +63,14 @@ public class UserController {
     private final IEventService eventService;
 
     private final IAuthenCommunicateService authenCommunicateService;
+
+    private final ICurriculumPlanService curriculumPlanService;
+
+    private final IGroupService groupService;
+
+    private final IWorkspaceService workspaceService;
+
+    private final ITimetableEventService timetableEventService;
 
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
@@ -105,8 +130,6 @@ public class UserController {
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(newUserDetail.getId()).toUri();
-
-
 
         return ResponseEntity.created(location).build();
     }
@@ -171,5 +194,54 @@ public class UserController {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return ResponseEntity.ok(userDetail);
+    }
+
+    @GetMapping("timetable")
+    public ResponseEntity<List<TimetableEventDTO>> getTimeTable() {
+        UserDetail currentUser = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (currentUser.isAdmin()) {
+            throw new AccessDeniedException("Admin cannot perform this request");
+        }
+
+        Curriculum curriculum = currentUser.getCurriculum();
+        Group clazz = groupService.getClassByStudentId(currentUser.getId());
+
+        List<Syllabus> syllabiInTerm = curriculumPlanService.getAllSyllabusByCurriculumIdAndSemester(curriculum.getId(), curriculum.getCurrentSemester());
+
+        //noinspection OptionalGetWithoutIsPresent
+        List<Group> courses = syllabiInTerm.stream().map(syllabus -> groupService.getBySyllabusIdAndReferenceClassId(syllabus.getId(), clazz.getId()).get()).toList();
+
+        List<TimetableEvent> result = new ArrayList<>();
+
+        courses.forEach(course -> course.getSlots().stream().map(slot -> getOrCreateTimetableEvent(currentUser, slot, course)).forEach(result::add));
+
+        return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(result, TimetableEventDTO[].class)).toList());
+    }
+
+    private TimetableEvent getOrCreateTimetableEvent(UserDetail userDetail, Slot slot, Group course) {
+
+        Optional<TimetableEvent> timetableEventOptional = timetableEventService.getByUserIdAndSlotId(userDetail.getId(), slot.getId());
+        Workspace workspace = workspaceService.get();
+
+        if (timetableEventOptional.isPresent()) {
+            return timetableEventOptional.get();
+        }
+
+        LocalTime startTime = SlotCalculator.calculateStartTime(slot.getOrder(), workspace.getMorningStartTime(), workspace.getMorningEndTime(),
+                workspace.getAfternoonStartTime(), workspace.getSlotDurationInMin(), workspace.getRestTimeInMin());
+        LocalTime endTime = startTime.plusMinutes(workspace.getSlotDurationInMin());
+
+        TimetableEvent timetableEvent = TimetableEvent.builder()
+                .title(course.getSyllabus().getCode())
+                .startDateTime(LocalDateTime.of(slot.getDate(), startTime))
+                .endDateTime(LocalDateTime.of(slot.getDate(), endTime))
+                .description("Slot %s of syllabus %s".formatted(slot.getNo(), course.getSyllabus().getName()))
+                .slot(slot)
+                .userDetail(userDetail)
+                .location(slot.getRoom())
+                .build();
+
+        return timetableEventService.save(timetableEvent);
     }
 }

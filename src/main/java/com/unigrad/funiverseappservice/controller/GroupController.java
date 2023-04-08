@@ -485,24 +485,6 @@ public class GroupController {
         return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(results, SlotDTO[].class)).toList());
     }
 
-    @PostMapping("{id}/single-slot")
-    public ResponseEntity<SlotDTO> createSlotForSyllabus(@PathVariable Long id, @RequestBody Slot slot) {
-        Optional<Group> groupOptional = groupService.get(id);
-
-        if (groupOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
-            throw new InvalidActionOnGroupException("This action can only use on COURSE");
-        }
-
-        slot.setGroup(groupOptional.get());
-        slot.setNo(groupOptional.get().getSlots().size() + 1);
-
-        return ResponseEntity.ok().body(dtoConverter.convert(slotService.save(slot), SlotDTO.class));
-    }
-
     @GetMapping("{id}/slot")
     public ResponseEntity<List<SlotDTO>> getSlotOfGroup(@PathVariable Long id) {
         Optional<Group> groupOptional = groupService.get(id);
@@ -538,28 +520,6 @@ public class GroupController {
         slot.setGroup(groupOptional.get());
 
         return ResponseEntity.ok(dtoConverter.convert(slotService.save(slot), SlotDTO.class));
-    }
-
-    @DeleteMapping("{groupId}/slot/{slotId}")
-    public ResponseEntity<Void> getSlotOfGroup(@PathVariable Long groupId, @PathVariable Long slotId) {
-        Optional<Group> groupOptional = groupService.get(groupId);
-        Optional<Slot> slotOptional = slotService.get(slotId);
-
-        if (groupOptional.isEmpty() || slotOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
-            throw new InvalidActionOnGroupException("This action can only use on COURSE");
-        }
-
-        if (!groupOptional.get().getId().equals(slotOptional.get().getGroup().getId())) {
-            throw new InvalidActionOnGroupException("Slot is not belong this Group");
-        }
-
-        slotService.delete(slotId);
-
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("{id}/academic")
