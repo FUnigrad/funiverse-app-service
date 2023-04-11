@@ -183,8 +183,10 @@ public class UserController {
             events = events.stream().filter(event -> !event.isRead()).toList();
         }
 
-        events.sort(Comparator.comparing(Event::getCreatedTime).reversed());
-
+        if (!events.isEmpty()) {
+            events = new ArrayList<>(events);
+            events.sort(Comparator.comparing(Event::getCreatedTime).reversed());
+        }
         return ResponseEntity.ok(events);
     }
 
