@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Slot;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.academic.Term;
@@ -18,6 +19,8 @@ import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.payload.DTO.SlotDTO;
 import com.unigrad.funiverseappservice.payload.request.AssignTeacherRequest;
 import com.unigrad.funiverseappservice.payload.request.BulkCreateSlotRequest;
+import com.unigrad.funiverseappservice.payload.response.AcademicPlanResponse;
+import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
@@ -52,7 +55,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -77,6 +85,8 @@ public class GroupController {
     private final ITermService termService;
 
     private final ISlotService slotService;
+
+    private final ICurriculumPlanService curriculumPlanService;
 
     private final DTOConverter dtoConverter;
 
@@ -582,5 +592,27 @@ public class GroupController {
         termService.save(nextTerm);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("{id}/academic/plan")
+    public ResponseEntity<List<AcademicPlanResponse>> getAllSyllabusInCurriculum(@PathVariable Long id) {
+        Optional<Group> groupOptional = groupService.get(id);
+
+        if (groupOptional.isPresent()) {
+            List<CurriculumPlan> curriculumPlans = curriculumPlanService.getAllByCurriculumId(groupOptional.get().getCurriculum().getId());
+            List<AcademicPlanResponse> academicPlanResponses = new ArrayList<>(Arrays.stream(dtoConverter.convert(curriculumPlans, AcademicPlanResponse[].class)).toList());
+            academicPlanResponses.sort(Comparator.comparing(AcademicPlanResponse::getSemester));
+
+            for (AcademicPlanResponse curriculumPlanDTO : academicPlanResponses) {
+                Optional<Group> course = groupService.getBySyllabusIdAndReferenceClassId(curriculumPlanDTO.getSyllabus().getId(), id);
+
+                course.ifPresent(c -> curriculumPlanDTO.setGroupId(c.getId()));
+            }
+
+
+            return ResponseEntity.ok(academicPlanResponses);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
