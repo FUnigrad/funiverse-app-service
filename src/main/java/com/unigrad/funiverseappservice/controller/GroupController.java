@@ -30,6 +30,7 @@ import com.unigrad.funiverseappservice.service.ISlotService;
 import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
+import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.Utils;
 import io.micrometer.common.util.StringUtils;
@@ -87,6 +88,8 @@ public class GroupController {
     private final ISlotService slotService;
 
     private final ICurriculumPlanService curriculumPlanService;
+
+    private final EmitterService emitterService;
 
     private final DTOConverter dtoConverter;
 
@@ -251,7 +254,7 @@ public class GroupController {
                             .createdTime(LocalDateTime.now())
                             .build();
 
-                    eventService.save(event);
+                    emitterService.pushNotification(eventService.save(event));
                 });
             }
 
@@ -360,7 +363,7 @@ public class GroupController {
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
-                            eventService.save(event);
+                            emitterService.pushNotification(eventService.save(event));
                         }
                     });
 
@@ -380,7 +383,7 @@ public class GroupController {
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
-                            eventService.save(event);
+                            emitterService.pushNotification(eventService.save(event));
                         }
                     });
 
@@ -431,7 +434,7 @@ public class GroupController {
                         .createdTime(LocalDateTime.now())
                         .build();
 
-                eventService.save(event);
+                emitterService.pushNotification(eventService.save(event));
             }
 
             return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));

@@ -9,7 +9,7 @@ import java.util.Optional;
 @Service
 public interface IEventService {
 
-    void save(Event event);
+    Event save(Event event);
 
     Optional<Event> get(Long id);
 

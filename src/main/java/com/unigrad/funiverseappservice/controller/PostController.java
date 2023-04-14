@@ -10,6 +10,7 @@ import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class PostController {
     private final IUserDetailService userDetailService;
 
     private final IEventService eventService;
+
+    private final EmitterService emitterService;
 
     private final DTOConverter dtoConverter;
 
@@ -77,7 +80,7 @@ public class PostController {
                                 .createdTime(LocalDateTime.now())
                                 .build();
 
-                        eventService.save(event);
+                        emitterService.pushNotification(eventService.save(event));
                     }
                 });
 
@@ -155,7 +158,7 @@ public class PostController {
                                 .createdTime(LocalDateTime.now())
                                 .build();
 
-                        eventService.save(event);
+                        emitterService.pushNotification(eventService.save(event));
                     }
                 });
 

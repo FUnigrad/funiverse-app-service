@@ -17,6 +17,7 @@ import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.ITimetableEventService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
+import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
@@ -24,6 +25,8 @@ import com.unigrad.funiverseappservice.util.SlotCalculator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -37,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -53,6 +57,8 @@ import java.util.stream.Collectors;
 @RequestMapping("user")
 @RequiredArgsConstructor
 public class UserController {
+
+    private final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     private final GroupMemberService groupMemberService;
 
@@ -71,6 +77,8 @@ public class UserController {
     private final IWorkspaceService workspaceService;
 
     private final ITimetableEventService timetableEventService;
+
+    private final EmitterService emitterService;
 
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
@@ -245,5 +253,18 @@ public class UserController {
                 .build();
 
         return timetableEventService.save(timetableEvent);
+    }
+
+    @GetMapping("/user/notification")
+    public SseEmitter subscribe() {
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        LOG.info("%s subscribing notification".formatted(userDetail.getCode()));
+
+        SseEmitter sseEmitter = new SseEmitter(24 * 60 * 60 * 1000L);
+        emitterService.addEmitter(sseEmitter);
+
+        LOG.info("Subscribed");
+        return sseEmitter;
     }
 }

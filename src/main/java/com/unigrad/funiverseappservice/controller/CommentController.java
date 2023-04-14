@@ -7,6 +7,7 @@ import com.unigrad.funiverseappservice.payload.request.UpdateContentRequest;
 import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
+import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,8 @@ public class CommentController {
     private final IUserDetailService userDetailService;
 
     private final IEventService eventService;
+
+    private final EmitterService emitterService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Comment> getById(@PathVariable Long id) {
@@ -72,7 +75,7 @@ public class CommentController {
                                                 .createdTime(LocalDateTime.now())
                                                 .build();
 
-                                        eventService.save(event);
+                                        emitterService.pushNotification(eventService.save(event));
                                     }
                                 });
 
