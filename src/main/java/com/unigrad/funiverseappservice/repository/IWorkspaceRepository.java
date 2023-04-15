@@ -13,4 +13,7 @@ public interface IWorkspaceRepository extends JpaRepository<Workspace, Long> {
 
     @Query(value = "select w.restTimeInMin from Workspace w")
     Integer getRestTimeInMin();
+
+    @Query(value = "select w.emailSuffix from Workspace w")
+    String getEmailSuffix();
 }

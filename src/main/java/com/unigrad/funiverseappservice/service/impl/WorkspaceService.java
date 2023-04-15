@@ -106,4 +106,9 @@ public class WorkspaceService implements IWorkspaceService {
     public Integer getRestTimeInMin() {
         return workspaceRepository.getRestTimeInMin();
     }
+
+    @Override
+    public String getEmailSuffix() {
+        return workspaceRepository.getEmailSuffix();
+    }
 }

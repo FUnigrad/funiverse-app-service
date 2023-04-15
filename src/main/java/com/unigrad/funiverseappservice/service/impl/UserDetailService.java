@@ -73,8 +73,15 @@ public class UserDetailService implements IUserDetailService {
     }
 
     @Override
-    public String getNextUserSeq(String code) {
-        return userDetailRepository.getNextUserSeq(code);
+    public String generateUserCode(String code) {
+        String regexp = "^" + code + "[0-9]+$";
+        return code + userDetailRepository.getNextUserSeq(regexp);
+    }
+
+    @Override
+    public String generateStudentCode(String schoolYear, String specStudentCode) {
+        Long nextSeq = userDetailRepository.getNextStudentSeq(schoolYear);
+        return "%s%s%s".formatted(specStudentCode.toLowerCase(), schoolYear.substring(1), String.format("%04d", nextSeq));
     }
 
     @Override

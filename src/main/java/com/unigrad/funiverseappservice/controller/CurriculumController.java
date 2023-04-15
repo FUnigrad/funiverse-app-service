@@ -4,6 +4,7 @@ import com.unigrad.funiverseappservice.entity.academic.Combo;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.ComboPlanDTO;
 import com.unigrad.funiverseappservice.payload.DTO.CurriculumPlanDTO;
@@ -17,6 +18,7 @@ import com.unigrad.funiverseappservice.service.ISyllabusService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import com.unigrad.funiverseappservice.util.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -211,17 +213,25 @@ public class CurriculumController {
 
     @PostMapping("{id}/students")
     public ResponseEntity<List<UserDTO>> addStudentToCurriculum(@PathVariable Long id, @RequestBody List<Long> studentIds) {
-        Optional<Curriculum> curriculum = curriculumService.get(id);
+        Optional<Curriculum> curriculumOptional = curriculumService.get(id);
         List<UserDTO> userDTOList = new ArrayList<>();
 
-        if (curriculum.isPresent()) {
+        if (curriculumOptional.isPresent()) {
+            Curriculum curriculum = curriculumOptional.get();
             for (Long studentId : studentIds) {
-                Optional<UserDetail> student = userDetailService.get(studentId);
+                Optional<UserDetail> studentOptional = userDetailService.get(studentId);
 
-                if (student.isPresent()) {
-                    student.get().setCurriculum(curriculum.get());
+                if (studentOptional.isPresent()) {
+                    UserDetail student = studentOptional.get();
+                    student.setCurriculum(curriculum);
+                    //generate code
+                    String userCode = userDetailService.generateStudentCode(curriculum.getSchoolYear(),
+                            curriculum.getSpecialization().getStudentCode());
+                    student.setCode(userCode);
+                    student.setSchoolYear(curriculum.getSchoolYear());
+                    student.setEduMail("%s%s@%s".formatted(Utils.generateUserCode(student.getName()), userCode, workspaceService.getEmailSuffix()));
 
-                    userDetailService.save(student.get());
+                    userDetailService.save(student);
                     userDTOList.add(dtoConverter.convert(student, UserDTO.class));
                 }
             }

@@ -6,6 +6,7 @@ import com.unigrad.funiverseappservice.entity.academic.Slot;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.TimetableEvent;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
@@ -13,6 +14,7 @@ import com.unigrad.funiverseappservice.payload.DTO.TimetableEventDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.service.IAuthenCommunicateService;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
+import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.ITimetableEventService;
@@ -22,6 +24,7 @@ import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.SlotCalculator;
+import com.unigrad.funiverseappservice.util.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +83,8 @@ public class UserController {
 
     private final EmitterService emitterService;
 
+    private final ICurriculumService curriculumService;
+
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
 
@@ -115,7 +120,6 @@ public class UserController {
                 .buildAndExpand(newUserDetail.getId()).toUri();
 
 
-
         return ResponseEntity.created(location).build();
     }
 
@@ -123,16 +127,34 @@ public class UserController {
     @Transactional
     public ResponseEntity<Void> save(@RequestBody UserDetail userDetail, HttpServletRequest request) {
 
+        //generate code
+        if (Role.STUDENT.equals(userDetail.getRole())) {
+            if (userDetail.getCurriculum() != null) {
+                Optional<Curriculum> curriculumOptional = curriculumService.get(userDetail.getCurriculum().getId());
+
+                if (curriculumOptional.isEmpty()) {
+                    return ResponseEntity.notFound().build();
+                }
+                Curriculum curriculum = curriculumOptional.get();
+                String userCode = userDetailService.generateStudentCode(curriculum.getSchoolYear(),
+                        curriculum.getSpecialization().getStudentCode());
+                userDetail.setCode(userCode);
+                userDetail.setSchoolYear(curriculum.getSchoolYear());
+                userDetail.setEduMail("%s%s@%s".formatted(Utils.generateUserCode(userDetail.getName()), userCode, workspaceService.getEmailSuffix()));
+            }
+        } else {
+            String userCode = userDetailService.generateUserCode(Utils.generateUserCode(userDetail.getName()));
+            userDetail.setCode(userCode);
+            userDetail.setEduMail("%s@%s".formatted(userCode, workspaceService.getEmailSuffix()));
+        }
+
+        UserDetail newUserDetail = userDetailService.save(userDetail);
+
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (!authenCommunicateService.saveUser(userDetail, token)) {
             throw new ServiceCommunicateException("An error occurs when call to Authen Service");
         }
-
-        //generate code
-
-
-        UserDetail newUserDetail = userDetailService.save(userDetail);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -143,10 +165,28 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserDetail> update(@RequestBody UserDetail user) {
+    public ResponseEntity<UserDetail> update(@RequestBody UserDetail userDetail) {
 
-        return userDetailService.isExist(user.getId())
-                ? ResponseEntity.ok(userDetailService.save(user))
+        //generate code
+        if (Role.STUDENT.equals(userDetail.getRole())) {
+            if (userDetail.getCurriculum() != null) {
+                Optional<Curriculum> curriculumOptional = curriculumService.get(userDetail.getCurriculum().getId());
+
+                if (curriculumOptional.isEmpty()) {
+                    return ResponseEntity.notFound().build();
+                }
+                Curriculum curriculum = curriculumOptional.get();
+
+                String userCode = userDetailService.generateStudentCode(curriculum.getSchoolYear(),
+                        curriculum.getSpecialization().getStudentCode());
+                userDetail.setCode(userCode);
+                userDetail.setSchoolYear(curriculum.getSchoolYear());
+                userDetail.setEduMail("%s%s%%%s".formatted(Utils.generateUserCode(userDetail.getName()), userCode, workspaceService.getEmailSuffix()));
+            }
+        }
+
+        return userDetailService.isExist(userDetail.getId())
+                ? ResponseEntity.ok(userDetailService.save(userDetail))
                 : ResponseEntity.notFound().build();
     }
 

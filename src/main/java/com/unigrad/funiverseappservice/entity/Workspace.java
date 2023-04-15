@@ -45,4 +45,6 @@ public class Workspace {
     private LocalTime afternoonStartTime;
 
     private LocalTime afternoonEndTime;
+
+    private String emailSuffix;
 }

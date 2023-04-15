@@ -15,5 +15,7 @@ public interface IUserDetailService extends IBaseService<UserDetail, Long> {
 
     Optional<UserDetail> findByPersonalMail(String eduMail);
 
-    String getNextUserSeq(String code);
+    String generateUserCode(String code);
+
+    String generateStudentCode(String schoolYear, String specStudentCode);
 }

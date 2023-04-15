@@ -19,6 +19,9 @@ public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long>
 
     Optional<UserDetail> findByPersonalMail(String personalMail);
 
-    @Query(value = "select count(*) from UserDetail u where (u.role = 'TEACHER' or u.role = 'OFFICER') and u.code like :code%")
+    @Query(value = "select count(*) + 1 from user_detail u where (u.role = 'TEACHER' or u.role = 'OFFICER') and u.code REGEXP :code", nativeQuery = true)
     String getNextUserSeq(String code);
+
+    @Query(value = "select count(*) + 1 from UserDetail u where u.curriculum.schoolYear = :schoolYear and u.role = 'STUDENT'")
+    Long getNextStudentSeq(String schoolYear);
 }

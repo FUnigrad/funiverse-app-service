@@ -20,4 +20,6 @@ public interface IWorkspaceService {
     Integer getSlotDurationInMin();
 
     Integer getRestTimeInMin();
+
+    String getEmailSuffix();
 }
