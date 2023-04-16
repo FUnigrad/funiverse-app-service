@@ -7,12 +7,17 @@ import com.unigrad.funiverseappservice.entity.academic.Specialization;
 import com.unigrad.funiverseappservice.entity.academic.Subject;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.ComboDTO;
+import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
+import com.unigrad.funiverseappservice.payload.response.SearchResultResponse;
 import com.unigrad.funiverseappservice.service.IComboService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.service.IMajorService;
+import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.ISpecializationService;
 import com.unigrad.funiverseappservice.service.ISubjectService;
 import com.unigrad.funiverseappservice.service.ISyllabusService;
@@ -20,8 +25,11 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import com.unigrad.funiverseappservice.specification.SearchCriteria;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +41,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("search")
+@RequiredArgsConstructor
 public class SearchController {
 
     private final ISyllabusService syllabusService;
@@ -51,20 +60,11 @@ public class SearchController {
 
     private final IComboService comboService;
 
+    private final IPostService postService;
+
+    private final IGroupMemberService groupMemberService;
+
     private final DTOConverter dtoConverter;
-
-    public SearchController(ISyllabusService syllabusService, ICurriculumService curriculumService, IUserDetailService userDetailService, IGroupService groupService, ISubjectService subjectService, IMajorService majorService, ISpecializationService specializationService, IComboService comboService, DTOConverter dtoConverter) {
-        this.syllabusService = syllabusService;
-        this.curriculumService = curriculumService;
-        this.userDetailService = userDetailService;
-        this.groupService = groupService;
-        this.subjectService = subjectService;
-        this.majorService = majorService;
-        this.specializationService = specializationService;
-        this.comboService = comboService;
-        this.dtoConverter = dtoConverter;
-    }
-
 
     @GetMapping
     public ResponseEntity<List<?>> search(@RequestParam String entity,
@@ -132,5 +132,71 @@ public class SearchController {
             }
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         }
+    }
+
+    @GetMapping("workspace")
+    public ResponseEntity<SearchResultResponse> searchWorkspace(@RequestParam String value) {
+        List<SearchCriteria> searchUserCriteria = new ArrayList<>(List.of(
+                new SearchCriteria("name", "like", value),
+                new SearchCriteria("code", "like", value))
+        );
+
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<UserDetail> userDetails = userDetailService.search(new EntitySpecification<>(searchUserCriteria));
+        List<Group> groups = groupService.getAllForUser(userDetail.getId(), value);
+
+        List<SearchResultResponse.GroupResult> groupResults = groups.stream()
+                .map(group -> {
+                    SearchResultResponse.GroupResult result = dtoConverter.convert(group, SearchResultResponse.GroupResult.class);
+                    result.setNumOfMembers(groupMemberService.countMemberInGroup(result.getId()));
+                    return result;
+                }).toList();
+
+        List<Post> posts = postService.getAllContainContentForUser(userDetail.getId(), value);
+
+        return ResponseEntity.ok(SearchResultResponse.builder()
+                .users(Arrays.stream(dtoConverter.convert(userDetails, SearchResultResponse.UserResult[].class)).toList())
+                .groups(groupResults)
+                .posts(Arrays.stream(dtoConverter.convert(posts, PostDTO[].class)).toList())
+                .build());
+    }
+
+    @GetMapping("group/{id}")
+    public ResponseEntity<List<PostDTO>> searchGroup(@RequestParam String value, @PathVariable Long id) {
+
+        if (!groupService.isExist(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Post> posts = postService.getAllInGroupWhoseContentContain(id, value);
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(posts, PostDTO[].class)).toList());
+    }
+
+    @GetMapping("chat")
+    public ResponseEntity<SearchResultResponse> searchChat(@RequestParam String value) {
+        List<SearchCriteria> searchUserCriteria = new ArrayList<>(List.of(
+                new SearchCriteria("name", "like", value),
+                new SearchCriteria("code", "like", value))
+        );
+
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<UserDetail> userDetails = userDetailService.search(new EntitySpecification<>(searchUserCriteria));
+        List<Group> groups = groupService.getAllForUser(userDetail.getId(), value);
+
+        List<SearchResultResponse.GroupResult> groupResults = groups.stream()
+                .map(group -> {
+                    SearchResultResponse.GroupResult result = dtoConverter.convert(group, SearchResultResponse.GroupResult.class);
+                    result.setNumOfMembers(groupMemberService.countMemberInGroup(result.getId()));
+                    return result;
+                }).toList();
+
+        return ResponseEntity.ok(SearchResultResponse.builder()
+                .users(Arrays.stream(dtoConverter.convert(userDetails, SearchResultResponse.UserResult[].class)).toList())
+                .groups(groupResults)
+                .posts(new ArrayList<>())
+                .build());
     }
 }

@@ -65,7 +65,7 @@ public class PostService implements IPostService {
 
     @Override
     public List<Post> search(EntitySpecification<Post> specification) {
-        return null;
+        return postRepository.findAll(specification);
     }
 
     @Override
@@ -98,5 +98,15 @@ public class PostService implements IPostService {
         );
 
         return pageConverter.convert(result, pageable);
+    }
+
+    @Override
+    public List<Post> getAllContainContentForUser(Long userId, String content) {
+        return postRepository.getAllPostContainContentForUser(userId, content);
+    }
+
+    @Override
+    public List<Post> getAllInGroupWhoseContentContain(Long groupId, String content) {
+        return postRepository.getAllPostInGroupWhoseContentContain(groupId, content);
     }
 }

@@ -14,4 +14,8 @@ public interface IPostService extends IBaseService<Post, Long> {
     List<Post> getAllPostInGroup(Long groupId);
 
     Page<PostDTO> getAllPostForNewFeed(Long userId, Pageable pageable);
+
+    List<Post> getAllContainContentForUser(Long userId, String content);
+
+    List<Post> getAllInGroupWhoseContentContain(Long groupId, String content);
 }

@@ -23,4 +23,6 @@ public interface IGroupMemberRepository extends JpaRepository<GroupMember, Group
 
     @Query("select count(*) > 0 from GroupMember gm where gm.user.id = :userId and gm.group.id = :groupId")
     boolean isGroupMember(Long userId, Long groupId);
+
+    int countGroupMemberByGroup_Id(Long groupId);
 }

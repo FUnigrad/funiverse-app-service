@@ -1,9 +1,8 @@
 package com.unigrad.funiverseappservice.service;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
-import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -20,4 +19,6 @@ public interface IGroupMemberService extends IBaseService<GroupMember, GroupMemb
     boolean isGroupAdmin(Long userId, Long groupId);
 
     boolean isGroupMember(Long userId, Long groupId);
+
+    int countMemberInGroup(Long groupId);
 }

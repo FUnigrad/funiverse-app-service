@@ -31,6 +31,11 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
+    public int countMemberInGroup(Long groupId) {
+        return groupMemberRepository.countGroupMemberByGroup_Id(groupId);
+    }
+
+    @Override
     public List<GroupMember> getAll() {
         return groupMemberRepository.findAll();
     }

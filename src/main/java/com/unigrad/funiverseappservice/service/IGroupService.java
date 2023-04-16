@@ -16,4 +16,6 @@ public interface IGroupService extends IBaseService<Group,Long> {
     Optional<Group> getBySyllabusIdAndReferenceClassId(Long syllabusId, Long referenceClassId);
 
     Group getClassByStudentId(Long studentId);
+
+    List<Group> getAllForUser(Long userId, String groupName);
 }
