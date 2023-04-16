@@ -2,6 +2,7 @@ package com.unigrad.funiverseappservice.controller;
 
 import com.unigrad.funiverseappservice.entity.academic.Major;
 import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
+import com.unigrad.funiverseappservice.payload.DTO.SpecializationDTO;
 import com.unigrad.funiverseappservice.service.IMajorService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import org.springframework.http.ResponseEntity;
@@ -87,13 +88,12 @@ public class MajorController {
     }
 
     @GetMapping("/{id}/specializations")
-    public ResponseEntity<List<EntityBaseDTO>> getAllSpecializationInMajor(@PathVariable Long id) {
+    public ResponseEntity<List<SpecializationDTO>> getAllSpecializationInMajor(@PathVariable Long id) {
         Optional<Major> majorOpt = majorService.get(id);
 
         return majorOpt.map(major ->
                 ResponseEntity.ok(Arrays.stream(dtoConverter.convert(major.getSpecializations(),
-                        EntityBaseDTO[].class)).toList()))
+                        SpecializationDTO[].class)).toList()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 }
