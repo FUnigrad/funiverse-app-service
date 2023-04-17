@@ -71,6 +71,10 @@ public class SearchController {
                                          @RequestParam String[] field,
                                          @RequestParam String[] operator,
                                          @RequestParam(defaultValue = "") String[] value){
+
+        if (value.length == 0) {
+            value = new String[]{""};
+        }
         //in case the condition of search criteria is not enough, search base on the least criteria
         int noCriteria = Math.min(Math.min(field.length, operator.length), value.length);
 
@@ -144,12 +148,15 @@ public class SearchController {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<UserDetail> userDetails = userDetailService.search(new EntitySpecification<>(searchUserCriteria));
+        userDetails = userDetails.stream().filter(user -> !user.isAdmin()).toList();
+
         List<Group> groups = groupService.getAllForUser(userDetail.getId(), value);
 
         List<SearchResultResponse.GroupResult> groupResults = groups.stream()
                 .map(group -> {
                     SearchResultResponse.GroupResult result = dtoConverter.convert(group, SearchResultResponse.GroupResult.class);
                     result.setNumOfMembers(groupMemberService.countMemberInGroup(result.getId()));
+                    result.setMembers(groupMemberService.getAllUsersInGroup(result.getId()));
                     return result;
                 }).toList();
 
@@ -184,12 +191,15 @@ public class SearchController {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<UserDetail> userDetails = userDetailService.search(new EntitySpecification<>(searchUserCriteria));
+        userDetails = userDetails.stream().filter(user -> !user.isAdmin()).toList();
+
         List<Group> groups = groupService.getAllForUser(userDetail.getId(), value);
 
         List<SearchResultResponse.GroupResult> groupResults = groups.stream()
                 .map(group -> {
                     SearchResultResponse.GroupResult result = dtoConverter.convert(group, SearchResultResponse.GroupResult.class);
                     result.setNumOfMembers(groupMemberService.countMemberInGroup(result.getId()));
+                    result.setMembers(groupMemberService.getAllUsersInGroup(result.getId()));
                     return result;
                 }).toList();
 

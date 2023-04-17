@@ -2,6 +2,7 @@ package com.unigrad.funiverseappservice.payload.response;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import lombok.AllArgsConstructor;
@@ -41,5 +42,7 @@ public class SearchResultResponse {
         private int numOfMembers;
 
         private Group.Type type;
+
+        private List<UserDetail> members;
     }
 }

@@ -136,6 +136,6 @@ public class UserDetail implements UserDetails {
 
     @JsonIgnore
     public boolean isAdmin() {
-        return Role.WORKSPACE_ADMIN.equals(role);
+        return Role.WORKSPACE_ADMIN.equals(role) || Role.SYSTEM_ADMIN.equals(role);
     }
 }
