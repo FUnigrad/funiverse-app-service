@@ -14,7 +14,7 @@ public interface IUserDetailRepository extends IBaseRepository<UserDetail, Long>
     List<UserDetail> getAllUsersHaveNoCurriculum();
 
     @Query(value = "select ud from UserDetail ud where ud.id not in " +
-            "(select gm.user.id from GroupMember gm where gm.group.id = :id) and ud.isActive = true")
+            "(select gm.user.id from GroupMember gm where gm.group.id = :id) and ud.isActive = true and ud.role not like '%ADMIN'")
     List<UserDetail> getAllUsersNotInGroup(Long id);
 
     Optional<UserDetail> findByPersonalMail(String personalMail);
