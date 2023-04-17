@@ -21,7 +21,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class CurriculumPlan {
 
     @EmbeddedId

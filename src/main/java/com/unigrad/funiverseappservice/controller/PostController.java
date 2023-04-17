@@ -12,7 +12,7 @@ import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
-import com.unigrad.funiverseappservice.util.Utils;
+import com.unigrad.funiverseappservice.util.HTMLDecode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -63,7 +63,7 @@ public class PostController {
             throw new AccessDeniedException("Current user don't have permission to edit this post");
         }
 
-        List<Long> mentionUserIds = Utils.extractUserFromContent(content.getContent());
+        List<Long> mentionUserIds = HTMLDecode.extractUser(content.getContent());
 
         mentionUserIds
                 .forEach(userId -> {
@@ -141,7 +141,7 @@ public class PostController {
 
         Comment comment = commentService.save(newComment);
 
-        List<Long> mentionUserIds = Utils.extractUserFromContent(newComment.getContent());
+        List<Long> mentionUserIds = HTMLDecode.extractUser(newComment.getContent());
 
         mentionUserIds
                 .forEach(userId -> {

@@ -8,7 +8,7 @@ import com.unigrad.funiverseappservice.service.ICommentService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.impl.EmitterService;
-import com.unigrad.funiverseappservice.util.Utils;
+import com.unigrad.funiverseappservice.util.HTMLDecode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -58,7 +58,7 @@ public class CommentController {
                         comment.setContent(contentRequest.getContent());
                         commentService.save(comment);
 
-                        List<Long> mentionUserIds = Utils.extractUserFromContent(contentRequest.getContent());
+                        List<Long> mentionUserIds = HTMLDecode.extractUser(contentRequest.getContent());
 
                         mentionUserIds
                                 .forEach(userId -> {

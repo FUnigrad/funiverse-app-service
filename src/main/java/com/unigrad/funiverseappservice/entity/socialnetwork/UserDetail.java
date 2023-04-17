@@ -31,7 +31,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class UserDetail implements UserDetails {
 
     @Id

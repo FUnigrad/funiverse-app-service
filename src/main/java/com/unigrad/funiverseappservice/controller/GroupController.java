@@ -32,7 +32,7 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
-import com.unigrad.funiverseappservice.util.Utils;
+import com.unigrad.funiverseappservice.util.HTMLDecode;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -346,7 +346,7 @@ public class GroupController {
             );
 
             // event for user who are mentioned
-            List<Long> mentionUserIds = Utils.extractUserFromContent(newPost.getContent());
+            List<Long> mentionUserIds = HTMLDecode.extractUser(newPost.getContent());
 
             mentionUserIds
                     .forEach(userId -> {
