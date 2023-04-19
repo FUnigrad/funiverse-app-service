@@ -295,7 +295,7 @@ public class UserController {
         return timetableEventService.save(timetableEvent);
     }
 
-    @GetMapping("/user/notification")
+    @GetMapping("/notification")
     public SseEmitter subscribe() {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
