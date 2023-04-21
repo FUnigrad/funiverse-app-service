@@ -22,6 +22,7 @@ import com.unigrad.funiverseappservice.payload.request.BulkCreateSlotRequest;
 import com.unigrad.funiverseappservice.payload.response.AcademicPlanResponse;
 import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.IEmailService;
 import com.unigrad.funiverseappservice.service.IEventService;
 import com.unigrad.funiverseappservice.service.IGroupMemberService;
 import com.unigrad.funiverseappservice.service.IGroupService;
@@ -34,6 +35,7 @@ import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import com.unigrad.funiverseappservice.util.HTMLDecode;
 import io.micrometer.common.util.StringUtils;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -50,6 +52,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -88,6 +91,8 @@ public class GroupController {
     private final ISlotService slotService;
 
     private final ICurriculumPlanService curriculumPlanService;
+
+    private final IEmailService emailService;
 
     private final EmitterService emitterService;
 
@@ -386,6 +391,14 @@ public class GroupController {
                             emitterService.pushNotification(eventService.save(event));
                         }
                     });
+
+            if (Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) {
+                try {
+                    emailService.sendAnnouncement(groupOptional.get(), members, post);
+                } catch (MessagingException | UnsupportedEncodingException e) {
+                    throw new RuntimeException("An unexpected error occurred when trying to send email");
+                };
+            }
 
             return ResponseEntity.ok().body(dtoConverter.convert(post, PostDTO.class));
         }
