@@ -9,6 +9,7 @@ import com.unigrad.funiverseappservice.service.ICurriculumService;
 import com.unigrad.funiverseappservice.service.ISpecializationService;
 import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,6 +60,7 @@ public class CurriculumService implements ICurriculumService {
     }
 
     @Override
+    @Transactional
     public void inactivate(Long key) {
         curriculumRepository.updateIsActive(key, false);
     }

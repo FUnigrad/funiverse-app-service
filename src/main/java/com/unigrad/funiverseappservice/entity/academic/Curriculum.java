@@ -55,7 +55,7 @@ public class Curriculum {
 
     private Integer noSemester;
 
-    private Integer currentSemester;
+    private Integer currentSemester = 0;
 
     @OneToMany(mappedBy = "curriculum")
     @JsonIgnore
