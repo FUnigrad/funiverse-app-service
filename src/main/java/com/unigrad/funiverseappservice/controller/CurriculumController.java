@@ -6,6 +6,7 @@ import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
 import com.unigrad.funiverseappservice.payload.DTO.ComboPlanDTO;
 import com.unigrad.funiverseappservice.payload.DTO.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
@@ -116,6 +117,18 @@ public class CurriculumController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Curriculum> deactivate(@PathVariable Long id) {
+        Optional<Curriculum> curriculumOptional = curriculumService.get(id);
+
+        if (curriculumOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<UserDetail> usersInCurriculum = curriculumService.getUsersInCurriculum(id);
+
+        if (!usersInCurriculum.isEmpty()) {
+            throw new InvalidActionOnGroupException("Cannot delete the curriculum has students!");
+        }
+
         curriculumService.inactivate(id);
 
         return curriculumService.get(id)

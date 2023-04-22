@@ -95,4 +95,9 @@ public class GroupService implements IGroupService {
     public List<Group> getAllForUser(Long userId, String groupName) {
         return groupRepository.getGroupForUser(userId, groupName);
     }
+
+    @Override
+    public List<Group> getTeachingClass(Long teacherId) {
+        return groupRepository.getGroupByTeacherId(teacherId);
+    }
 }

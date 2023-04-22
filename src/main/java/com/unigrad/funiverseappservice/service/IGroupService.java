@@ -18,4 +18,6 @@ public interface IGroupService extends IBaseService<Group,Long> {
     Group getClassByStudentId(Long studentId);
 
     List<Group> getAllForUser(Long userId, String groupName);
+
+    List<Group> getTeachingClass(Long teacherId);
 }

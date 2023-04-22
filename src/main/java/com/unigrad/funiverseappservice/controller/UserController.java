@@ -9,6 +9,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.TimetableEvent;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
 import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
 import com.unigrad.funiverseappservice.payload.DTO.TimetableEventDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
@@ -254,19 +255,31 @@ public class UserController {
             throw new AccessDeniedException("Admin cannot perform this request");
         }
 
-        Curriculum curriculum = currentUser.getCurriculum();
-        Group clazz = groupService.getClassByStudentId(currentUser.getId());
+        if (Role.STUDENT.equals(currentUser.getRole())) {
+            Curriculum curriculum = currentUser.getCurriculum();
+            Group clazz = groupService.getClassByStudentId(currentUser.getId());
 
-        List<Syllabus> syllabiInTerm = curriculumPlanService.getAllSyllabusByCurriculumIdAndSemester(curriculum.getId(), curriculum.getCurrentSemester());
+            List<Syllabus> syllabiInTerm = curriculumPlanService.getAllSyllabusByCurriculumIdAndSemester(curriculum.getId(), curriculum.getCurrentSemester());
 
-        //noinspection OptionalGetWithoutIsPresent
-        List<Group> courses = syllabiInTerm.stream().map(syllabus -> groupService.getBySyllabusIdAndReferenceClassId(syllabus.getId(), clazz.getId()).get()).toList();
+            //noinspection OptionalGetWithoutIsPresent
+            List<Group> courses = syllabiInTerm.stream().map(syllabus -> groupService.getBySyllabusIdAndReferenceClassId(syllabus.getId(), clazz.getId()).get()).toList();
 
-        List<TimetableEvent> result = new ArrayList<>();
+            List<TimetableEvent> result = new ArrayList<>();
 
-        courses.forEach(course -> course.getSlots().stream().map(slot -> getOrCreateTimetableEvent(currentUser, slot, course)).forEach(result::add));
+            courses.forEach(course -> course.getSlots().stream().map(slot -> getOrCreateTimetableEvent(currentUser, slot, course)).forEach(result::add));
 
-        return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(result, TimetableEventDTO[].class)).toList());
+            return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(result, TimetableEventDTO[].class)).toList());
+        } else if (Role.TEACHER.equals(currentUser.getRole())) {
+            List<Group> groups = groupService.getTeachingClass(currentUser.getId());
+
+            List<TimetableEvent> result = new ArrayList<>();
+
+            groups.forEach(course -> course.getSlots().stream().map(slot -> getOrCreateTimetableEvent(currentUser, slot, course)).forEach(result::add));
+
+            return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(result, TimetableEventDTO[].class)).toList());
+        }
+
+        throw new InvalidActionOnGroupException("Current User cannot access Timetable");
     }
 
     private TimetableEvent getOrCreateTimetableEvent(UserDetail userDetail, Slot slot, Group course) {
