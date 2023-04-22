@@ -50,11 +50,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -218,8 +214,21 @@ public class UserController {
 
     @GetMapping("group/none")
     public ResponseEntity<List<UserDTO>> getUsersNotInGroup(@RequestParam Long id) {
+        Optional<Group> groupOptional = groupService.get(id);
 
-        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(userDetailService.getAllUsersNotInGroup(id), UserDTO[].class)).toList());
+        if (groupOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Group group = groupOptional.get();
+        List<UserDetail> usersNotInGroup = userDetailService.getAllUsersNotInGroup(id);
+
+        if (Group.Type.CLASS.equals(group.getType()) || Group.Type.COURSE.equals(group.getType())) {
+            usersNotInGroup = usersNotInGroup.stream()
+                    .filter(user -> Objects.equals(user.getCurriculum().getId(), group.getCurriculum().getId()) && Role.STUDENT.equals(user.getRole())).toList();
+        }
+
+        return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(usersNotInGroup, UserDTO[].class)).toList());
     }
 
     @GetMapping("event")
