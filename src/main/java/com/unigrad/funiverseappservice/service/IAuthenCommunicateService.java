@@ -7,4 +7,6 @@ import org.springframework.stereotype.Service;
 public interface IAuthenCommunicateService {
 
     boolean saveUser(UserDetail user, String token);
+
+    boolean inactiveUser(String email, String token);
 }

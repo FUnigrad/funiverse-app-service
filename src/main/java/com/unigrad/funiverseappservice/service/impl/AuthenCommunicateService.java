@@ -66,6 +66,29 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
         }
     }
 
+    @Override
+    public boolean inactiveUser(String email, String token) {
+        setUrl(token);
+
+        Mono<Boolean> isSuccessful =  webClient.delete()
+                .uri("/user/%s".formatted(email))
+                .exchangeToMono(clientResponse -> {
+                    if (clientResponse.statusCode().is2xxSuccessful()) {
+                        return Mono.just(true);
+                    } else {
+                        return Mono.just(false);
+                    }
+                });
+
+        if (Boolean.TRUE.equals(isSuccessful.block())) {
+            LOG.info("Save User into %s successful".formatted(AUTHEN_SERVICE_URL));
+            return true;
+        } else {
+            LOG.error("An error occurs when calling to %s. Can not save Workspace Admin".formatted(AUTHEN_SERVICE_URL));
+            return false;
+        }
+    }
+
     private void setUrl(String token) {
         try {
             SslContext sslContext = SslContextBuilder.forClient()

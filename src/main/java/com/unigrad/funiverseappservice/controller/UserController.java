@@ -121,7 +121,7 @@ public class UserController {
     }
 
     @PostMapping
-    @Transactional
+    @Transactional(rollbackOn = ServiceCommunicateException.class)
     public ResponseEntity<Void> save(@RequestBody UserDetail userDetail, HttpServletRequest request) {
 
         //generate code
@@ -188,13 +188,23 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDetail> deactivate(@PathVariable Long id) {
+    @Transactional(rollbackOn = ServiceCommunicateException.class)
+    public ResponseEntity<UserDetail> deactivate(@PathVariable Long id, HttpServletRequest request) {
+        Optional<UserDetail> userDetailOptional = userDetailService.get(id);
+
+        if (userDetailOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (!authenCommunicateService.inactiveUser(userDetailOptional.get().getPersonalMail(), token)) {
+            throw new ServiceCommunicateException("An error occurs when call to Authen Service");
+        }
 
         userDetailService.inactivate(id);
 
-        return userDetailService.get(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
