@@ -21,4 +21,6 @@ public interface IGroupMemberService extends IBaseService<GroupMember, GroupMemb
     boolean isGroupMember(Long userId, Long groupId);
 
     int countMemberInGroup(Long groupId);
+
+    void removeAllMembers(Long groupId);
 }

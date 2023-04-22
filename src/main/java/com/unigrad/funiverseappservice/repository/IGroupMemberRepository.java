@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.repository;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -25,4 +26,8 @@ public interface IGroupMemberRepository extends JpaRepository<GroupMember, Group
     boolean isGroupMember(Long userId, Long groupId);
 
     int countGroupMemberByGroup_Id(Long groupId);
+
+    @Query(value = "delete from GroupMember gm where gm.group.id = :groupId")
+    @Modifying
+    void deleteAllByGroupId(Long groupId);
 }

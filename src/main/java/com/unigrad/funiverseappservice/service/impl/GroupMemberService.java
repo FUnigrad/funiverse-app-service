@@ -36,6 +36,12 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
+    @Transactional
+    public void removeAllMembers(Long groupId) {
+        groupMemberRepository.deleteAllByGroupId(groupId);
+    }
+
+    @Override
     public List<GroupMember> getAll() {
         return groupMemberRepository.findAll();
     }

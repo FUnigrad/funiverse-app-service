@@ -298,6 +298,7 @@ public class GroupController {
         }
 
         if (groupMemberService.isGroupAdmin(userDetail.getId(), id) || userDetail.isAdmin()) {
+            groupMemberService.removeAllMembers(id);
 
             groupService.inactivate(id);
             return ResponseEntity.ok().build();

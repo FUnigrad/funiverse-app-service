@@ -5,6 +5,7 @@ import com.unigrad.funiverseappservice.repository.IGroupRepository;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,13 +13,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class GroupService implements IGroupService {
 
     private final IGroupRepository groupRepository;
-
-    public GroupService(IGroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
 
     @Override
     public List<Group> getAll() {
@@ -53,6 +51,7 @@ public class GroupService implements IGroupService {
     @Override
     @Transactional
     public void inactivate(Long key) {
+
         groupRepository.updateIsActive(key,false);
     }
 
