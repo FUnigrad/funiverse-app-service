@@ -85,10 +85,12 @@ public class CurriculumService implements ICurriculumService {
 
     @Override
     public String generateCode(Curriculum curriculum) {
-        String CODE_TEMPLATE = "B%s_%s_%s";
+        String CODE_TEMPLATE = "B%s_%s_%s" + (char) (curriculum.getStartedTerm().getSeason().getOrdinalNumber() + 64);
         Optional<Specialization> specializationOpt = specializationService.get(curriculum.getSpecialization().getId());
 
-        return specializationOpt.map(specialization -> CODE_TEMPLATE.formatted(specialization.getMajor().getCode(), specialization.getCode(), curriculum.getSchoolYear())).orElse(null);
+        return specializationOpt.map(specialization ->
+                CODE_TEMPLATE.formatted(specialization.getMajor().getCode(), specialization.getCode(),
+                        curriculum.getSchoolYear())).orElse(null);
     }
 
     @Override
@@ -104,5 +106,10 @@ public class CurriculumService implements ICurriculumService {
     @Override
     public List<Curriculum> getCurriculumByCurrentTerm(Long id) {
         return curriculumRepository.getCurriculumByCurrentTermId(id);
+    }
+
+    @Override
+    public Optional<Curriculum> getCurriculumByCode(String code) {
+        return curriculumRepository.getCurriculumByCode(code);
     }
 }

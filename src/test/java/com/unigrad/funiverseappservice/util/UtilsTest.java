@@ -1,8 +1,9 @@
 package com.unigrad.funiverseappservice.util;
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UtilsTest {
 
@@ -40,5 +41,23 @@ class UtilsTest {
         String code = Utils.removeAccent(name);
 
         assertEquals(expectedResult, code);
+    }
+
+    @Test
+    void hasField1() {
+        Class<?> clazz = UserDetail.class;
+        String fieldName = "name";
+        String fieldCode = "code";
+
+        assertTrue(Utils.hasField(clazz, fieldName));
+        assertTrue(Utils.hasField(clazz, fieldCode));
+    }
+
+    @Test
+    void hasField2() {
+        Class<?> clazz = UserDetail.class;
+        String fieldName = "teacher";
+
+        assertFalse(Utils.hasField(clazz, fieldName));
     }
 }

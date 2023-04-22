@@ -71,6 +71,7 @@ public class SecurityConfiguration {
                 .requestMatchers("combo/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("group/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("search/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
+                .requestMatchers("import/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 // user
                 .requestMatchers("group/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 .requestMatchers("post/**").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())

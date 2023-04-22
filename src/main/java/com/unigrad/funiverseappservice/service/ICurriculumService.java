@@ -5,6 +5,7 @@ import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ICurriculumService extends IBaseService<Curriculum, Long> {
 
@@ -17,4 +18,6 @@ public interface ICurriculumService extends IBaseService<Curriculum, Long> {
     List<Curriculum> getCurriculumByStartedTerm(Long id);
 
     List<Curriculum> getCurriculumByCurrentTerm(Long id);
+
+    Optional<Curriculum> getCurriculumByCode(String code);
 }
