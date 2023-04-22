@@ -265,6 +265,9 @@ public class CurriculumController {
 
                 if (student.isPresent() && student.get().getCurriculum().getId().equals(curriculum.get().getId())) {
                     student.get().setCurriculum(null);
+                    student.get().setSchoolYear(null);
+                    student.get().setCode(null);
+                    student.get().setEduMail(null);
 
                     userDetailService.save(student.get());
                 }
