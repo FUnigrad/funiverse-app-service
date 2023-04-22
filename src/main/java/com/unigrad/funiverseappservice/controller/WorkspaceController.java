@@ -97,7 +97,7 @@ public class WorkspaceController {
     @GetMapping("user")
     public ResponseEntity<List<UserDTO>> getAllUser() {
 
-        List<UserDetail> userDetails = userDetailService.getAll();
+        List<UserDetail> userDetails = userDetailService.getAllActive();
 
         return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(userDetails, UserDTO[].class)).toList());
     }

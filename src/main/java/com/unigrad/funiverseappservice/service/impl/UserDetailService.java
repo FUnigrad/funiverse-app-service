@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 
+import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.IUserDetailRepository;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
@@ -27,7 +28,10 @@ public class UserDetailService implements IUserDetailService {
 
     @Override
     public List<UserDetail> getAllActive() {
-        return userDetailRepository.findAllByActiveIsTrue();
+        List<UserDetail> result = userDetailRepository.findAllByActiveIsTrue();
+        result = result.stream().filter(user -> !Role.WORKSPACE_ADMIN.equals(user.getRole()) && !Role.SYSTEM_ADMIN.equals(user.getRole())).toList();
+
+        return result;
     }
 
     @Override
