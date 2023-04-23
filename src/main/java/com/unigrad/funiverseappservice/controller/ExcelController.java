@@ -10,12 +10,16 @@ import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.util.ExcelUtil;
 import com.unigrad.funiverseappservice.util.Utils;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +60,23 @@ public class ExcelController {
 
         message = "Please upload an excel file!";
         throw new InvalidValueException(message);
+    }
+
+    @GetMapping
+    public ResponseEntity<Void> generateTemplate(@RequestParam String entity, HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream");
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=%s.xlsx".formatted(entity);
+        response.setHeader(headerKey, headerValue);
+
+        XSSFWorkbook workbook = ExcelUtil.getTemplate(entity);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+
+        return ResponseEntity.ok().build();
     }
 
     private UserDetail buildUser(UserFlat userFlat) {

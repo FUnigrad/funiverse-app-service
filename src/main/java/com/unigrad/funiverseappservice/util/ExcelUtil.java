@@ -11,6 +11,8 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.InvalidValueException;
 import com.unigrad.funiverseappservice.payload.excel.UserFlat;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,7 +89,32 @@ public class ExcelUtil {
         }
     }
 
-    private List<String> fields (String clazz) {
+    public static XSSFWorkbook getTemplate(String object) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        if ("User".equals(object)) {
+            XSSFSheet sheet = workbook.createSheet("USER");
+            Row row = sheet.createRow(0);
+
+            CellStyle style = workbook.createCellStyle();
+            XSSFFont font = workbook.createFont();
+            font.setBold(true);
+            font.setFontHeight(16);
+            style.setFont(font);
+
+            int cellNum = 0;
+            for (String field : fields("USER")) {
+                Cell cell = row.createCell(cellNum);
+                cell.setCellValue(field);
+                cell.setCellStyle(style);
+                sheet.autoSizeColumn(cellNum);
+                cellNum++;
+            }
+        }
+
+        return workbook;
+    }
+
+    private static List<String> fields (String clazz) {
         List<String> result = new ArrayList<>();
         switch (clazz) {
             case "MAJOR", "SUBJECT" -> result = List.of("id", "code", "name");
@@ -95,7 +122,7 @@ public class ExcelUtil {
             case "SYLLABUS" -> result = List.of("id", "code", "name", "description", "min_avg_mark_to_pass", "no_credit", "subject_id");
             case "CURRICULUM" -> result = List.of("id", "name", "description", "no_semester", "specialization_id");
             case "CURRICULUM_PLAN" -> result = List.of("curriculum_id", "syllabus_id", "semester");
-            case "USER" -> result = List.of("id", "name", "personal_mail", "phone_number", "role", "curriculum_code", "identify_number");
+            case "USER" -> result = List.of("id", "name", "personal_mail", "phone_number", "identify_number", "role", "curriculum_code");
             default -> throw new IllegalStateException("Unexpected value: " + clazz);
         }
 
