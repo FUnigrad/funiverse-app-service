@@ -4,22 +4,23 @@ package com.unigrad.funiverseappservice.service.impl;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.IUserDetailRepository;
+import com.unigrad.funiverseappservice.service.ISchoolYearService;
 import com.unigrad.funiverseappservice.service.IUserDetailService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserDetailService implements IUserDetailService {
 
     private final IUserDetailRepository userDetailRepository;
 
-    public UserDetailService(IUserDetailRepository userDetailRepository) {
-        this.userDetailRepository = userDetailRepository;
-    }
+    private final ISchoolYearService schoolYearService;
 
     @Override
     public List<UserDetail> getAll() {
@@ -84,7 +85,7 @@ public class UserDetailService implements IUserDetailService {
 
     @Override
     public String generateStudentCode(String schoolYear, String specStudentCode) {
-        Long nextSeq = userDetailRepository.getNextStudentSeq(schoolYear);
+        Long nextSeq = schoolYearService.getNextSeq(schoolYear);
         return "%s%s%s".formatted(specStudentCode.toLowerCase(), schoolYear.substring(1), String.format("%04d", nextSeq));
     }
 

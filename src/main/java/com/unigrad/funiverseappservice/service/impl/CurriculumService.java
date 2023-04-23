@@ -1,21 +1,25 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
+import com.unigrad.funiverseappservice.entity.academic.SchoolYear;
 import com.unigrad.funiverseappservice.entity.academic.Specialization;
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.ICurriculumRepository;
 import com.unigrad.funiverseappservice.service.ICurriculumService;
+import com.unigrad.funiverseappservice.service.ISchoolYearService;
 import com.unigrad.funiverseappservice.service.ISpecializationService;
 import com.unigrad.funiverseappservice.service.ITermService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CurriculumService implements ICurriculumService {
 
     private final ICurriculumRepository curriculumRepository;
@@ -24,11 +28,7 @@ public class CurriculumService implements ICurriculumService {
 
     private final ITermService termService;
 
-    public CurriculumService(ICurriculumRepository curriculumRepository, ISpecializationService specializationService, ITermService termService) {
-        this.curriculumRepository = curriculumRepository;
-        this.specializationService = specializationService;
-        this.termService = termService;
-    }
+    private final ISchoolYearService schoolYearService;
 
     @Override
     public List<Curriculum> getAll() {
@@ -50,6 +50,10 @@ public class CurriculumService implements ICurriculumService {
         Optional<Term> term = termService.get(entity.getStartedTerm().getSeason().getId(), entity.getStartedTerm().getYear());
 
         entity.setStartedTerm(term.orElseGet(() -> termService.save(entity.getStartedTerm())));
+
+        if (!schoolYearService.isExist(entity.getSchoolYear())) {
+            schoolYearService.save(entity.getSchoolYear(), 0L);
+        }
 
         return curriculumRepository.save(entity);
     }
