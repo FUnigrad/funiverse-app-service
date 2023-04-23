@@ -7,6 +7,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.payload.request.OnBoardingRequest;
+import com.unigrad.funiverseappservice.payload.request.SeasonOnboardRequest;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.ISeasonService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
@@ -112,8 +113,8 @@ public class WorkspaceController {
     }
 
     @PostMapping("season")
-    public ResponseEntity<List<Season>> save(@RequestBody List<Season> seasons) {
-        List<Season> newSeasons = seasons.stream().map(seasonService::save).toList();
+    public ResponseEntity<List<Season>> save(@RequestBody SeasonOnboardRequest seasonOnboardRequest) {
+        List<Season> newSeasons = seasonOnboardRequest.getSeason().stream().map(seasonService::save).toList();
 
         return ResponseEntity.ok(newSeasons);
     }
