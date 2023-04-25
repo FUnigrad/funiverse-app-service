@@ -23,6 +23,11 @@ public class UserDetailService implements IUserDetailService {
     private final ISchoolYearService schoolYearService;
 
     @Override
+    public List<UserDetail> saveAll(List<UserDetail> entities) {
+        return userDetailRepository.saveAll(entities);
+    }
+
+    @Override
     public List<UserDetail> getAll() {
         return userDetailRepository.findAll();
     }

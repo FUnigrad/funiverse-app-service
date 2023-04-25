@@ -39,6 +39,11 @@ public class MajorService implements IMajorService {
     }
 
     @Override
+    public List<Major> saveAll(List<Major> entities) {
+        return majorRepository.saveAll(entities);
+    }
+
+    @Override
     public void activate(Long key) {
         majorRepository.updateIsActive(key, true);
     }
@@ -56,5 +61,10 @@ public class MajorService implements IMajorService {
     @Override
     public List<Major> search(EntitySpecification<Major> specification) {
         return majorRepository.findAll(specification);
+    }
+
+    @Override
+    public Optional<Major> findByCode(String code) {
+        return majorRepository.findByCode(code);
     }
 }

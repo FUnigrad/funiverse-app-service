@@ -55,6 +55,11 @@ public class ComboService implements IComboService {
     }
 
     @Override
+    public List<Combo> saveAll(List<Combo> entities) {
+        return null;
+    }
+
+    @Override
     public void activate(Long key) {
 
     }

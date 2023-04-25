@@ -62,6 +62,11 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
+    public List<GroupMember> saveAll(List<GroupMember> entities) {
+        return null;
+    }
+
+    @Override
     public void activate(GroupMember.GroupMemberKey key) {
 
     }

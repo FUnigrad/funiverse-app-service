@@ -15,6 +15,8 @@ public interface IBaseService<T, K> {
 
     T save(T entity);
 
+    List<T> saveAll(List<T> entities);
+
     void activate(K key);
 
     void inactivate(K key);

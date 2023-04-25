@@ -4,9 +4,8 @@ import com.unigrad.funiverseappservice.entity.academic.Combo;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.CurriculumPlan;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
+import com.unigrad.funiverseappservice.exception.InvalidActionException;
 import com.unigrad.funiverseappservice.payload.DTO.ComboPlanDTO;
 import com.unigrad.funiverseappservice.payload.DTO.CurriculumPlanDTO;
 import com.unigrad.funiverseappservice.payload.DTO.EntityBaseDTO;
@@ -88,15 +87,6 @@ public class CurriculumController {
     @PostMapping
     public ResponseEntity<String> save(@RequestBody Curriculum curriculum) {
 
-        //calculates school year
-        Long foundedYear = workspaceService.get().getFoundedYear();
-        Long curriculumYear = Long.valueOf(curriculum.getStartedTerm().getYear());
-
-        //todo curriculum name = school year + season: ex: K15A, K15B, K15C
-        curriculum.setSchoolYear("K%s".formatted(curriculumYear - foundedYear +1));
-        curriculum.setCode(curriculumService.generateCode(curriculum));
-        curriculum.setName(curriculumService.generateName(curriculum));
-
         Curriculum newCurriculum = curriculumService.save(curriculum);
 
         URI location = ServletUriComponentsBuilder
@@ -126,7 +116,7 @@ public class CurriculumController {
         List<UserDetail> usersInCurriculum = curriculumService.getUsersInCurriculum(id);
 
         if (!usersInCurriculum.isEmpty()) {
-            throw new InvalidActionOnGroupException("Cannot delete the curriculum has students!");
+            throw new InvalidActionException("Cannot delete the curriculum has students!");
         }
 
         curriculumService.inactivate(id);

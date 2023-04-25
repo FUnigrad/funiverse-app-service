@@ -6,10 +6,7 @@ import com.unigrad.funiverseappservice.entity.academic.Specialization;
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.repository.ICurriculumRepository;
-import com.unigrad.funiverseappservice.service.ICurriculumService;
-import com.unigrad.funiverseappservice.service.ISchoolYearService;
-import com.unigrad.funiverseappservice.service.ISpecializationService;
-import com.unigrad.funiverseappservice.service.ITermService;
+import com.unigrad.funiverseappservice.service.*;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +27,8 @@ public class CurriculumService implements ICurriculumService {
 
     private final ISchoolYearService schoolYearService;
 
+    private final IWorkspaceService workspaceService;
+
     @Override
     public List<Curriculum> getAll() {
         return curriculumRepository.findAll();
@@ -47,6 +46,15 @@ public class CurriculumService implements ICurriculumService {
 
     @Override
     public Curriculum save(Curriculum entity) {
+        //calculates school year
+        Long foundedYear = workspaceService.get().getFoundedYear();
+        Long curriculumYear = Long.valueOf(entity.getStartedTerm().getYear());
+
+        //todo curriculum name = school year + season: ex: K15A, K15B, K15C
+        entity.setSchoolYear("K%s".formatted(curriculumYear - foundedYear +1));
+        entity.setCode(generateCode(entity));
+        entity.setName(generateName(entity));
+
         Optional<Term> term = termService.get(entity.getStartedTerm().getSeason().getId(), entity.getStartedTerm().getYear());
 
         entity.setStartedTerm(term.orElseGet(() -> termService.save(entity.getStartedTerm())));
@@ -56,6 +64,11 @@ public class CurriculumService implements ICurriculumService {
         }
 
         return curriculumRepository.save(entity);
+    }
+
+    @Override
+    public List<Curriculum> saveAll(List<Curriculum> entities) {
+        return curriculumRepository.saveAll(entities);
     }
 
     @Override

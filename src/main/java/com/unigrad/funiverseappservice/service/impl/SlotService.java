@@ -11,8 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class
-SlotService implements ISlotService {
+public class SlotService implements ISlotService {
 
     private final ISlotRepository slotRepository;
 

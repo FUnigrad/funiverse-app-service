@@ -10,7 +10,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Post;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
+import com.unigrad.funiverseappservice.exception.InvalidActionException;
 import com.unigrad.funiverseappservice.exception.MissingRequiredPropertyException;
 import com.unigrad.funiverseappservice.payload.DTO.CommentDTO;
 import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
@@ -129,7 +129,7 @@ public class GroupController {
                 Optional<Group> referenceClass = groupService.get(newGroup.getReferenceClass().getId());
 
                 if (referenceClass.isEmpty()) {
-                    throw new InvalidActionOnGroupException("Reference Clas it not exist");
+                    throw new InvalidActionException("Reference Clas it not exist");
                 }
                 newGroup.setCurriculum(referenceClass.get().getReferenceClass().getCurriculum());
 
@@ -466,7 +466,7 @@ public class GroupController {
         }
 
         if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
-            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+            throw new InvalidActionException("This action can only use on COURSE");
         }
 
         List<Slot> results = new ArrayList<>();
@@ -479,7 +479,7 @@ public class GroupController {
         // check if the number of slots is maximum when create in Group Detail
         if (bulkCreateSlotRequest.getAmount() != null) {
             if (bulkCreateSlotRequest.getAmount() + currentSlotAmount > syllabus.getNoSlot()) {
-                throw new InvalidActionOnGroupException("Number of slots is maximum");
+                throw new InvalidActionException("Number of slots is maximum");
             }
         }
         int index = 1;
@@ -521,7 +521,7 @@ public class GroupController {
         }
 
         if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
-            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+            throw new InvalidActionException("This action can only use on COURSE");
         }
 
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(slotService.getAllSlotsInGroup(id), SlotDTO[].class)).toList());
@@ -537,11 +537,11 @@ public class GroupController {
         }
 
         if (!groupOptional.get().getType().equals(Group.Type.COURSE)) {
-            throw new InvalidActionOnGroupException("This action can only use on COURSE");
+            throw new InvalidActionException("This action can only use on COURSE");
         }
 
         if (!groupOptional.get().getId().equals(slotOptional.get().getGroup().getId())) {
-            throw new InvalidActionOnGroupException("Slot is not belong this Group");
+            throw new InvalidActionException("Slot is not belong this Group");
         }
 
         slot.setGroup(groupOptional.get());
@@ -567,7 +567,7 @@ public class GroupController {
             return ResponseEntity.ok(group.getSyllabus());
         }
 
-        throw new InvalidActionOnGroupException("Can not get Academic information on group %s".formatted(group.getType()));
+        throw new InvalidActionException("Can not get Academic information on group %s".formatted(group.getType()));
     }
 
     @PostMapping("assign-teacher")

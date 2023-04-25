@@ -49,6 +49,11 @@ public class PostService implements IPostService {
     }
 
     @Override
+    public List<Post> saveAll(List<Post> entities) {
+        return null;
+    }
+
+    @Override
     public void activate(Long key) {
 
     }

@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface ITermService extends IBaseService<Term, Long>{
 
     Optional<Term> get(Long seasonId, String year);
+
+    Term getOrCreate(String term);
 }

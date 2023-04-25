@@ -38,7 +38,7 @@ public class SubjectController {
 
         List<Subject> subjects = code == null
                 ? subjectService.getAllActive()
-                : subjectService.getByCode(code);
+                : subjectService.getByCodeLike(code);
 
         return ResponseEntity.ok(subjects);
     }

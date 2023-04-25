@@ -41,9 +41,9 @@ public class Syllabus {
 
     private String code;
 
-    private byte noCredit;
+    private Integer noCredit;
 
-    private byte noSlot;
+    private Integer noSlot;
 
     private boolean isActive = true;
 
@@ -54,7 +54,7 @@ public class Syllabus {
     @Column(columnDefinition = "text")
     private String description;
 
-    private byte minAvgMarkToPass;
+    private Integer minAvgMarkToPass;
 
     @OneToMany(mappedBy = "syllabus")
     @JsonIgnore

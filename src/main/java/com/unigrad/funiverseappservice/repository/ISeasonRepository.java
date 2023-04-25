@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface ISeasonRepository extends IBaseRepository<Season, Long> {
 
     Optional<Season> getSeasonByOrdinalNumber(int ordinalNumber);
+
+    Optional<Season> getSeasonByName(String name);
 }

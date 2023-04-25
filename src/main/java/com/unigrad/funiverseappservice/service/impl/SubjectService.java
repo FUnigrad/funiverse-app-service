@@ -34,13 +34,23 @@ public class SubjectService implements ISubjectService{
         return subjectRepository.findById(key);
     }
 
-    public List<Subject> getByCode(String code) {
+    public List<Subject> getByCodeLike(String code) {
         return subjectRepository.findAllByCodeLike(code);
+    }
+
+    @Override
+    public Optional<Subject> getByCode(String code) {
+        return subjectRepository.findByCode(code);
     }
 
     @Override
     public Subject save(Subject entity) {
         return subjectRepository.save(entity);
+    }
+
+    @Override
+    public List<Subject> saveAll(List<Subject> entities) {
+        return subjectRepository.saveAll(entities);
     }
 
     @Override

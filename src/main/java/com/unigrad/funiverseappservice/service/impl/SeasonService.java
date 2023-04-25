@@ -64,12 +64,21 @@ public class SeasonService implements ISeasonService {
         return season.getOrdinalNumber() == seasons.size()
                 ? seasons.get(0)
                 : seasonRepository.getSeasonByOrdinalNumber(season.getOrdinalNumber() + 1).get();
-
     }
 
     @Override
     public boolean isLastSeason(int ordinalNumber) {
         List<Season> seasons = getAllActive();
         return ordinalNumber == seasons.size();
+    }
+
+    @Override
+    public Optional<Season> get(String season) {
+        return seasonRepository.getSeasonByName(season);
+    }
+
+    @Override
+    public List<Season> saveAll(List<Season> entities) {
+        return seasonRepository.saveAll(entities);
     }
 }

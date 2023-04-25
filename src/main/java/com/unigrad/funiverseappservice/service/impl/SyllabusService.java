@@ -55,6 +55,11 @@ public class SyllabusService implements ISyllabusService {
     }
 
     @Override
+    public List<Syllabus> saveAll(List<Syllabus> entities) {
+        return syllabusRepository.saveAll(entities);
+    }
+
+    @Override
     @Transactional
     public void activate(Long key) {
         syllabusRepository.updateIsActive(key, true);
@@ -90,7 +95,7 @@ public class SyllabusService implements ISyllabusService {
         comboPlans.sort(Comparator.comparing(CurriculumPlan::getSemester));
         Optional<Curriculum> curriculumOpt = curriculumService.get(curriculumId);
 
-        Map<Byte, List<Syllabus>> syllabiBySemester = comboPlans.stream()
+        Map<Integer, List<Syllabus>> syllabiBySemester = comboPlans.stream()
                 .collect(Collectors.groupingBy(CurriculumPlan::getSemester,
                         Collectors.mapping(CurriculumPlan::getSyllabus, Collectors.toList())));
         String preComboCode = comboCode.substring(0, comboCode.length()-1);
@@ -99,7 +104,7 @@ public class SyllabusService implements ISyllabusService {
         List<Syllabus> result = new ArrayList<>();
 
         //create syllabus combo
-        for (Map.Entry<Byte, List<Syllabus>> entry : syllabiBySemester.entrySet()) {
+        for (Map.Entry<Integer, List<Syllabus>> entry : syllabiBySemester.entrySet()) {
             List<Syllabus> syllabi = entry.getValue();
 
 
@@ -144,5 +149,10 @@ public class SyllabusService implements ISyllabusService {
     @Override
     public List<Syllabus> getReadySyllabusForAdding(Long curriculumId) {
         return syllabusRepository.getReadySyllabusForAdding(curriculumId);
+    }
+
+    @Override
+    public Optional<Syllabus> findByCode(String code) {
+        return syllabusRepository.findByCode(code);
     }
 }

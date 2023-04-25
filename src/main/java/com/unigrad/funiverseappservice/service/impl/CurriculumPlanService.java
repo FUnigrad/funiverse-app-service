@@ -42,6 +42,11 @@ public class CurriculumPlanService implements ICurriculumPlanService {
     }
 
     @Override
+    public List<CurriculumPlan> saveAll(List<CurriculumPlan> entities) {
+        return curriculumPlanRepository.saveAll(entities);
+    }
+
+    @Override
     public void activate(CurriculumPlan.CurriculumPlanKey key) {
 
     }

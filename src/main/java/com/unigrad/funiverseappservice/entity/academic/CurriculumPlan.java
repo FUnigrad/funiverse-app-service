@@ -35,7 +35,7 @@ public class CurriculumPlan {
     @MapsId("syllabusId")
     private Syllabus syllabus;
 
-    private Byte semester;
+    private Integer semester;
 
     private boolean isComboPlan = false;
 

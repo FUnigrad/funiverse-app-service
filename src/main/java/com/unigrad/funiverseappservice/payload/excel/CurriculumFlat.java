@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.payload.excel;
 
+import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,20 +10,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFlat {
+public class CurriculumFlat {
 
     private String id;
 
-    private String name;
+    private String description;
 
-    private String personal_mail;
+    private String no_semester;
 
-    private String identify_number;
+    private String specialization_code;
 
-    private String phone_number;
-
-    private String role;
-
-    private String curriculum_code;
+    private String start_term;
 
 }

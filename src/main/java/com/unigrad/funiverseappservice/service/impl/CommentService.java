@@ -24,7 +24,6 @@ public class CommentService implements ICommentService {
 
     private final IPostService postService;
 
-
     public CommentService(ICommentRepository commentRepository, IUserDetailService userDetailService, IPostService postService) {
         this.commentRepository = commentRepository;
         this.userDetailService = userDetailService;
@@ -63,6 +62,11 @@ public class CommentService implements ICommentService {
         entity.setCreatedDateTime(date);
 
         return commentRepository.save(entity);
+    }
+
+    @Override
+    public List<Comment> saveAll(List<Comment> entities) {
+        return null;
     }
 
     @Override

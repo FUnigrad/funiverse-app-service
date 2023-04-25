@@ -9,20 +9,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFlat {
+public class SyllabusFlat {
 
     private String id;
 
+    private String code;
+
     private String name;
 
-    private String personal_mail;
+    private String description;
 
-    private String identify_number;
+    private String min_avg_mark_to_pass;
 
-    private String phone_number;
+    private String no_credit;
 
-    private String role;
+    private String subject_code;
 
-    private String curriculum_code;
-
+    private String no_slot;
 }

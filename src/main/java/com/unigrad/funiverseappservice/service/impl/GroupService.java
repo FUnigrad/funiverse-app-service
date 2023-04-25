@@ -43,6 +43,11 @@ public class GroupService implements IGroupService {
     }
 
     @Override
+    public List<Group> saveAll(List<Group> entities) {
+        return groupRepository.saveAll(entities);
+    }
+
+    @Override
     @Transactional
     public void activate(Long key) {
         groupRepository.updateIsActive(key,true);

@@ -9,20 +9,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFlat {
+public class GroupFlat {
 
     private String id;
 
     private String name;
 
-    private String personal_mail;
-
-    private String identify_number;
-
-    private String phone_number;
-
-    private String role;
+    private String type;
 
     private String curriculum_code;
-
 }

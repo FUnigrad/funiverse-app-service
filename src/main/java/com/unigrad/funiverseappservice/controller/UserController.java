@@ -9,7 +9,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.TimetableEvent;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
-import com.unigrad.funiverseappservice.exception.InvalidActionOnGroupException;
+import com.unigrad.funiverseappservice.exception.InvalidActionException;
 import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
 import com.unigrad.funiverseappservice.payload.DTO.TimetableEventDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
@@ -298,7 +298,7 @@ public class UserController {
             return ResponseEntity.ok().body(Arrays.stream(dtoConverter.convert(result, TimetableEventDTO[].class)).toList());
         }
 
-        throw new InvalidActionOnGroupException("Current User cannot access Timetable");
+        throw new InvalidActionException("Current User cannot access Timetable");
     }
 
     private TimetableEvent getOrCreateTimetableEvent(UserDetail userDetail, Slot slot, Group course) {

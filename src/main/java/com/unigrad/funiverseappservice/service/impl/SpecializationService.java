@@ -24,6 +24,11 @@ public class SpecializationService implements ISpecializationService {
     }
 
     @Override
+    public List<Specialization> saveAll(List<Specialization> entities) {
+        return specializationRepository.saveAll(entities);
+    }
+
+    @Override
     public List<Specialization> getAllActive() {
         return specializationRepository.findAllByActiveIsTrue();
     }
@@ -56,5 +61,10 @@ public class SpecializationService implements ISpecializationService {
     @Override
     public List<Specialization> search(EntitySpecification<Specialization> specification) {
         return specializationRepository.findAll(specification);
+    }
+
+    @Override
+    public Optional<Specialization> getByCode(String code) {
+        return specializationRepository.findByCode(code);
     }
 }

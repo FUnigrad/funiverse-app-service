@@ -15,4 +15,6 @@ public interface ISyllabusRepository extends IBaseRepository<Syllabus, Long> {
     @Query("select s from Syllabus s right outer join CurriculumPlan cp on s.id = cp.syllabus.id " +
             "where s.isSyllabusCombo = false and cp.curriculum.id != :curriculumId")
     List<Syllabus> getReadySyllabusForAdding(Long curriculumId);
+
+    Optional<Syllabus> findByCode(String code);
 }
