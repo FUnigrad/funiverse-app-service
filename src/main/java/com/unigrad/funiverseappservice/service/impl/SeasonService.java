@@ -4,6 +4,7 @@ import com.unigrad.funiverseappservice.entity.academic.Season;
 import com.unigrad.funiverseappservice.repository.ISeasonRepository;
 import com.unigrad.funiverseappservice.service.ISeasonService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,7 @@ public class SeasonService implements ISeasonService {
     }
 
     @Override
+    @Transactional
     public void inactivate(Long key) {
         seasonRepository.updateIsActive(key, false);
     }
