@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 import javax.net.ssl.SSLException;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
@@ -121,7 +122,9 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
                     .trustManager(InsecureTrustManagerFactory.INSTANCE)
                     .build();
 
-            HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
+            HttpClient httpClient = HttpClient.create()
+                    .secure(t -> t.sslContext(sslContext))
+                    .responseTimeout(Duration.ofSeconds(60));
 
             webClient = WebClient.builder()
                     .baseUrl("http://" + AUTHEN_SERVICE_URL)
