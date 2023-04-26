@@ -115,27 +115,33 @@ public class ExcelUtil {
 
     public static XSSFWorkbook getTemplate(String object) {
         XSSFWorkbook workbook = new XSSFWorkbook();
-        if ("User".equals(object)) {
-            XSSFSheet sheet = workbook.createSheet("USER");
-            Row row = sheet.createRow(0);
-
-            CellStyle style = workbook.createCellStyle();
-            XSSFFont font = workbook.createFont();
-            font.setBold(true);
-            font.setFontHeight(16);
-            style.setFont(font);
-
-            int cellNum = 0;
-            for (String field : fields("USER")) {
-                Cell cell = row.createCell(cellNum);
-                cell.setCellValue(field);
-                cell.setCellStyle(style);
-                sheet.autoSizeColumn(cellNum);
-                cellNum++;
+        if ("All".equals(object)) {
+            for (String sheet : SHEETS) {
+                createSheet(sheet, workbook);
             }
         }
 
         return workbook;
+    }
+
+    private static void createSheet(String object, XSSFWorkbook workbook) {
+        XSSFSheet sheet = workbook.createSheet(object);
+        Row row = sheet.createRow(0);
+
+        CellStyle style = workbook.createCellStyle();
+        XSSFFont font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeight(16);
+        style.setFont(font);
+
+        int cellNum = 0;
+        for (String field : fields(object)) {
+            Cell cell = row.createCell(cellNum);
+            cell.setCellValue(field);
+            cell.setCellStyle(style);
+            sheet.autoSizeColumn(cellNum);
+            cellNum++;
+        }
     }
 
     private static List<String> fields (String clazz) {
