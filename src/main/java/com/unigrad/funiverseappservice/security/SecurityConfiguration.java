@@ -56,7 +56,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 // notification
-                .requestMatchers("/user/notification").permitAll()
+                .requestMatchers("/user/notification").hasAnyAuthority(Role.STUDENT.toString(), Role.TEACHER.toString(), Role.OFFICER.toString())
                 // admin
                 .requestMatchers("subject/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())

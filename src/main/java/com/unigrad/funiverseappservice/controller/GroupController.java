@@ -37,6 +37,8 @@ import com.unigrad.funiverseappservice.util.HTMLDecode;
 import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -71,6 +73,8 @@ import java.util.stream.Collectors;
 @RequestMapping("group")
 @RequiredArgsConstructor
 public class GroupController {
+
+    private final Logger LOG = LoggerFactory.getLogger(GroupController.class);
 
     private final IGroupService groupService;
 
@@ -373,8 +377,16 @@ public class GroupController {
                         }
                     });
 
-            // event for all users in group
-            List<UserDetail> members = groupMemberService.getAllUsersInGroup(groupOptional.get().getId());
+            // event for all remain users in group
+            List<UserDetail> members;
+
+            if (Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) {
+                members = userDetailService.getAllActive();
+            } else {
+                members = groupMemberService.getAllUsersInGroup(groupOptional.get().getId());
+            }
+
+            members = members.stream().filter(userDetail -> mentionUserIds.contains(userDetail.getId())).toList();
 
             members
                     .forEach(user -> {
@@ -397,7 +409,7 @@ public class GroupController {
                 try {
                     emailService.sendAnnouncement(groupOptional.get(), members, post);
                 } catch (MessagingException | UnsupportedEncodingException e) {
-                    throw new RuntimeException("An unexpected error occurred when trying to send email");
+                    LOG.error("An unexpected error occurred when trying to send email");
                 };
             }
 
