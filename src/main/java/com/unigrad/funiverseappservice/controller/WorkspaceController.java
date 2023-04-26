@@ -8,14 +8,17 @@ import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.payload.request.OnBoardingRequest;
 import com.unigrad.funiverseappservice.payload.request.SeasonOnboardRequest;
+import com.unigrad.funiverseappservice.service.IAuthenCommunicateService;
 import com.unigrad.funiverseappservice.service.IPostService;
 import com.unigrad.funiverseappservice.service.ISeasonService;
 import com.unigrad.funiverseappservice.service.IWorkspaceService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +46,8 @@ public class WorkspaceController {
 
     private final IPostService postService;
 
+    private final IAuthenCommunicateService authenCommunicateService;
+
     private final DTOConverter dtoConverter;
 
     @GetMapping
@@ -58,11 +63,13 @@ public class WorkspaceController {
     }
 
     @PutMapping
-    private ResponseEntity<Workspace> update(@RequestBody Workspace workspace) {
+    private ResponseEntity<Workspace> update(@RequestBody Workspace workspace, HttpServletRequest request) {
 
         if (!workspaceService.get().getId().equals(workspace.getId())) {
             return ResponseEntity.notFound().build();
         }
+
+        authenCommunicateService.activeWorkspace(request.getHeader(HttpHeaders.AUTHORIZATION));
 
         return ResponseEntity.ok(workspaceService.save(workspace));
     }

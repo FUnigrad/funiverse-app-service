@@ -1,5 +1,6 @@
 package com.unigrad.funiverseappservice.service.impl;
 
+import com.unigrad.funiverseappservice.entity.Workspace;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.AuthenUserDTO;
@@ -85,6 +86,31 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
             return true;
         } else {
             LOG.error("An error occurs when calling to %s. Can not save Workspace Admin".formatted(AUTHEN_SERVICE_URL));
+            return false;
+        }
+    }
+
+    @Override
+    public boolean activeWorkspace(String token) {
+        setUrl(token);
+
+        Workspace workspace = workspaceService.get();
+
+        Mono<Boolean> isSuccessful =  webClient.delete()
+                .uri("/workspace/%s".formatted(workspace.getId()))
+                .exchangeToMono(clientResponse -> {
+                    if (clientResponse.statusCode().is2xxSuccessful()) {
+                        return Mono.just(true);
+                    } else {
+                        return Mono.just(false);
+                    }
+                });
+
+        if (Boolean.TRUE.equals(isSuccessful.block())) {
+            LOG.info("Active Workspace successful");
+            return true;
+        } else {
+            LOG.error("An error occurs when calling to %s. Can not active Workspace".formatted(AUTHEN_SERVICE_URL));
             return false;
         }
     }
