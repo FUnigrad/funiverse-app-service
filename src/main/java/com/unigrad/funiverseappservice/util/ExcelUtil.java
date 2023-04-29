@@ -115,10 +115,12 @@ public class ExcelUtil {
 
     public static XSSFWorkbook getTemplate(String object) {
         XSSFWorkbook workbook = new XSSFWorkbook();
-        if ("All".equals(object)) {
+        if ("All".equalsIgnoreCase(object)) {
             for (String sheet : SHEETS) {
                 createSheet(sheet, workbook);
             }
+        } else {
+            createSheet(object.toUpperCase(), workbook);
         }
 
         return workbook;
