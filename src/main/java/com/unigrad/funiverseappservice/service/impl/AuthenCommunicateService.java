@@ -97,7 +97,7 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
 
         Workspace workspace = workspaceService.get();
 
-        Mono<Boolean> isSuccessful =  webClient.delete()
+        Mono<Boolean> isSuccessful =  webClient.put()
                 .uri("/workspace/%s".formatted(workspace.getId()))
                 .exchangeToMono(clientResponse -> {
                     if (clientResponse.statusCode().is2xxSuccessful()) {

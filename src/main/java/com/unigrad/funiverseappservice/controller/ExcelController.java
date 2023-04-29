@@ -1,23 +1,27 @@
 package com.unigrad.funiverseappservice.controller;
 
+import com.unigrad.funiverseappservice.entity.Workspace;
 import com.unigrad.funiverseappservice.entity.academic.*;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.exception.InvalidActionException;
 import com.unigrad.funiverseappservice.exception.InvalidValueException;
+import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
 import com.unigrad.funiverseappservice.payload.excel.*;
 import com.unigrad.funiverseappservice.service.*;
 import com.unigrad.funiverseappservice.util.ExcelUtil;
 import com.unigrad.funiverseappservice.util.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,9 +56,11 @@ public class ExcelController {
 
     private final IGroupService groupService;
 
+    private final IAuthenCommunicateService authenCommunicateService;
+
     @PostMapping
     @Transactional(rollbackOn = {InvalidActionException.class, EntityNotFoundException.class, InvalidValueException.class})
-    public ResponseEntity<Map<String, List<Object>>> importData(@RequestParam("file")MultipartFile file) {
+    public ResponseEntity<Map<String, List<Object>>> importData(@RequestParam("file")MultipartFile file, HttpServletRequest request) {
 
         String message = "";
 
@@ -88,7 +94,16 @@ public class ExcelController {
                                 curriculumMap.put(((CurriculumFlat) o).getId(), curriculum);
                             }
                             case "CurriculumPlanFlat" -> objects.add(curriculumPlanService.save(buildCurriculumPlan((CurriculumPlanFlat) o, curriculumMap, syllabusMap)));
-                            case "UserFlat" -> objects.add(userDetailService.save(buildUser((UserFlat) o, curriculumMap)));
+                            case "UserFlat" -> {
+                                UserDetail userDetail = buildUser((UserFlat) o, curriculumMap);
+                                objects.add(userDetailService.save(userDetail));
+
+                                String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+                                if (!authenCommunicateService.saveUser(userDetail, token)) {
+                                    throw new ServiceCommunicateException("An error occurs when call to Authen Service");
+                                }
+                            }
                             case "GroupFlat" -> objects.add(groupService.save(buildGroup((GroupFlat) o, curriculumMap)));
                             default -> {
                                 LOG.warn("No class found");
