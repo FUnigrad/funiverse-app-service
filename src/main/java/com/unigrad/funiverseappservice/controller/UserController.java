@@ -329,9 +329,6 @@ public class UserController {
 
     @GetMapping("/notification")
     public SseEmitter subscribe() {
-        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        LOG.info("%s subscribing notification".formatted(userDetail.getCode()));
 
         SseEmitter sseEmitter = new SseEmitter(24 * 60 * 60 * 1000L);
         emitterService.addEmitter(sseEmitter);
