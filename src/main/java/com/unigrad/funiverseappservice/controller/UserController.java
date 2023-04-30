@@ -4,22 +4,12 @@ import com.unigrad.funiverseappservice.entity.Workspace;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Slot;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
-import com.unigrad.funiverseappservice.entity.socialnetwork.Role;
-import com.unigrad.funiverseappservice.entity.socialnetwork.TimetableEvent;
-import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.entity.socialnetwork.*;
 import com.unigrad.funiverseappservice.exception.InvalidActionException;
 import com.unigrad.funiverseappservice.exception.ServiceCommunicateException;
 import com.unigrad.funiverseappservice.payload.DTO.TimetableEventDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
-import com.unigrad.funiverseappservice.service.IAuthenCommunicateService;
-import com.unigrad.funiverseappservice.service.ICurriculumPlanService;
-import com.unigrad.funiverseappservice.service.ICurriculumService;
-import com.unigrad.funiverseappservice.service.IEventService;
-import com.unigrad.funiverseappservice.service.IGroupService;
-import com.unigrad.funiverseappservice.service.ITimetableEventService;
-import com.unigrad.funiverseappservice.service.IWorkspaceService;
+import com.unigrad.funiverseappservice.service.*;
 import com.unigrad.funiverseappservice.service.impl.EmitterService;
 import com.unigrad.funiverseappservice.service.impl.GroupMemberService;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
@@ -81,6 +71,10 @@ public class UserController {
     private final EmitterService emitterService;
 
     private final ICurriculumService curriculumService;
+
+    private final IPostService postService;
+
+    private final ICommentService commentService;
 
     @GetMapping
     public ResponseEntity<List<UserDetail>> getAll() {
@@ -335,5 +329,32 @@ public class UserController {
 
         LOG.info("Subscribed");
         return sseEmitter;
+    }
+
+    @GetMapping("permission")
+    public ResponseEntity<Boolean> checkPermissionDelete(@RequestParam String object, @RequestParam Long id) {
+        UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if ("member".equalsIgnoreCase(object)) {
+
+            if (groupService.isExist(id)) {
+                return ResponseEntity.ok(groupMemberService.isGroupAdmin(userDetail.getId(), id));
+            }
+        } else if ("post".equalsIgnoreCase(object)) {
+
+            Optional<Post> postOptional = postService.get(id);
+
+            if (postOptional.isPresent()) {
+                return ResponseEntity.ok(postOptional.get().getOwner().getId().equals(userDetail.getId()));
+            }
+        } else if ("comment".equalsIgnoreCase(object)) {
+            Optional<Comment> commentOptional = commentService.get(id);
+
+            if (commentOptional.isPresent()) {
+                return ResponseEntity.ok(commentOptional.get().getOwner().getId().equals(userDetail.getId()));
+            }
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
