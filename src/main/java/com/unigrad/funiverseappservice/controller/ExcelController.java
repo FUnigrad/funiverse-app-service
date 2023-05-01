@@ -186,6 +186,7 @@ public class ExcelController {
                 .description(curriculumFlat.getDescription())
                 .noSemester(Integer.valueOf(curriculumFlat.getNo_semester()))
                 .startedTerm(termService.getOrCreate(curriculumFlat.getStart_term()))
+                .currentSemester(0)
                 .isActive(true)
                 .specialization(specializationService.getByCode(curriculumFlat.getSpecialization_code())
                         .orElseThrow(() -> new EntityNotFoundException("Specialization code %s not found".formatted(curriculumFlat.getSpecialization_code()))))

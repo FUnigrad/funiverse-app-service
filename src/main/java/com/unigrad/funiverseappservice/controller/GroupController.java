@@ -206,7 +206,7 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<List<Group>> getAll() {
-
+        // todo order by latest
         List<Group> groups = groupService.getAllActive();
 
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

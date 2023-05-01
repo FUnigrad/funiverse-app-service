@@ -4,6 +4,9 @@ import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.academic.Term;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
+import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.TermDTO;
 import com.unigrad.funiverseappservice.payload.request.StartDateRequest;
 import com.unigrad.funiverseappservice.service.*;
@@ -39,6 +42,8 @@ public class TermController {
     private final ICurriculumService curriculumService;
 
     private final IGroupService groupService;
+
+    private final IGroupMemberService groupMemberService;
 
     @PostMapping()
     public ResponseEntity<Void> create(@RequestBody TermDTO termDTO) {
@@ -130,6 +135,11 @@ public class TermController {
                 .createdDateTime(LocalDateTime.now())
                 .type(Group.Type.COURSE)
                 .build();
+
+        List<UserDetail> students = groupMemberService.getAllUsersInGroup(clazz.getId());
+        for (UserDetail student : students) {
+            groupMemberService.addMemberToGroup(new GroupMemberDTO(student.getId(), clazz.getId(), false));
+        }
 
         return groupService.save(course);
     }
