@@ -263,7 +263,7 @@ public class GroupController {
                             .createdTime(LocalDateTime.now())
                             .build();
 
-                    emitterService.pushNotification(eventService.save(event));
+//                    emitterService.pushNotification(eventService.save(event));
                 });
             }
 
@@ -373,7 +373,7 @@ public class GroupController {
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
-                            emitterService.pushNotification(eventService.save(event));
+//                            emitterService.pushNotification(eventService.save(event));
                         }
                     });
 
@@ -401,7 +401,7 @@ public class GroupController {
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
-                            emitterService.pushNotification(eventService.save(event));
+//                            emitterService.pushNotification(eventService.save(event));
                         }
                     });
 
@@ -460,7 +460,7 @@ public class GroupController {
                         .createdTime(LocalDateTime.now())
                         .build();
 
-                emitterService.pushNotification(eventService.save(event));
+//                emitterService.pushNotification(eventService.save(event));
             }
 
             return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));
