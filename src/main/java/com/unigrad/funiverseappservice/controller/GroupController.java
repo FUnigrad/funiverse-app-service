@@ -195,7 +195,7 @@ public class GroupController {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!userDetail.isAdmin()) {
-            if (groupMemberService.isGroupMember(userDetail.getId(), id)) {
+            if (groupMemberService.isGroupMember(userDetail.getId(), id) || !groupOptional.get().isPrivate() || Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) {
                 return ResponseEntity.ok(groupOptional.get());
             } else {
                 throw new AccessDeniedException("You don not have permission to perform this action");
