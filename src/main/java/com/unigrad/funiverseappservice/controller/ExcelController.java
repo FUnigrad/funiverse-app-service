@@ -150,6 +150,7 @@ public class ExcelController {
                 .role(Role.valueOf(userFlat.getRole()))
                 .identifyNumber(userFlat.getIdentify_number())
                 .phoneNumber(userFlat.getPhone_number())
+                .isActive(true)
                 .build();
 
         if (Role.STUDENT.equals(userDetail.getRole()) && userFlat.getCurriculum_code() != null) {
@@ -185,6 +186,7 @@ public class ExcelController {
                 .description(curriculumFlat.getDescription())
                 .noSemester(Integer.valueOf(curriculumFlat.getNo_semester()))
                 .startedTerm(termService.getOrCreate(curriculumFlat.getStart_term()))
+                .isActive(true)
                 .specialization(specializationService.getByCode(curriculumFlat.getSpecialization_code())
                         .orElseThrow(() -> new EntityNotFoundException("Specialization code %s not found".formatted(curriculumFlat.getSpecialization_code()))))
                 .build();
@@ -225,6 +227,7 @@ public class ExcelController {
         Group group = Group.builder()
                 .name(groupFlat.getName())
                 .type(Group.Type.valueOf(groupFlat.getType()))
+                .isActive(true)
                 .build();
 
         if (Group.Type.COURSE.equals(group.getType())) {
@@ -267,6 +270,7 @@ public class ExcelController {
         return Major.builder()
                 .code(majorFlat.getCode())
                 .name(majorFlat.getName())
+                .isActive(true)
                 .build();
     }
 
@@ -277,6 +281,7 @@ public class ExcelController {
                 .studentCode(specializationFlat.getStudent_code())
                 .major(majorService.findByCode(specializationFlat.getMajor_code())
                         .orElseThrow(() -> new EntityNotFoundException("Major code %s not found".formatted(specializationFlat.getMajor_code()))))
+                .isActive(true)
                 .build();
     }
 
@@ -284,6 +289,7 @@ public class ExcelController {
         return Subject.builder()
                 .code(subjectFlat.getCode())
                 .name(subjectFlat.getName())
+                .isActive(true)
                 .build();
     }
 
@@ -295,6 +301,7 @@ public class ExcelController {
                 .noSlot(Integer.valueOf(syllabusFlat.getNo_slot()))
                 .minAvgMarkToPass(Integer.valueOf(syllabusFlat.getMin_avg_mark_to_pass()))
                 .description(syllabusFlat.getDescription())
+                .isActive(true)
                 .build();
 
         Subject subject = subjectMap.get(syllabusFlat.getSubject_code());
