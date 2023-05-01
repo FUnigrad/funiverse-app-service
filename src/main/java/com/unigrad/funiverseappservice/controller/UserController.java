@@ -229,7 +229,7 @@ public class UserController {
 
         if (Group.Type.CLASS.equals(group.getType()) || Group.Type.COURSE.equals(group.getType())) {
             usersNotInGroup = usersNotInGroup.stream()
-                    .filter(user -> Objects.equals(user.getCurriculum().getId(), group.getCurriculum().getId()) && Role.STUDENT.equals(user.getRole())).toList();
+                    .filter(user -> user.getCurriculum() != null && Objects.equals(user.getCurriculum().getId(), group.getCurriculum().getId()) && Role.STUDENT.equals(user.getRole())).toList();
         }
 
         return ResponseEntity.ok(Arrays.stream(dtoConverter.convert(usersNotInGroup, UserDTO[].class)).toList());
