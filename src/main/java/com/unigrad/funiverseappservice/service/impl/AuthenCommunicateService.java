@@ -129,7 +129,7 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
             webClient = WebClient.builder()
                     .baseUrl("https://" + AUTHEN_SERVICE_URL)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                    .defaultHeader(HttpHeaders.AUTHORIZATION, token)
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, token)
                     .clientConnector(new ReactorClientHttpConnector(httpClient))
                     .build();
 
