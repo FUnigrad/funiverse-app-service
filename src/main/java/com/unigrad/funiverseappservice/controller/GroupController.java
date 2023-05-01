@@ -214,6 +214,7 @@ public class GroupController {
         if (!userDetail.isAdmin()) {
             groups = groups.stream()
                     .filter(group -> groupMemberService.isGroupMember(userDetail.getId(), group.getId()))
+                    .filter(Group::isPublish)
                     .collect(Collectors.toList());
         } else {
             groups.sort(Comparator.comparing(Group::getCreatedDateTime));
