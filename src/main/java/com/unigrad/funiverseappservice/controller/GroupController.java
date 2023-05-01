@@ -215,6 +215,8 @@ public class GroupController {
             groups = groups.stream()
                     .filter(group -> groupMemberService.isGroupMember(userDetail.getId(), group.getId()))
                     .collect(Collectors.toList());
+        } else {
+            groups.sort(Comparator.comparing(Group::getCreatedDateTime));
         }
 
         return ResponseEntity.ok(groups);
@@ -245,6 +247,8 @@ public class GroupController {
         if (groupOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        // todo class have same curriculum must have diffirent students
 
         if (groupMemberService.isGroupAdmin(userDetail.getId(), id) || userDetail.isAdmin()) {
             for (Long memberId : memberIds) {
