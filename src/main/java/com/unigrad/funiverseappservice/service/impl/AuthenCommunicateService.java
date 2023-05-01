@@ -127,9 +127,9 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
                     .responseTimeout(Duration.ofSeconds(60));
 
             webClient = WebClient.builder()
-                    .baseUrl("http://" + AUTHEN_SERVICE_URL)
+                    .baseUrl("https://" + AUTHEN_SERVICE_URL)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .defaultHeader(HttpHeaders.AUTHORIZATION, token)
+//                    .defaultHeader(HttpHeaders.AUTHORIZATION, token)
                     .clientConnector(new ReactorClientHttpConnector(httpClient))
                     .build();
 
