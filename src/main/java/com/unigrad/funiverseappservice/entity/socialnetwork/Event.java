@@ -60,7 +60,8 @@ public class Event {
         NEW_COMMENT,
         REACTION,
         SET_GROUP_ADMIN,
-        ADD_TO_GROUP;
+        ADD_TO_GROUP,
+        NEW_SEMESTER
     }
 
     @Getter

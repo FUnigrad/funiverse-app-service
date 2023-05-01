@@ -229,6 +229,7 @@ public class ExcelController {
                 .name(groupFlat.getName())
                 .type(Group.Type.valueOf(groupFlat.getType()))
                 .isActive(true)
+                .isPublish(true)
                 .build();
 
         if (Group.Type.COURSE.equals(group.getType())) {
@@ -248,6 +249,8 @@ public class ExcelController {
                 }
 
                 group.setCurriculum(curriculumOptional.get());
+                group.setPublish(false);
+                group.setPrivate(true);
 
                 String name = curriculumOptional.get().getSpecialization().getCode() + curriculumOptional.get().getSchoolYear().substring(1);
                 int order = groupService.getNextNameOrderForClass(name);
@@ -256,12 +259,16 @@ public class ExcelController {
 
             } else {
                 group.setCurriculum(curriculum);
+                group.setPublish(false);
+                group.setPrivate(true);
 
                 String name = curriculum.getSpecialization().getCode() + curriculum.getSchoolYear().substring(1);
                 int order = groupService.getNextNameOrderForClass(name);
                 name += String.format("%02d", order);
                 group.setName(name);
             }
+        } else if (Group.Type.DEPARTMENT.equals(group.getType())) {
+            group.setPrivate(false);
         }
 
         return group;

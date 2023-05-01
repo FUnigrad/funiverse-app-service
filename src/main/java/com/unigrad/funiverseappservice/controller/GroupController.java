@@ -165,6 +165,7 @@ public class GroupController {
                     .isActive(true)
                     .createdDateTime(LocalDateTime.now())
                     .isPrivate(true)
+                    .isPublish(true)
                     .build();
 
             returnGroup = groupService.save(newGroup);
@@ -206,14 +207,14 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<List<Group>> getAll() {
-        // todo order by latest
         List<Group> groups = groupService.getAllActive();
 
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!userDetail.isAdmin()) {
             groups = groups.stream()
-                    .filter(group -> groupMemberService.isGroupMember(userDetail.getId(), group.getId()))
+                    .filter(group -> groupMemberService.isGroupMember(userDetail.getId(), group.getId())
+                            || !group.isPrivate() || Group.Type.DEPARTMENT.equals(group.getType()))
                     .filter(Group::isPublish)
                     .collect(Collectors.toList());
         } else {
@@ -268,7 +269,7 @@ public class GroupController {
                             .createdTime(LocalDateTime.now())
                             .build();
 
-//                    emitterService.pushNotification(eventService.save(event));
+                    eventService.save(event);
                 });
             }
 
@@ -378,7 +379,7 @@ public class GroupController {
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
-//                            emitterService.pushNotification(eventService.save(event));
+                            eventService.save(event);
                         }
                     });
 
@@ -406,7 +407,7 @@ public class GroupController {
                                     .createdTime(LocalDateTime.now())
                                     .build();
 
-//                            emitterService.pushNotification(eventService.save(event));
+                            eventService.save(event);
                         }
                     });
 
@@ -465,7 +466,7 @@ public class GroupController {
                         .createdTime(LocalDateTime.now())
                         .build();
 
-//                emitterService.pushNotification(eventService.save(event));
+                eventService.save(event);
             }
 
             return ResponseEntity.ok(dtoConverter.convert(groupMemberService.save(groupMemberOpt.get()), GroupMemberDTO.class));

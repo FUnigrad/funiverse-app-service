@@ -3,6 +3,7 @@ package com.unigrad.funiverseappservice.controller;
 import com.unigrad.funiverseappservice.entity.academic.Curriculum;
 import com.unigrad.funiverseappservice.entity.academic.Syllabus;
 import com.unigrad.funiverseappservice.entity.academic.Term;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
@@ -13,6 +14,7 @@ import com.unigrad.funiverseappservice.service.*;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +46,10 @@ public class TermController {
     private final IGroupService groupService;
 
     private final IGroupMemberService groupMemberService;
+
+    private final IUserDetailService userDetailService;
+
+    private final IEventService eventService;
 
     @PostMapping()
     public ResponseEntity<Void> create(@RequestBody TermDTO termDTO) {
@@ -166,6 +172,51 @@ public class TermController {
                     curriculumService.save(curriculum);
                 }
             });
+
+            Map<Long, List<Syllabus>> curriculumSyllabusMap = new HashMap<>();
+            Map<Long, List<Group>> curriculumClassMap = new HashMap<>();
+            Map<Long, Curriculum> curriculumMap = new HashMap<>();
+
+            curriculaInNextTerm.forEach(curriculum -> {
+                curriculumSyllabusMap.put(curriculum.getId(), curriculumPlanService.getAllSyllabusByCurriculumIdAndSemester(curriculum.getId(), curriculum.getCurrentSemester() + 1));
+                curriculumClassMap.put(curriculum.getId(), groupService.getAllClassByCurriculumId(curriculum.getId()));
+                curriculumMap.put(curriculum.getId(), curriculum);
+            });
+
+            // 4. Create Group by Syllabus and Class
+            // There are some group that already created and some group will be created
+            List<Group> groups = new ArrayList<>();
+
+            for (Map.Entry<Long, List<Syllabus>> entry : curriculumSyllabusMap.entrySet()) {
+                for (Group group : curriculumClassMap.get(entry.getKey())) {
+                    for (Syllabus syllabus : entry.getValue()) {
+                        groups.add(prepareCourseGroup(syllabus, group, curriculumMap.get(entry.getKey())));
+                    }
+                }
+            }
+
+            for (Group group : groups) {
+                group.setPublish(true);
+                groupService.save(group);
+            }
+
+            List<UserDetail> userDetails = userDetailService.getAllActive();
+            UserDetail admin = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            for (UserDetail user : userDetails) {
+                Event event = Event.builder()
+                        .actor(admin)
+                        .receiver(user)
+                        .sourceId(null)
+                        .sourceType(null)
+                        .type(Event.Type.NEW_SEMESTER)
+                        .group(null)
+                        .createdTime(LocalDateTime.now())
+                        .build();
+
+                eventService.save(event);
+            }
+
             return ResponseEntity.ok(workspaceService.startNextTerm());
         }
 

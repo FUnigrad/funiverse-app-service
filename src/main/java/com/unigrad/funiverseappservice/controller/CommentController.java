@@ -75,7 +75,7 @@ public class CommentController {
                                                 .createdTime(LocalDateTime.now())
                                                 .build();
 
-//                                        emitterService.pushNotification(eventService.save(event));
+                                        eventService.save(event);
                                     }
                                 });
 

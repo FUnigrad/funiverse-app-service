@@ -80,7 +80,7 @@ public class PostController {
                                 .createdTime(LocalDateTime.now())
                                 .build();
 
-//                        emitterService.pushNotification(eventService.save(event));
+                        eventService.save(event);
                     }
                 });
 
@@ -158,7 +158,7 @@ public class PostController {
                                 .createdTime(LocalDateTime.now())
                                 .build();
 
-//                        emitterService.pushNotification(eventService.save(event));
+                        eventService.save(event);
                     }
                 });
 
