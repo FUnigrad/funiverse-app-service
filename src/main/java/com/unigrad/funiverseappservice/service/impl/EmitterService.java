@@ -22,14 +22,14 @@ public class EmitterService {
     }
 
     public void pushNotification(Event event) {
-        log.info("Pushing notification for user {}", event.getReceiver().getCode());
+        log.info("Pushing notification for user {}", event.getReceiver().getPersonalMail());
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
         emitters.forEach(emitter -> {
             try {
                 emitter.send(SseEmitter
                         .event()
-                        .name(event.getReceiver().getCode())
+                        .name(event.getReceiver().getPersonalMail())
                         .data(event));
 
             } catch (IOException e) {

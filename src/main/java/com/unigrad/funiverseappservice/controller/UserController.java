@@ -324,7 +324,7 @@ public class UserController {
     @GetMapping("/notification")
     public SseEmitter subscribe() {
 
-        SseEmitter sseEmitter = new SseEmitter(24 * 60 * 60 * 1000L);
+        SseEmitter sseEmitter = new SseEmitter(24 * 60 * 60 * 1000000L);
         emitterService.addEmitter(sseEmitter);
 
         LOG.info("Subscribed");
