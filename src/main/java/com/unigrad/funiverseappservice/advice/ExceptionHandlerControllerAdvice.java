@@ -18,7 +18,7 @@ public class ExceptionHandlerControllerAdvice {
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 ex.getMessage(),
-                ex.getCause().toString(),
+                ex.getCause() != null ? ex.getCause().getMessage() : "",
                 request.getDescription(false)
         );
     }
