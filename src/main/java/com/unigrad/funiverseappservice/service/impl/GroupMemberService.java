@@ -42,6 +42,11 @@ public class GroupMemberService implements IGroupMemberService {
     }
 
     @Override
+    public boolean isUserHaveClass(Long userId) {
+        return groupMemberRepository.isUserHaveClass(userId);
+    }
+
+    @Override
     public List<GroupMember> getAll() {
         return groupMemberRepository.findAll();
     }

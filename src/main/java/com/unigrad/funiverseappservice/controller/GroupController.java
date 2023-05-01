@@ -250,8 +250,6 @@ public class GroupController {
             return ResponseEntity.notFound().build();
         }
 
-        // todo class have same curriculum must have diffirent students
-
         if (groupMemberService.isGroupAdmin(userDetail.getId(), id) || userDetail.isAdmin()) {
             for (Long memberId : memberIds) {
                 Optional<UserDetail> memberOptional = userDetailService.get(memberId);

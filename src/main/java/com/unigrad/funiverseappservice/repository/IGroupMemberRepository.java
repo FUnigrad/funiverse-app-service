@@ -30,4 +30,7 @@ public interface IGroupMemberRepository extends JpaRepository<GroupMember, Group
     @Query(value = "delete from GroupMember gm where gm.group.id = :groupId")
     @Modifying
     void deleteAllByGroupId(Long groupId);
+
+    @Query(value = "select count (gm) > 0 from GroupMember gm where gm.user.id = :userId and gm.group.type = 'CLASS'")
+    boolean isUserHaveClass(Long userId);
 }
