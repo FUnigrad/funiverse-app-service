@@ -162,6 +162,21 @@ public class PostController {
                     }
                 });
 
+        if (!userDetail.getId().equals(postOptional.get().getOwner().getId())) {
+            Event event = Event.builder()
+                    .actor(comment.getOwner())
+                    .receiver(postOptional.get().getOwner())
+                    .type(Event.Type.NEW_COMMENT)
+                    .sourceId(postOptional.get().getId())
+                    .sourceType(Event.SourceType.POST)
+                    .group(postOptional.get().getGroup())
+                    .createdTime(LocalDateTime.now())
+                    .build();
+
+            eventService.save(event);
+        }
+
+
         return ResponseEntity.ok().body(dtoConverter.convert(comment, CommentDTO.class));
     }
 }
