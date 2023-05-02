@@ -230,7 +230,7 @@ public class UserController {
         if (Group.Type.CLASS.equals(group.getType())) {
             usersNotInGroup = usersNotInGroup.stream()
                     .filter(user -> user.getCurriculum() != null && Objects.equals(user.getCurriculum().getId(), group.getCurriculum().getId()) && Role.STUDENT.equals(user.getRole()))
-                    .filter(user -> groupMemberService.isUserHaveClass(user.getId()))
+                    .filter(user -> !groupMemberService.isUserHaveClass(user.getId()))
                     .toList();
         } else if (Group.Type.COURSE.equals(group.getType())) {
             usersNotInGroup = usersNotInGroup.stream()
