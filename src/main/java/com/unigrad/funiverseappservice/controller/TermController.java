@@ -7,6 +7,7 @@ import com.unigrad.funiverseappservice.entity.socialnetwork.Event;
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.GroupMember;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
+import com.unigrad.funiverseappservice.exception.InvalidActionException;
 import com.unigrad.funiverseappservice.payload.DTO.GroupMemberDTO;
 import com.unigrad.funiverseappservice.payload.DTO.TermDTO;
 import com.unigrad.funiverseappservice.payload.request.StartDateRequest;
@@ -107,6 +108,12 @@ public class TermController {
             curriculumClassMap.put(curriculum.getId(), groupService.getAllClassByCurriculumId(curriculum.getId()));
             curriculumMap.put(curriculum.getId(), curriculum);
         });
+
+        for (Long aLong : curriculumClassMap.keySet()) {
+            if (curriculumClassMap.get(aLong).isEmpty()) {
+                throw new InvalidActionException("Do not have any Class for curriculum %s".formatted(curriculumMap.get(aLong).getCode()));
+            }
+        }
 
         // 4. Create Group by Syllabus and Class
         // There are some group that already created and some group will be created
