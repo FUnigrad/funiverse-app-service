@@ -59,7 +59,7 @@ public class ExcelController {
     private final IAuthenCommunicateService authenCommunicateService;
 
     @PostMapping
-    @Transactional(rollbackOn = {InvalidActionException.class, EntityNotFoundException.class, InvalidValueException.class})
+    @Transactional(rollbackOn = RuntimeException.class)
     public ResponseEntity<Map<String, List<Object>>> importData(@RequestParam("file")MultipartFile file, HttpServletRequest request) {
 
         String message = "";
