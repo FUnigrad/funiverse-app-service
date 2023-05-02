@@ -60,7 +60,7 @@ public class CurriculumService implements ICurriculumService {
         entity.setStartedTerm(term.orElseGet(() -> termService.save(entity.getStartedTerm())));
 
         if (!schoolYearService.isExist(entity.getSchoolYear())) {
-            schoolYearService.save(entity.getSchoolYear(), 0L);
+            schoolYearService.save(entity.getSchoolYear(), 1L);
         }
 
         return curriculumRepository.save(entity);
