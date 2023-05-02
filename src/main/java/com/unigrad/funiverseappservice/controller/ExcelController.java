@@ -226,12 +226,13 @@ public class ExcelController {
         return curriculumPlan;
     }
 
-    private Group buildGroup(GroupFlat groupFlat, Map<String, Curriculum> curriculumMap) {
+    private Group  buildGroup(GroupFlat groupFlat, Map<String, Curriculum> curriculumMap) {
         Group group = Group.builder()
                 .name(groupFlat.getName())
                 .type(Group.Type.valueOf(groupFlat.getType()))
                 .isActive(true)
                 .isPublish(true)
+                .isPrivate(true)
                 .build();
 
         if (Group.Type.COURSE.equals(group.getType())) {
@@ -262,7 +263,6 @@ public class ExcelController {
             } else {
                 group.setCurriculum(curriculum);
                 group.setPublish(false);
-                group.setPrivate(true);
 
                 String name = curriculum.getSpecialization().getCode() + curriculum.getSchoolYear().substring(1);
                 int order = groupService.getNextNameOrderForClass(name);
