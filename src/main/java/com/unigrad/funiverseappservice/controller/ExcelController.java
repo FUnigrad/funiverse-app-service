@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,7 +60,7 @@ public class ExcelController {
     private final IAuthenCommunicateService authenCommunicateService;
 
     @PostMapping
-    @Transactional(rollbackOn = RuntimeException.class)
+    @Transactional(rollbackOn = InvalidValueException.class)
     public ResponseEntity<Map<String, List<Object>>> importData(@RequestParam("file")MultipartFile file, HttpServletRequest request) {
 
         String message = "";
@@ -118,6 +119,7 @@ public class ExcelController {
                 return ResponseEntity.ok(result);
             } catch (Exception e) {
                 message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 throw new InvalidValueException(message, e);
             }
         }
