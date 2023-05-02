@@ -397,7 +397,7 @@ public class GroupController {
                             Event event = Event.builder()
                                     .actor(owner)
                                     .receiver(user)
-                                    .type(Event.Type.MENTION)
+                                    .type(Event.Type.NEW_POST)
                                     .sourceId(post.getId())
                                     .sourceType(Event.SourceType.POST)
                                     .group(post.getGroup())
