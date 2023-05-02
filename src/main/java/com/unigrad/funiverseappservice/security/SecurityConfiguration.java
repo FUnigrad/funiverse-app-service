@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 // notification
                 .requestMatchers("/user/notification/**").permitAll()
+                .requestMatchers("/workspace").permitAll()
                 // admin
                 .requestMatchers("subject/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
                 .requestMatchers("syllabus/**").hasAuthority(Role.WORKSPACE_ADMIN.toString())
