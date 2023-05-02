@@ -151,7 +151,7 @@ public class TermController {
 
         List<UserDetail> students = groupMemberService.getAllUsersInGroup(clazz.getId());
         for (UserDetail student : students) {
-            groupMemberService.addMemberToGroup(new GroupMemberDTO(student.getId(), clazz.getId(), false));
+            groupMemberService.addMemberToGroup(new GroupMemberDTO(student.getId(), course.getId(), false));
         }
 
         return groupService.save(course);
