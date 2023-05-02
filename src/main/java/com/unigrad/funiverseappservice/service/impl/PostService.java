@@ -89,7 +89,8 @@ public class PostService implements IPostService {
         List<PostDTO> result = new ArrayList<>();
 
         for (Post post : posts) {
-            if (!post.getGroup().isPrivate() || groupMemberService.isGroupMember(userId, post.getGroup().getId())) {
+            if ((!post.getGroup().isPrivate() || groupMemberService.isGroupMember(userId, post.getGroup().getId()))
+            && post.getGroup().isPublish() && post.getGroup().isActive()) {
                 result.add(dtoConverter.convert(post, PostDTO.class));
             }
         }

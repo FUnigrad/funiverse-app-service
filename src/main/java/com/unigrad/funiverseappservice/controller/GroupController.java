@@ -98,8 +98,6 @@ public class GroupController {
 
     private final IEmailService emailService;
 
-    private final EmitterService emitterService;
-
     private final DTOConverter dtoConverter;
 
     @PostMapping
@@ -195,7 +193,8 @@ public class GroupController {
         UserDetail userDetail = (UserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!userDetail.isAdmin()) {
-            if (groupMemberService.isGroupMember(userDetail.getId(), id) || !groupOptional.get().isPrivate() || Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) {
+            if ((groupMemberService.isGroupMember(userDetail.getId(), id) || !groupOptional.get().isPrivate()
+                    || Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) && groupOptional.get().isPublish()) {
                 return ResponseEntity.ok(groupOptional.get());
             } else {
                 throw new AccessDeniedException("You don not have permission to perform this action");
@@ -218,7 +217,7 @@ public class GroupController {
                     .filter(Group::isPublish)
                     .collect(Collectors.toList());
         } else {
-            groups.sort(Comparator.comparing(Group::getCreatedDateTime));
+            groups.sort(Comparator.comparing(Group::getCreatedDateTime).reversed());
         }
 
         return ResponseEntity.ok(groups);
@@ -390,7 +389,7 @@ public class GroupController {
                 members = groupMemberService.getAllUsersInGroup(groupOptional.get().getId());
             }
 
-            members = members.stream().filter(userDetail -> mentionUserIds.contains(userDetail.getId())).toList();
+            members = members.stream().filter(userDetail -> !mentionUserIds.contains(userDetail.getId())).toList();
 
             members
                     .forEach(user -> {

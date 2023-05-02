@@ -162,6 +162,16 @@ public class TermController {
             curriculaInNextTerm.addAll(curriculumService.getCurriculumByCurrentTerm(currentTerm.getId()));
             curriculaInNextTerm.addAll(curriculumService.getCurriculumByStartedTerm(nextTerm.getId()));
 
+            Map<Long, List<Syllabus>> curriculumSyllabusMap = new HashMap<>();
+            Map<Long, List<Group>> curriculumClassMap = new HashMap<>();
+            Map<Long, Curriculum> curriculumMap = new HashMap<>();
+
+            curriculaInNextTerm.forEach(curriculum -> {
+                curriculumSyllabusMap.put(curriculum.getId(), curriculumPlanService.getAllSyllabusByCurriculumIdAndSemester(curriculum.getId(), curriculum.getCurrentSemester() + 1));
+                curriculumClassMap.put(curriculum.getId(), groupService.getAllClassByCurriculumId(curriculum.getId()));
+                curriculumMap.put(curriculum.getId(), curriculum);
+            });
+
             // Update next current term
             curriculaInNextTerm.forEach(curriculum -> {
                 // Check if current is last semester
@@ -173,18 +183,6 @@ public class TermController {
                 }
             });
 
-            Map<Long, List<Syllabus>> curriculumSyllabusMap = new HashMap<>();
-            Map<Long, List<Group>> curriculumClassMap = new HashMap<>();
-            Map<Long, Curriculum> curriculumMap = new HashMap<>();
-
-            curriculaInNextTerm.forEach(curriculum -> {
-                curriculumSyllabusMap.put(curriculum.getId(), curriculumPlanService.getAllSyllabusByCurriculumIdAndSemester(curriculum.getId(), curriculum.getCurrentSemester() + 1));
-                curriculumClassMap.put(curriculum.getId(), groupService.getAllClassByCurriculumId(curriculum.getId()));
-                curriculumMap.put(curriculum.getId(), curriculum);
-            });
-
-            // 4. Create Group by Syllabus and Class
-            // There are some group that already created and some group will be created
             List<Group> groups = new ArrayList<>();
 
             for (Map.Entry<Long, List<Syllabus>> entry : curriculumSyllabusMap.entrySet()) {
@@ -211,6 +209,7 @@ public class TermController {
                         .sourceType(null)
                         .type(Event.Type.NEW_SEMESTER)
                         .group(null)
+                        .term(nextTerm.toString())
                         .createdTime(LocalDateTime.now())
                         .build();
 

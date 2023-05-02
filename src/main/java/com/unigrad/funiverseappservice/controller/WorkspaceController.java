@@ -3,15 +3,13 @@ package com.unigrad.funiverseappservice.controller;
 import com.unigrad.funiverseappservice.entity.Workspace;
 import com.unigrad.funiverseappservice.entity.academic.Season;
 import com.unigrad.funiverseappservice.entity.academic.Term;
+import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
 import com.unigrad.funiverseappservice.entity.socialnetwork.UserDetail;
 import com.unigrad.funiverseappservice.payload.DTO.PostDTO;
 import com.unigrad.funiverseappservice.payload.DTO.UserDTO;
 import com.unigrad.funiverseappservice.payload.request.OnBoardingRequest;
 import com.unigrad.funiverseappservice.payload.request.SeasonOnboardRequest;
-import com.unigrad.funiverseappservice.service.IAuthenCommunicateService;
-import com.unigrad.funiverseappservice.service.IPostService;
-import com.unigrad.funiverseappservice.service.ISeasonService;
-import com.unigrad.funiverseappservice.service.IWorkspaceService;
+import com.unigrad.funiverseappservice.service.*;
 import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +47,8 @@ public class WorkspaceController {
     private final IAuthenCommunicateService authenCommunicateService;
 
     private final DTOConverter dtoConverter;
+
+    private final IGroupService groupService;
 
     @GetMapping
     private ResponseEntity<Workspace> get() {

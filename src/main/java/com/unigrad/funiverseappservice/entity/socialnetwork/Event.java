@@ -45,6 +45,8 @@ public class Event {
     @JoinColumn
     private Group group;
 
+    private String term;
+
     @Enumerated(EnumType.STRING)
     private SourceType sourceType;
 
@@ -69,6 +71,7 @@ public class Event {
     public enum SourceType {
         GROUP,
         POST,
-        COMMENT
+        COMMENT,
+        TERM
     }
 }
