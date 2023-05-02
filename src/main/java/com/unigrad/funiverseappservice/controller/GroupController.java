@@ -408,13 +408,13 @@ public class GroupController {
                         }
                     });
 
-            if (Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) {
-                try {
-                    emailService.sendAnnouncement(groupOptional.get(), members, post);
-                } catch (MessagingException | UnsupportedEncodingException e) {
-                    LOG.error("An unexpected error occurred when trying to send email");
-                };
-            }
+//            if (Group.Type.DEPARTMENT.equals(groupOptional.get().getType())) {
+//                try {
+//                    emailService.sendAnnouncement(groupOptional.get(), members, post);
+//                } catch (MessagingException | UnsupportedEncodingException e) {
+//                    LOG.error("An unexpected error occurred when trying to send email");
+//                };
+//            }
 
             return ResponseEntity.ok().body(dtoConverter.convert(post, PostDTO.class));
         }
