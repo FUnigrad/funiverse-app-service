@@ -124,7 +124,7 @@ public class AuthenCommunicateService implements IAuthenCommunicateService {
 
             HttpClient httpClient = HttpClient.create()
                     .secure(t -> t.sslContext(sslContext))
-                    .responseTimeout(Duration.ofSeconds(60));
+                    .responseTimeout(Duration.ofSeconds(3600));
 
             webClient = WebClient.builder()
                     .baseUrl("https://" + AUTHEN_SERVICE_URL)

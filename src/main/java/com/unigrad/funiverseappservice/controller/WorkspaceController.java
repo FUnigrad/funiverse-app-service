@@ -14,6 +14,8 @@ import com.unigrad.funiverseappservice.service.impl.UserDetailService;
 import com.unigrad.funiverseappservice.util.DTOConverter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +37,8 @@ import java.util.List;
 @RequestMapping("workspace")
 @RequiredArgsConstructor
 public class WorkspaceController {
+
+    private final Logger LOG = LoggerFactory.getLogger(WorkspaceController.class);
 
     private final IWorkspaceService workspaceService;
 
@@ -58,6 +62,7 @@ public class WorkspaceController {
 
     @PostMapping
     private ResponseEntity<Workspace> save(@RequestBody Workspace workspace) {
+        LOG.info("Saving workspace information");
 
         return ResponseEntity.ok(workspaceService.save(workspace));
     }
