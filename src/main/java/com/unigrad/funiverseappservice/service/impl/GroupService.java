@@ -1,6 +1,7 @@
 package com.unigrad.funiverseappservice.service.impl;
 
 import com.unigrad.funiverseappservice.entity.socialnetwork.Group;
+import com.unigrad.funiverseappservice.repository.IGroupMemberRepository;
 import com.unigrad.funiverseappservice.repository.IGroupRepository;
 import com.unigrad.funiverseappservice.service.IGroupService;
 import com.unigrad.funiverseappservice.specification.EntitySpecification;
@@ -17,6 +18,8 @@ import java.util.Optional;
 public class GroupService implements IGroupService {
 
     private final IGroupRepository groupRepository;
+
+    private final IGroupMemberRepository groupMemberRepository;
 
     @Override
     public List<Group> getAll() {
@@ -97,7 +100,13 @@ public class GroupService implements IGroupService {
 
     @Override
     public List<Group> getAllForUser(Long userId, String groupName) {
-        return groupRepository.getGroupForUser(userId, groupName);
+        List<Group> groups = getAllActive();
+
+        groups = groups.stream()
+                .filter(group -> group.getName().contains(groupName) && group.isPublish()
+                                && (groupMemberRepository.isGroupMember(userId, group.getId()) || !group.isPrivate())).toList();
+
+        return groups;
     }
 
     @Override

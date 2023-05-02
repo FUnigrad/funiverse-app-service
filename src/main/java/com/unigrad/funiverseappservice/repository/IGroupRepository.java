@@ -25,10 +25,6 @@ public interface IGroupRepository extends IBaseRepository<Group, Long> {
             "where g.type = 'CLASS' and gm.user.id = :studentId")
     Group getClassByStudentId(Long studentId);
 
-    @Query(value = "select g from Group g left outer join GroupMember gm on g.id = gm.group.id " +
-            "where (g.isPrivate = true and g.isActive = true and gm.user.id = :userId and g.name like %:name%) or (g.isPrivate = false and g.isActive = true)")
-    List<Group> getGroupForUser(Long userId, String name);
-
     @Query(value = "select g from Group g where g.teacher.id = :teacherId and g.isActive = true and g.type = 'COURSE'")
     List<Group> getGroupByTeacherId(Long teacherId);
 }
