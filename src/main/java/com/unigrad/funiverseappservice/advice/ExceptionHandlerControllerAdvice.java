@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @RestControllerAdvice
 public class ExceptionHandlerControllerAdvice {
@@ -18,7 +19,7 @@ public class ExceptionHandlerControllerAdvice {
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 ex.getMessage(),
-                ex.getCause() != null ? ex.getCause().getMessage() : "",
+                ex.getCause() != null ? Arrays.toString(ex.getCause().getStackTrace()) : "",
                 request.getDescription(false)
         );
     }
