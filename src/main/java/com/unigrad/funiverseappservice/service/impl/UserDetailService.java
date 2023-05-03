@@ -91,7 +91,7 @@ public class UserDetailService implements IUserDetailService {
     @Override
     public String generateStudentCode(String schoolYear, String specStudentCode) {
         Long nextSeq = schoolYearService.getNextSeq(schoolYear);
-        return "%s%s%s".formatted(specStudentCode.toLowerCase(), schoolYear.substring(1), String.format("%04d", nextSeq));
+        return "%s%s%s".formatted(specStudentCode.toUpperCase(), schoolYear.substring(1), String.format("%04d", nextSeq));
     }
 
     @Override
